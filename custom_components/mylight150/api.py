@@ -122,9 +122,6 @@ class MyLight150ApiClient:
                     raise MyLight150ApiError(f"Token rejected by API for {endpoint} ({response.status})")
                 response.raise_for_status()
 
-                json_data = await response.json()
-                _LOGGER.debug("MyLight150: API response : %s", json.dumps(json_data, indent=2, ensure_ascii=False)[:200])
-
                 return await response.json()
         except MyLight150AuthError:
             raise
@@ -159,7 +156,7 @@ class MyLight150ApiClient:
         }
 
     # ------------------------------------------------------------------
-    # JWT validation
+    # Token validation
     # ------------------------------------------------------------------
 
     async def _get_signing_key(self, token: str) -> Any:
