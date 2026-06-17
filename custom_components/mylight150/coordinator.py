@@ -145,6 +145,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
         
         except Exception as err:
             _LOGGER.debug("Diagnostics: Error while retrieving %s : %s", endpoint, err)
+            return {}
 
 
     async def _fetch_device_data(self) -> dict[str, Any]:
@@ -168,3 +169,4 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
         
         except Exception as err:
             _LOGGER.debug("Diagnostics: Error while retrieving /v3/equipments : %s", err)
+            return {}
