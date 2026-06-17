@@ -58,10 +58,7 @@
       "solar_production": { "name": "Production solaire" },
       "grid": { "name": "Puissance réseau" },
       "injection": { "name": "Injection réseau" },
-      "load": { "name": "Consommation totale" },
-      "load_home": { "name": "Consommation maison" },
-      "self_consumption": { "name": "Autoconsommation" },
-      "independence": { "name": "Autonomie" },
+      "load": { "name": "Consommation" },
       "msb_state": {
         "name": "État de la batterie virtuelle",
         "state": {
@@ -74,6 +71,7 @@
       "msb_power": { "name": "Puissance batterie virtuelle" },
       "msb_autonomy": { "name": "Autonomie batterie virtuelle" },
       "msb_capacity": { "name": "Capacité batterie virtuelle" },
+      "msb_level": { "name": "Niveau batterie virtuelle" },
       "savings": { "name": "Économies mensuelles" },
       "heatpump_mode": {
         "name": "Mode smart de la PAC",

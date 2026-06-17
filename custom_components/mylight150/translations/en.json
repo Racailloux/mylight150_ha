@@ -58,10 +58,7 @@
       "solar_production": { "name": "Solar production" },
       "grid": { "name": "Grid power" },
       "injection": { "name": "Grid injection" },
-      "load": { "name": "total load" },
-      "load_home": { "name": "Home load" },
-      "self_consumption": { "name": "Self-consumption" },
-      "independence": { "name": "Independance" },
+      "load": { "name": "Load" },
       "msb_state": {
         "name": "Virtual battery status", 
         "state": {
@@ -74,6 +71,7 @@
       "msb_power": { "name": "Virtual battery power" },
       "msb_autonomy": { "name": "Virtual battery autonomy" },
       "msb_capacity": { "name": "Virtual battery capacity" },
+      "msb_level": { "name": "Virtual battery level" },
       "savings": { "name": "Monthly money saving" },
       "heatpump_mode": {
         "name": "Heat pump mode",

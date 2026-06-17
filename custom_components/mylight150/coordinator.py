@@ -37,23 +37,28 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
 
     async def _async_update_data(self) -> dict[str, Any]:
         """Cyclic refresh every N minutes from config."""
+        _LOGGER.info("MyLight150: Start retrieving data")
         try:
             # Fetch installation code if not already done
             if not self.installation_code:
                 self.installation_code = await self._fetch_installation_code()
                 _LOGGER.debug("MyLight150: Installation code: %s", self.installation_code)
 
-            parsed_data: dict[str, Any] = {}
+            data: dict[str, Any] = {}
 
             # Fetch realtime home data and parse it for sensors
-            parsed_data.update(await self._fetch_home_data())
+            parsed_data = await self._fetch_home_data()
+            if parsed_data is not {}:
+                data.update(parsed_data)
 
             # Fetch device data and parse it for sensors
-            parsed_data.update(await self._fetch_device_data())
+            parsed_data = await self._fetch_device_data()
+            if parsed_data is not {}:
+                data.update(parsed_data)
 
             # Fetch other data (historical, savings, etc.) if needed in the future
 
-            return parsed_data
+            return data
 
         except MyLight150AuthError as err:
             raise UpdateFailed(f"Erreur d'authentification : {err}") from err
@@ -123,6 +128,10 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             data = await self._api.async_call_api(endpoint)
         
             """Parse device data from /v2/installations/{code}/home?msb=msb01 endpoint."""
+            if data.get("msb", {}).get("capacity", {}).get("value"):
+                msb_level = 100.0 * (float)(data.get("msb", {}).get("autonomy", {}).get("value")) / (float)(data.get("msb", {}).get("capacity", {}).get("value"))
+            else: msb_level = 0.0
+            
             parsed: dict[str, Any] = {
                 # Live powers (kW)
                 "solar_production":  data.get("solarProduction", {}).get("value"),
@@ -134,6 +143,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
                 "msb_power":         data.get("msb", {}).get("power", {}).get("value"),
                 "msb_autonomy":      data.get("msb", {}).get("autonomy", {}).get("value"),
                 "msb_capacity":      data.get("msb", {}).get("capacity", {}).get("value"),
+                "msb_level":         msb_level,
                 # Saving (weekly display)
                 "savings":           data.get("savings", {}).get("amount", {}).get("value"),
                 # Timestamp of the data (UTC)
