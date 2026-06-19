@@ -81,6 +81,13 @@ This will be the base of all entity ID structure : mylight150_<installation_code
 | | | | |
 
 
+## Features roadmap
+* 0.3.x : Energy sensors (production, consumptions) with total sensors to get the cumulative value for each sensors in the long term.
+* 0.4.x : Pricing timeline and pricing value for each mode (HP/HC)
+* 0.5.x : MyBattery (support and logs needed from owners)
+* 0.6.x : evCharger (support and logs needed from owners)
+
+
 ## Credits
 * [Home Assistant](https://github.com/home-assistant) : Home Assistant open-source powerful domotic plateform.
 * [HACS](https://hacs.xyz/) : Home Assistant Community Store gives you a powerful UI to handle downloads of all your custom needs.
