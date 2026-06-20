@@ -203,7 +203,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
 
         if self._persistent is None or self._persistent == {}:
             _LOGGER.debug("MyLight150: No persistent data found, start loading historical data...")
-            await self._async_update_energy_history()
+            self._persistent: dict[str, Any] = {}
 
         
         if is_first_refresh_of_day:
@@ -255,88 +255,6 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
         self._last_refresh_date = today
 
         return total
-
-
-    async def _async_update_energy_history(self) -> bool:
-        """Fetch production and consumption data since the creation of MyLight150 (2014) until the given date."""
-        now = datetime.now()
-        
-        # Get past years since creation of MyLight150 in 2014
-        years_data: dict[str, Any] = {}
-        past_year = now.year - 1
-        i = 2014
-
-        while i <= past_year:
-            year_data: dict[str, Any] = {}
-            data = await self._async_get_energy_production_year(i)
-            if data:
-                year_data.update(data)
-            data = await self._async_get_energy_production_year(i)
-            if data:
-                year_data.update(data)
-            years_data = {
-                CONF_ENERGY_PROD_FROM_SOLAR:  years_data.get(CONF_ENERGY_PROD_FROM_SOLAR, 0.0)  + year_data.get(CONF_ENERGY_PROD_FROM_SOLAR, 0.0),
-                CONF_ENERGY_PROD_TO_MSB:      years_data.get(CONF_ENERGY_PROD_TO_MSB, 0.0)      + year_data.get(CONF_ENERGY_PROD_TO_MSB, 0.0),
-                CONF_ENERGY_PROD_TO_GRID:     years_data.get(CONF_ENERGY_PROD_TO_GRID, 0.0)     + year_data.get(CONF_ENERGY_PROD_TO_GRID, 0.0),
-                CONF_ENERGY_CONSUMPTION:      years_data.get(CONF_ENERGY_CONSUMPTION, 0.0)      + year_data.get(CONF_ENERGY_CONSUMPTION, 0.0),
-                CONF_ENERGY_CONSO_FROM_SOLAR: years_data.get(CONF_ENERGY_CONSO_FROM_SOLAR, 0.0) + year_data.get(CONF_ENERGY_CONSO_FROM_SOLAR, 0.0),
-                CONF_ENERGY_CONSO_FROM_MSB:   years_data.get(CONF_ENERGY_CONSO_FROM_MSB, 0.0)   + year_data.get(CONF_ENERGY_CONSO_FROM_MSB, 0.0),
-                CONF_ENERGY_CONSO_FROM_GRID:  years_data.get(CONF_ENERGY_CONSO_FROM_GRID, 0.0)  + year_data.get(CONF_ENERGY_CONSO_FROM_GRID, 0.0),
-            }
-            i += 1 # next month
-
-        _LOGGER.debug(f"MyLight150 years history data retrieved: {years_data}")
-
-        # Get past months of the current year
-        months_data: dict[str, Any] = {}
-        past_month = now.month - 1
-        i = 1
-
-        while i <= past_month:
-            month_data: dict[str, Any] = {}
-            data = await self._async_get_energy_production_month(now.year, i)
-            if data:
-                month_data.update(data)
-            data = await self._async_get_energy_consumption_month(now.year, i)
-            if data:
-                month_data.update(data)
-            months_data = {
-                CONF_ENERGY_PROD_FROM_SOLAR:  months_data.get(CONF_ENERGY_PROD_FROM_SOLAR, 0.0)  + month_data.get(CONF_ENERGY_PROD_FROM_SOLAR, 0.0),
-                CONF_ENERGY_PROD_TO_MSB:      months_data.get(CONF_ENERGY_PROD_TO_MSB, 0.0)      + month_data.get(CONF_ENERGY_PROD_TO_MSB, 0.0),
-                CONF_ENERGY_PROD_TO_GRID:     months_data.get(CONF_ENERGY_PROD_TO_GRID, 0.0)     + month_data.get(CONF_ENERGY_PROD_TO_GRID, 0.0),
-                CONF_ENERGY_CONSUMPTION:      months_data.get(CONF_ENERGY_CONSUMPTION, 0.0)      + month_data.get(CONF_ENERGY_CONSUMPTION, 0.0),
-                CONF_ENERGY_CONSO_FROM_SOLAR: months_data.get(CONF_ENERGY_CONSO_FROM_SOLAR, 0.0) + month_data.get(CONF_ENERGY_CONSO_FROM_SOLAR, 0.0),
-                CONF_ENERGY_CONSO_FROM_MSB:   months_data.get(CONF_ENERGY_CONSO_FROM_MSB, 0.0)   + month_data.get(CONF_ENERGY_CONSO_FROM_MSB, 0.0),
-                CONF_ENERGY_CONSO_FROM_GRID:  months_data.get(CONF_ENERGY_CONSO_FROM_GRID, 0.0)  + month_data.get(CONF_ENERGY_CONSO_FROM_GRID, 0.0),
-            }
-            i += 1 # next month
-        _LOGGER.debug(f"MyLight150 months history data retrieved: {months_data}")
-
-        # Get past days of the current month
-        past_dom = now.day - 1
-        start_date = f"{now.year}-{now.month}-01"
-
-        days_data: dict[str, Any] = {}
-        data = await self._async_get_energy_production_days(start_date, past_dom)
-        if data:
-            days_data.update(data)
-        data = await self._async_get_energy_consumption_days(start_date, past_dom)
-        if data:
-            days_data.update(data)
-        _LOGGER.debug(f"MyLight150 days history data retrieved: {days_data}")
-
-        # Sum all historicals & save it to persistency
-        self._persistent = {
-            "past_energy_prod_from_solar":  years_data.get(CONF_ENERGY_PROD_FROM_SOLAR, 0.0)  + months_data.get(CONF_ENERGY_PROD_FROM_SOLAR, 0.0)  + days_data.get(CONF_ENERGY_PROD_FROM_SOLAR, 0.0),
-            "past_energy_prod_to_msb":      years_data.get(CONF_ENERGY_PROD_TO_MSB, 0.0)      + months_data.get(CONF_ENERGY_PROD_TO_MSB, 0.0)      + days_data.get(CONF_ENERGY_PROD_TO_MSB, 0.0),
-            "past_energy_prod_to_grid":     years_data.get(CONF_ENERGY_PROD_TO_GRID, 0.0)     + months_data.get(CONF_ENERGY_PROD_TO_GRID, 0.0)     + days_data.get(CONF_ENERGY_PROD_TO_GRID, 0.0),
-            "past_energy_consumption":      years_data.get(CONF_ENERGY_CONSUMPTION, 0.0)      + months_data.get(CONF_ENERGY_CONSUMPTION, 0.0)      + days_data.get(CONF_ENERGY_CONSUMPTION, 0.0),
-            "past_energy_conso_from_solar": years_data.get(CONF_ENERGY_CONSO_FROM_SOLAR, 0.0) + months_data.get(CONF_ENERGY_CONSO_FROM_SOLAR, 0.0) + days_data.get(CONF_ENERGY_CONSO_FROM_SOLAR, 0.0),
-            "past_energy_conso_from_msb":   years_data.get(CONF_ENERGY_CONSO_FROM_MSB, 0.0)   + months_data.get(CONF_ENERGY_CONSO_FROM_MSB, 0.0)   + days_data.get(CONF_ENERGY_CONSO_FROM_MSB, 0.0),
-            "past_energy_conso_from_grid":  years_data.get(CONF_ENERGY_CONSO_FROM_GRID, 0.0)  + months_data.get(CONF_ENERGY_CONSO_FROM_GRID, 0.0)  + days_data.get(CONF_ENERGY_CONSO_FROM_GRID, 0.0),
-        }
-        await self._async_save_persistent_data()
-        return True
 
 
     async def _async_get_energy_production_days(self, start_date: str, days_nr: int = 1) -> dict:
