@@ -75,6 +75,17 @@ This will be the base of all entity ID structure : mylight150_<installation_code
 | `sensor.mylight150_<installation_code>_msb_autonomy`          | Virtual battery autonomy                            | kWh  | `measurement`      |
 | `sensor.mylight150_<installation_code>_msb_capacity`          | Virtual battery capacity                            | kWh  | `measurement`      |
 | `sensor.mylight150_<installation_code>_savings`               | Monthly money saved                                 | EUR  | `total_increasing` |
+| | | | |
+| `sensor.mylight150_<installation_code>_heatPump_mode`         | Current heat pump mode                              |  -   | `text`             |
+| `sensor.mylight150_<installation_code>_waterHeater_mode`      | Current water heater mode                           |  -   | `text`             |
+| | | | |
+
+
+## Features roadmap
+* **0.3.x : Energy sensors** (production, consumptions) with total sensors to get the cumulative value for each sensors in the long term.
+* 0.4.x : Pricing timeline and pricing value for each mode (HP/HC)
+* 0.5.x : MyBattery (support and logs needed from owners)
+* 0.6.x : evCharger (support and logs needed from owners)
 
 
 ## Credits
