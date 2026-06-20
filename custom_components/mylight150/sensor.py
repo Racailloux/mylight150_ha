@@ -18,7 +18,16 @@ from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
-from .const import DOMAIN, CONF_USERNAME
+from .const import (
+    DOMAIN,
+    CONF_ENERGY_PROD_FROM_SOLAR,
+    CONF_ENERGY_PROD_TO_MSB,
+    CONF_ENERGY_PROD_TO_GRID,
+    CONF_ENERGY_CONSUMPTION,
+    CONF_ENERGY_CONSO_FROM_SOLAR,
+    CONF_ENERGY_CONSO_FROM_MSB,
+    CONF_ENERGY_CONSO_FROM_GRID,
+)
 from .coordinator import MyLight150Coordinator
 
 _LOGGER = logging.getLogger(__name__)
@@ -119,7 +128,7 @@ SENSORS: tuple[MyLight150SensorEntityDescription, ...] = (
         suggested_display_precision=0,
         device_class=SensorDeviceClass.ENERGY_STORAGE,
         state_class=SensorStateClass.MEASUREMENT,
-        icon="mdi:battery",
+        icon="mdi:home-battery",
     ),
     MyLight150SensorEntityDescription(
         key="msb_level",
@@ -160,6 +169,86 @@ SENSORS: tuple[MyLight150SensorEntityDescription, ...] = (
         translation_key= "waterheater_mode",
         # Text status, no unit, no device class
         icon="mdi:water-boiler",
+    ),
+
+    # Total energy sensors (kWh)
+    MyLight150SensorEntityDescription(
+        key=CONF_ENERGY_PROD_FROM_SOLAR,
+        data_key=CONF_ENERGY_PROD_FROM_SOLAR,
+        has_entity_name=True,
+        translation_key=CONF_ENERGY_PROD_FROM_SOLAR,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        suggested_display_precision=2,
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        icon="mdi:solar-power",
+    ),
+    MyLight150SensorEntityDescription(
+        key=CONF_ENERGY_PROD_TO_MSB,
+        data_key=CONF_ENERGY_PROD_TO_MSB,
+        has_entity_name=True,
+        translation_key=CONF_ENERGY_PROD_TO_MSB,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        suggested_display_precision=2,
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        icon="mdi:battery-arrow-up",
+    ),
+    MyLight150SensorEntityDescription(
+        key=CONF_ENERGY_PROD_TO_GRID,
+        data_key=CONF_ENERGY_PROD_TO_GRID,
+        has_entity_name=True,
+        translation_key=CONF_ENERGY_PROD_TO_GRID,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        suggested_display_precision=2,
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        icon="mdi:transmission-tower-import",
+    ),
+    MyLight150SensorEntityDescription(
+        key=CONF_ENERGY_CONSUMPTION,
+        data_key=CONF_ENERGY_CONSUMPTION,
+        has_entity_name=True,
+        translation_key=CONF_ENERGY_CONSUMPTION,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        suggested_display_precision=2,
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        icon="mdi:home-lightning-bolt",
+    ),
+    MyLight150SensorEntityDescription(
+        key=CONF_ENERGY_CONSO_FROM_SOLAR,
+        data_key=CONF_ENERGY_CONSO_FROM_SOLAR,
+        has_entity_name=True,
+        translation_key=CONF_ENERGY_CONSO_FROM_SOLAR,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        suggested_display_precision=2,
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        icon="mdi:solar-power-variant",
+    ),
+    MyLight150SensorEntityDescription(
+        key=CONF_ENERGY_CONSO_FROM_MSB,
+        data_key=CONF_ENERGY_CONSO_FROM_MSB,
+        has_entity_name=True,
+        translation_key=CONF_ENERGY_CONSO_FROM_MSB,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        suggested_display_precision=2,
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        icon="mdi:battery-arrow-down",
+    ),
+    MyLight150SensorEntityDescription(
+        key=CONF_ENERGY_CONSO_FROM_GRID,
+        data_key=CONF_ENERGY_CONSO_FROM_GRID,
+        has_entity_name=True,
+        translation_key=CONF_ENERGY_CONSO_FROM_GRID,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        suggested_display_precision=2,
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL_INCREASING,
+        icon="mdi:transmission-tower-export",
+        entity_registry_enabled_default=False,
     ),
 )
 

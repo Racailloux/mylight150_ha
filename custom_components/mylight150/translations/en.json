@@ -87,7 +87,14 @@
           "smart": "Smart",
           "comfort": "Comfort"
         }
-      }
+      },
+      "energy_prod_from_solar": { "name": "Solar energy production" },
+      "energy_prod_to_msb": { "name": "MSB energy in" },
+      "energy_prod_to_grid": { "name": "Grid energy injection" },
+      "energy_consumption": { "name": "Total energy consumption" },
+      "energy_conso_from_solar": { "name": "Solar energy self-consumption" },
+      "energy_conso_from_msb": { "name": "MSB energy out" },
+      "energy_conso_from_grid": { "name": "Grid energy consumption" }
     },
     "switch": {
     }

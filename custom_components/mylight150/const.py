@@ -27,6 +27,14 @@ CONF_DEVICE_ID = "device_id"
 CONF_UPDATE_INITIAL = "update_initial"
 CONF_UPDATE_INTERVAL = "update_interval"
 
+CONF_ENERGY_PROD_FROM_SOLAR = "energy_prod_from_solar"
+CONF_ENERGY_PROD_TO_MSB = "energy_prod_to_msb"
+CONF_ENERGY_PROD_TO_GRID = "energy_prod_to_grid"
+CONF_ENERGY_CONSUMPTION = "energy_consumption"
+CONF_ENERGY_CONSO_FROM_SOLAR = "energy_conso_from_solar"
+CONF_ENERGY_CONSO_FROM_MSB = "energy_conso_from_msb"
+CONF_ENERGY_CONSO_FROM_GRID = "energy_conso_from_grid"
+
 REFRESH_DATA_FAILED_EVENT = "refresh_failed"
 REFRESH_DATA_COMPLETED_EVENT = "refresh_completed"
 
@@ -43,6 +51,13 @@ PLATFORMS: list[Platform] = [
 
 __all__ = [
     "CONF_DEVICE_ID",
+    "CONF_ENERGY_PROD_FROM_SOLAR",
+    "CONF_ENERGY_PROD_TO_MSB",
+    "CONF_ENERGY_PROD_TO_GRID",
+    "CONF_ENERGY_CONSUMPTION",
+    "CONF_ENERGY_CONSO_FROM_SOLAR",
+    "CONF_ENERGY_CONSO_FROM_MSB",
+    "CONF_ENERGY_CONSO_FROM_GRID",
     "CONF_PASSWORD",
     "CONF_UPDATE_INTERVAL",
     "CONF_UPDATE_INITIAL",

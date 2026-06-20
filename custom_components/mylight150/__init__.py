@@ -37,11 +37,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         update_interval_minutes=update_interval,
     )
 
-    # First refresh
+    # Restore long term data & First refresh
+    await coordinator.async_load_persistent_data()
     await coordinator.async_config_entry_first_refresh()
-
-    # Nightly refresh
-#    await coordinator.async_setup_nightly_refresh()
 
     # Storing coordinator into hass.data to be acccessible from sensor.py
     hass.data.setdefault(DOMAIN, {})
@@ -62,7 +60,6 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     if unload_ok:
         # Cancel the coordinator's scheduled tasks and remove it
         coordinator: MyLight150Coordinator = hass.data[DOMAIN].pop(entry.entry_id)
-        coordinator.async_teardown()
 
     return unload_ok
 
