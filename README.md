@@ -1,4 +1,4 @@
-# Home Assistant MYLight150 Integration
+# Home Assistant MyLight150 Integration
 
 [![GitHub Release][releases-shield]][releases] 
 [![hacs][hacsbadge]][hacs] 
