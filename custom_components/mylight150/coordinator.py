@@ -214,10 +214,10 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
 
             # Get yesterday energies and update persistent data
             yesterday_data: dict[str, Any] = {}
-            data = await self._async_get_energy_production_days(strf_today)
+            data = await self._async_get_energy_production_days(strf_yesterday)
             if data:
                 yesterday_data.update(data)
-            data = await self._async_get_energy_consumption_days(strf_today)
+            data = await self._async_get_energy_consumption_days(strf_yesterday)
             if data:
                 yesterday_data.update(data)
 
