@@ -24,8 +24,8 @@ Alternatively, installation can be done manually by copying the files in this re
 
 1. Open the configuration directory of your Home Assistant installation.
 2. If you do not have a `custom_components` directory, create it.
-3. In the `custom_components` directory, create a new directory called `mylight150`.
-4. Copy all files from the `custom_components/mylight150/` directory in this repository into the `mylight150` directory.
+3. In the `custom_components` directory, create a new directory called `mylight150_ha`.
+4. Copy all files from the `custom_components/mylight150_ha/` directory in this repository into the `mylight150_ha` directory.
 5. Restart Home Assistant.
 6. Add the integration to Home Assistant (see **Configuration**).
 
@@ -89,10 +89,14 @@ This will be the base of all entity ID structure : mylight150_<installation_code
 
 
 ## Features roadmap
-* **0.3.x : Energy sensors** (production, consumptions) with total sensors to get the cumulative value for each sensors in the long term.
-* 0.4.x : Pricing timeline and pricing value for each mode (HP/HC)
-* 0.5.x : MyBattery (support and logs needed from owners)
-* 0.6.x : evCharger (support and logs needed from owners)
+* **0.3.x : Energy sensors** (in dev)<br/>
+  production and consumptions sensors to get the cumulative value for each sensors in the long term.
+* 0.4.x : Pricing (planned)<br/>
+  Pricing timeline and pricing value for each mode (HP/HC)
+* 0.5.x : MyBattery  (support and logs needed from owners)<br/>
+  Integration of the MyBattery option
+* 0.6.x : evCharger  (support and logs needed from owners)<br/>
+  Integration of the car charger equipment
 
 
 ## Credits
