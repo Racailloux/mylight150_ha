@@ -25,35 +25,37 @@ TO_REDACT = {
 # List of endpoints to call for diagnostics. Each tuple contains a key and the endpoint path.
 DIAGNOSTIC_ENDPOINTS: list[tuple[str, str]] = [
     # General information about the API and installation
-    ("v2",                      "/v2"),
-    ("v2_installation",         "/v2/installations/{code}"),
+    ("v2",                              "/v2"),
+    ("v2_installation",                 "/v2/installations/{code}"),
+    ("v3_contract_energy-pricing",      "/v3/contract/energy-pricing"),
+     
     # Live data
-    ("v2_home",                 "/v2/installations/{code}/home?msb=msb01"),
+    ("v2_home",                         "/v2/installations/{code}/home?msb=msb01"),
     # Options from contracts (MSB, MSP, MSH, etc.)
-    ("v3_contract_options",     "/v3/contract/options"),
-    ("v3_contract_options_msb", "/v3/contract/options/msb"),
-    ("v3_contract_options_mb",  "/v3/contract/options/mb"),
-    ("v3_contract_options_msp", "/v3/contract/options/msp"),
-    ("v3_contract_options_msh", "/v3/contract/options/msh"),
+    ("v3_contract_options",             "/v3/contract/options"),
+    ("v3_contract_options_msb",         "/v3/contract/options/msb"),
+    ("v3_contract_options_mb",          "/v3/contract/options/mb"),
+    ("v3_contract_options_msp",         "/v3/contract/options/msp"),
+    ("v3_contract_options_msh",         "/v3/contract/options/msh"),
     ("v3_contract_options_myBatteryWithEms", "/v3/contract/options/myBatteryWithEms"),
     # Savings and money pot
-    ("v3_savings",              "/v3/savings"),
-    ("v3_money_pot",            "/v3/money-pot"),
+    ("v3_savings",                      "/v3/savings"),
+    ("v3_money_pot",                    "/v3/money-pot"),
     # Energy, production and consumption
-    ("v3_energies",             "/v3/energies"),
-    ("v3_production",           "/v3/production"),
-    ("v3_production_day",       "/v3/production?aggregation=Days"),
-    ("v3_consumption",          "/v3/consumption"),
-    ("v3_consumption_day",      "/v3/consumption?aggregation=Days"),
+    ("v3_energies",                     "/v3/energies"),
+    ("v3_production",                   "/v3/production"),
+    ("v3_production_day",               "/v3/production?aggregation=Days"),
+    ("v3_consumption",                  "/v3/consumption"),
+    ("v3_consumption_day",              "/v3/consumption?aggregation=Days"),
     # Piloted Equipment (HVAC, water heater, etc.)
-    ("v2_equipments",           "/v2/installations/{code}/equipments"),
-    ("v3_equipments",           "/v3/equipments"),
+    ("v2_equipments",                   "/v2/installations/{code}/equipments"),
+    ("v3_equipments",                   "/v3/equipments"),
     ("v3_equipments_hvacAirToWater05",  "/v3/equipments/hvacAirToWater05/heatPump"),
     ("v3_equipments_waterHeater03",     "/v3/equipments/waterHeater03/waterHeater"),
     ("v3_consumption_hvacAirToWater05", "/v3/consumption/hvacAirToWater05?aggregation=Week"),
     ("v3_consumption_waterHeater03",    "/v3/consumption/waterHeater03?aggregation=Week"),
     # MSB (MySmartBattery)
-    ("v3_msb_legacy",           "/v3/msb/legacy"),
+    ("v3_msb_legacy",                   "/v3/msb/legacy"),
 ]
 
 
