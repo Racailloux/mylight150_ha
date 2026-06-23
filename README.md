@@ -14,6 +14,10 @@ The `MyLight150` component provides an integration with the MyLight150 cloud ser
 
 **Note:** This integration will not manage actions on the system, but retrieve data to integrate them into your domotic environment.
 
+ℹ️ Diagnotics data is searched, especially from people who has options (evCharger, MyBattery, etc.)
+
+⚠️ This integration is in beta testing until v1.0.0. All data could be wiped from one update to the other.
+
 ## Installation
 
 There are two ways this integration can be installed into [Home Assistant](https://www.home-assistant.io).
