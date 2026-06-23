@@ -154,6 +154,8 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
                 # Timestamp of the data (UTC)
                 "timestamp":         data.get("timestamp"),
             }
+            if parsed.get("msb_state", "idle") == "charging":
+                parsed["msb_power"] = parsed.get("msb_power", 0.0) * -1
 
             _LOGGER.debug("MyLight150: Data parsed for live home: %s", parsed)
             return parsed
@@ -222,13 +224,13 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
                 yesterday_data.update(data)
 
             # Save in long term persistancy
-            self._persistent["past_energy_prod_from_solar"]  = self._persistent.get("past_energy_prod_from_solar", 0.0)  + yesterday_data.get(CONF_ENERGY_PROD_FROM_SOLAR, 0.0)
-            self._persistent["past_energy_prod_to_msb"]      = self._persistent.get("past_energy_prod_to_msb", 0.0)      + yesterday_data.get(CONF_ENERGY_PROD_TO_MSB, 0.0)
-            self._persistent["past_energy_prod_to_grid"]     = self._persistent.get("past_energy_prod_to_grid", 0.0)     + yesterday_data.get(CONF_ENERGY_PROD_TO_GRID, 0.0)
-            self._persistent["past_energy_consumption"]      = self._persistent.get("past_energy_consumption", 0.0)      + yesterday_data.get(CONF_ENERGY_CONSUMPTION, 0.0)
-            self._persistent["past_energy_conso_from_solar"] = self._persistent.get("past_energy_conso_from_solar", 0.0) + yesterday_data.get(CONF_ENERGY_CONSO_FROM_SOLAR, 0.0)
-            self._persistent["past_energy_conso_from_msb"]   = self._persistent.get("past_energy_conso_from_msb", 0.0)   + yesterday_data.get(CONF_ENERGY_CONSO_FROM_MSB, 0.0)
-            self._persistent["past_energy_conso_from_grid"]  = self._persistent.get("past_energy_conso_from_grid", 0.0)  + yesterday_data.get(CONF_ENERGY_CONSO_FROM_GRID, 0.0)
+            self._persistent["CONF_ENERGY_PROD_FROM_SOLAR"]  = self._persistent.get("CONF_ENERGY_PROD_FROM_SOLAR", 0.0)  + yesterday_data.get(CONF_ENERGY_PROD_FROM_SOLAR, 0.0)
+            self._persistent["CONF_ENERGY_PROD_TO_MSB"]      = self._persistent.get("CONF_ENERGY_PROD_TO_MSB", 0.0)      + yesterday_data.get(CONF_ENERGY_PROD_TO_MSB, 0.0)
+            self._persistent["CONF_ENERGY_PROD_TO_GRID"]     = self._persistent.get("CONF_ENERGY_PROD_TO_GRID", 0.0)     + yesterday_data.get(CONF_ENERGY_PROD_TO_GRID, 0.0)
+            self._persistent["CONF_ENERGY_CONSUMPTION"]      = self._persistent.get("CONF_ENERGY_CONSUMPTION", 0.0)      + yesterday_data.get(CONF_ENERGY_CONSUMPTION, 0.0)
+            self._persistent["CONF_ENERGY_CONSO_FROM_SOLAR"] = self._persistent.get("CONF_ENERGY_CONSO_FROM_SOLAR", 0.0) + yesterday_data.get(CONF_ENERGY_CONSO_FROM_SOLAR, 0.0)
+            self._persistent["CONF_ENERGY_CONSO_FROM_MSB"]   = self._persistent.get("CONF_ENERGY_CONSO_FROM_MSB", 0.0)   + yesterday_data.get(CONF_ENERGY_CONSO_FROM_MSB, 0.0)
+            self._persistent["CONF_ENERGY_CONSO_FROM_GRID"]  = self._persistent.get("CONF_ENERGY_CONSO_FROM_GRID", 0.0)  + yesterday_data.get(CONF_ENERGY_CONSO_FROM_GRID, 0.0)
             await self._async_save_persistent_data()
         
         _LOGGER.debug("MyLight150: Fetching energy data for date: %s", strf_today)
@@ -242,13 +244,13 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
 
         # Generate sum of past and daily energies
         total = {
-            CONF_ENERGY_PROD_FROM_SOLAR:  self._persistent.get("past_energy_prod_from_solar", 0.0)  + daily.get(CONF_ENERGY_PROD_FROM_SOLAR, 0.0),
-            CONF_ENERGY_PROD_TO_MSB:      self._persistent.get("past_energy_prod_to_msb", 0.0)      + daily.get(CONF_ENERGY_PROD_TO_MSB, 0.0),
-            CONF_ENERGY_PROD_TO_GRID:     self._persistent.get("past_energy_prod_to_grid", 0.0)     + daily.get(CONF_ENERGY_PROD_TO_GRID, 0.0),
-            CONF_ENERGY_CONSUMPTION:      self._persistent.get("past_energy_consumption", 0.0)      + daily.get(CONF_ENERGY_CONSUMPTION, 0.0),
-            CONF_ENERGY_CONSO_FROM_SOLAR: self._persistent.get("past_energy_conso_from_solar", 0.0) + daily.get(CONF_ENERGY_CONSO_FROM_SOLAR, 0.0),
-            CONF_ENERGY_CONSO_FROM_MSB:   self._persistent.get("past_energy_conso_from_msb", 0.0)   + daily.get(CONF_ENERGY_CONSO_FROM_MSB, 0.0),
-            CONF_ENERGY_CONSO_FROM_GRID:  self._persistent.get("past_energy_conso_from_grid", 0.0)  + daily.get(CONF_ENERGY_CONSO_FROM_GRID, 0.0),
+            CONF_ENERGY_PROD_FROM_SOLAR:  self._persistent.get("CONF_ENERGY_PROD_FROM_SOLAR", 0.0)  + daily.get(CONF_ENERGY_PROD_FROM_SOLAR, 0.0),
+            CONF_ENERGY_PROD_TO_MSB:      self._persistent.get("CONF_ENERGY_PROD_TO_MSB", 0.0)      + daily.get(CONF_ENERGY_PROD_TO_MSB, 0.0),
+            CONF_ENERGY_PROD_TO_GRID:     self._persistent.get("CONF_ENERGY_PROD_TO_GRID", 0.0)     + daily.get(CONF_ENERGY_PROD_TO_GRID, 0.0),
+            CONF_ENERGY_CONSUMPTION:      self._persistent.get("CONF_ENERGY_CONSUMPTION", 0.0)      + daily.get(CONF_ENERGY_CONSUMPTION, 0.0),
+            CONF_ENERGY_CONSO_FROM_SOLAR: self._persistent.get("CONF_ENERGY_CONSO_FROM_SOLAR", 0.0) + daily.get(CONF_ENERGY_CONSO_FROM_SOLAR, 0.0),
+            CONF_ENERGY_CONSO_FROM_MSB:   self._persistent.get("CONF_ENERGY_CONSO_FROM_MSB", 0.0)   + daily.get(CONF_ENERGY_CONSO_FROM_MSB, 0.0),
+            CONF_ENERGY_CONSO_FROM_GRID:  self._persistent.get("CONF_ENERGY_CONSO_FROM_GRID", 0.0)  + daily.get(CONF_ENERGY_CONSO_FROM_GRID, 0.0),
         }
                 
         _LOGGER.debug(f"MyLight150 total energy data retrieved: {total}")
