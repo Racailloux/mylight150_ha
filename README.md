@@ -90,16 +90,16 @@ This will be the base of all entity ID structure : mylight150_<installation_code
 | `sensor.mylight150_<installation_code>_energy_conso_from_solar` | Solar energy self-consumption since integration installation | kWh  | `total_increasing` |
 | `sensor.mylight150_<installation_code>_energy_conso_from_msb`   | MSB energy out since integration installation                | kWh  | `total_increasing` |
 | `sensor.mylight150_<installation_code>_energy_conso_from_grid`  | Grid energy consumption since integration installation       | kWh  | `total_increasing` |
-
+| | | | |
+| `sensor.mylight150_<installation_code>_pricing_mode`            | Current pringin mode, depending on the contract.             |  -   | `text`             |
+| `sensor.mylight150_<installation_code>_current_pricing`         | Current pricing value. Pricing needs to be configured.       | €/kWh| `measurement`      |
 
 ## Features roadmap
-* **0.3.x : Energy sensors** (in dev)<br/>
-  production and consumptions sensors to get the cumulative value for each sensors in the long term.
-* 0.4.x : Pricing (planned)<br/>
-  Pricing timeline and pricing value for each mode (HP/HC)
-* 0.5.x : MyBattery  (support and logs needed from owners)<br/>
+
+**Features needing users data to be implemented**
+* MyBattery  (support and logs needed from owners)<br/>
   Integration of the MyBattery option
-* 0.6.x : evCharger  (support and logs needed from owners)<br/>
+* evCharger  (support and logs needed from owners)<br/>
   Integration of the car charger equipment
 
 
