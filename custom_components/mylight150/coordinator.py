@@ -8,6 +8,7 @@ from typing import Any
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.helpers.storage import Store
+from homeassistant.config_entries import ConfigEntry
 
 from .api import MyLight150ApiClient, MyLight150ApiError, MyLight150AuthError
 from .const import (
@@ -19,6 +20,15 @@ from .const import (
     CONF_ENERGY_CONSO_FROM_SOLAR,
     CONF_ENERGY_CONSO_FROM_MSB,
     CONF_ENERGY_CONSO_FROM_GRID,
+    CONF_PRICING_BASE,
+    CONF_PRICING_CURRENT,
+    CONF_PRICING_OFFPEAK,
+    CONF_PRICING_MODE,
+    CONF_PRICING_TYPE,
+    CONF_PRICING_TYPE_HPHC,
+    DEFAULT_PRICING_BASE,
+    DEFAULT_PRICING_OFFPEAK,
+    DEFAULT_PRICING_TYPE,
 )
 
 STORAGE_KEY = "mylight150_past_energies"
@@ -33,15 +43,19 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
     def __init__(
         self,
         hass: HomeAssistant,
+        entry: ConfigEntry,
         api: MyLight150ApiClient,
         update_interval_minutes: int,
     ) -> None:
+        self._hass = hass
+        self._entry = entry
         self._api = api
         self.installation_code: str | None = None
         self._last_refresh_date: date | None = None
         # Init storage for long term persistency
         self._store = Store(hass, STORAGE_VERSION, STORAGE_KEY)
         self._persistent: dict[str, Any] = {}
+        self.hphc_schedule: list[dict] = []
 
         super().__init__(
             hass,
@@ -77,7 +91,14 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             if parsed_data:
                 data.update(parsed_data)
 
+            # Update pricing informations if needed
+            await self._async_update_pricing_data()
+                
+
             # Fetch other data if needed in the future..
+
+            # Update date after having updated all dependent data
+            self._last_refresh_date = datetime.now().date()
 
             return data
 
@@ -191,8 +212,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
 
     async def _async_update_energy_data(self) -> dict[str, Any]:
         """Fetch all energy data from /v3/consumption and /v3/production endpoints."""
-        now = datetime.now()
-        today = now.date()
+        today = datetime.now().date()
         yesterday = today - timedelta(days=1)
 
         strf_today = today.strftime('%Y-%m-%d')
@@ -252,9 +272,9 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             CONF_ENERGY_CONSO_FROM_MSB:   self._persistent.get(CONF_ENERGY_CONSO_FROM_MSB, 0.0)   + daily.get(CONF_ENERGY_CONSO_FROM_MSB, 0.0),
             CONF_ENERGY_CONSO_FROM_GRID:  self._persistent.get(CONF_ENERGY_CONSO_FROM_GRID, 0.0)  + daily.get(CONF_ENERGY_CONSO_FROM_GRID, 0.0),
         }
-                
+
+
         _LOGGER.debug(f"MyLight150 total energy data retrieved: {total}")
-        self._last_refresh_date = today
 
         return total
 
@@ -422,3 +442,59 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
         except Exception as err:
             _LOGGER.debug("MyLight150: Error while retrieving energy consumption data : %s from endpoint:%s", err, endpoint)
             return {}
+
+
+    async def _async_update_pricing_data(self) -> bool:
+        """Fetch pricing data at first morning update."""
+        today = datetime.now().date()
+
+        is_first_refresh_of_day = (
+            self._last_refresh_date is not None
+            and self._last_refresh_date < today
+        )
+        ### TEMP
+        is_first_refresh_of_day = True
+        ### TEMP
+
+        # Nothing to do, avoid API request
+        if is_first_refresh_of_day is not True and self._hphc_schedule:
+            return True
+        
+        """Fetch pricing data at first morning update."""
+        endpoint = "/v3/contract/energy-pricing"
+        _LOGGER.debug(f"MyLight150: endpoints: {endpoint}")
+        try:
+            pricing_data = await self._api.async_call_api(endpoint)
+        except Exception as err:
+            _LOGGER.warning("MyLight150: Error while retrieving pricing data : %s from endpoint:%s", err, endpoint)
+            return False
+        
+        # Update pricing type at 1st refresh of the day
+        if is_first_refresh_of_day:
+            try:
+                # Load pricing type from entry and API and update it, if necessary
+                pricing_type = pricing_data.get("current", DEFAULT_PRICING_TYPE)
+                pricing_type_stored = self._entry.data.get(CONF_PRICING_TYPE, DEFAULT_PRICING_TYPE)
+
+                if pricing_type != pricing_type_stored:
+                    _LOGGER.info(f"MyLight150: Pricing type change detected! Configuration was '{pricing_type_stored}', new pricing is '{pricing_type}'")
+                    entry_data = self._entry.data.copy()
+                    entry_data[CONF_PRICING_TYPE] = pricing_type
+                    self._hass.config_entries.async_update_entry(self._entry, data=entry_data)
+                    await self._hass.config_entries.async_reload(self._entry.entry_id)
+
+            except Exception as err:
+                _LOGGER.warning("MyLight150: Error while updating pricing type : %s", err)
+                return False
+
+        # Update schedule table at 1st refresh of the day or if never retrieved since last reboot
+        if is_first_refresh_of_day or self.hphc_schedule == []:
+            try:
+                schedule = pricing_data.get("schedule", {})
+                self.hphc_schedule = schedule.get("breakdown", [])
+                _LOGGER.debug("MyLight150: peak/offpeak schedule loaded: %s", self.hphc_schedule)
+            except Exception as err:
+                _LOGGER.warning("MyLight150: Error while retrieving pricing schedule : %s.", err)
+    
+        return True
+

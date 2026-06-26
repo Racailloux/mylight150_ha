@@ -2,7 +2,7 @@
   "config": {
     "abort": {
       "invalid_credentials": "Informations d'identification non valides",
-      "user_already_configured": "Le compte a d\u00e9j\u00e0 \u00e9t\u00e9 configur\u00e9.",
+      "user_already_configured": "Le compte a déjà été configuré.",
       "reconfigure_successful": "Configuration mise à jour avec succès",
       "already_configured": "Ce compte est déjà configuré."
     },
@@ -11,17 +11,34 @@
       "invalid_credentials": "Informations d'identification non valides",
       "invalid_username": "Nom d'utilisateur invalide",
       "unexpected": "Erreur inattendue lors de la communication avec le serveur MyLight150.",
-      "user_already_configured": "Le compte a d\u00e9j\u00e0 \u00e9t\u00e9 configur\u00e9."
+      "user_already_configured": "Le compte a déjà été configuré."
     },
     "step": {
       "user": {
+        "title": "MyLight150 - Compte",
+        "description": "Entrez les identifiants de votre compte MyLight150.",
         "data": {
           "username": "Nom d'utilisateur",
           "password": "Mot de passe",
+          "tarif_hp": "Tarif heures pleines (HP)",
+          "tarif_hc": "Tarif heures creuses (HC)"
+        }
+      },
+      "options": {
+        "title": "MyLight150 - Réglages",
+        "description": "Type de tarification détectée : **{pricing_type}**.\n\nEntrez votre tarification électrique pour permettre de calculer les coûts dans le dashboard.",
+        "data": {
           "update_interval": "Intervalle de mise à jour",
-          "update_initial": "Mise à jour au démarrage"
+          "update_initial": "Mise à jour au démarrage",
+          "pricing_base": "Tarif heures pleines (€/kWh)",
+          "pricing_offpeak": "Tarif heures creuses (€/kWh)"
         },
-        "title": "Informations sur le compte MyLight150"
+        "data_description": {
+          "update_interval": "Minutes etre les mises à jour depuis le cloud.",
+          "update_initial": "Faire une mise à jour à démarrage de Home Assistant.",
+          "pricing_base": "Votre tarif standard ou heures pleines.",
+          "pricing_offpeak": "Votre tarif heures creuses."
+        }
       },
       "reconfigure": {
         "title": "Mise à jour de la configuration de MyLight150",
@@ -35,22 +52,27 @@
   "options": {
     "step": {
       "init": {
-        "data": {
-          "update_initial": "Mise \u00e0 jour au d\u00e9marrage",
-          "update_interval": "Intervalle de mises \u00e0 jour"
-        },
         "title": "Options de MyLight150",
+        "description": "Type de tarification détectée : **{pricing_type}**.",
+        "data": {
+          "update_initial": "Mise à jour au démarrage",
+          "update_interval": "Intervalle de mises à jour",
+          "pricing_base": "Votre tarif standard ou heures pleines.",
+          "pricing_offpeak": "Votre tarif heures creuses (contrat HC/HP uniquement)."
+        },
         "data_description": {
-          "update_initial": "Effectuer une mise \u00e0 jour imm\u00e9diatement apr\u00e8s le d\u00e9marrage.",
-          "update_interval": "Minutes entre les mises \u00e0 jour du cloud."
+          "update_initial": "Effectuer une mise à jour immédiatement après le démarrage.",
+          "update_interval": "Minutes entre les mises à jour du cloud.",
+          "pricing_base": "Votre tarif standard ou heures pleines.",
+          "pricing_offpeak": "Votre tarif heures creuses (contrat HC/HP uniquement)."
         }
       }
     }
   },
   "services": {
     "refresh_cloud_data": {
-      "name": "Actualiser les donn\u00e9es cloud",
-      "description": "R\u00e9cup\u00e8re les donn\u00e9es cloud actuelles."
+      "name": "Actualiser les données cloud",
+      "description": "Récupère les données cloud actuelles."
     }
   },
   "entity": {
@@ -94,9 +116,16 @@
       "energy_consumption": { "name": "Energie totale consommée" },
       "energy_conso_from_solar": { "name": "Energie solaire auto-consommée" },
       "energy_conso_from_msb": { "name": "Energie MSB consommée" },
-      "energy_conso_from_grid": { "name": "Energie réseau consommée" }
-    },
-    "switch": {
+      "energy_conso_from_grid": { "name": "Energie réseau consommée" },
+      "pricing_mode": {
+        "name": "Mode de tarif",
+        "state": {
+          "base": "Base",
+          "peak": "Heures pleines",
+          "offpeak": "Heures creuses"
+        }
+      },
+      "current_pricing": { "name": "Tarif actuel" }
     }
   }
 }

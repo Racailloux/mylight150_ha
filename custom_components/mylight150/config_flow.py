@@ -22,6 +22,7 @@ from .api import MyLight150ApiClient, MyLight150AuthError, MyLight150ApiError
 from .const import (
     CONF_PASSWORD,
     CONF_PRICING_TYPE,
+    CONF_PRICING_TYPE_HPHC,
     CONF_PRICING_BASE,
     CONF_PRICING_OFFPEAK,
     CONF_UPDATE_INITIAL,
@@ -44,7 +45,7 @@ _PRICING_SELECTOR = NumberSelectorConfig(
     min=0.0,
     max=2.0,
     step=0.001,
-    unit_of_measurement="�/kWh",
+    unit_of_measurement="€/kWh",
     mode="box",
 )
 
@@ -55,6 +56,7 @@ async def _validate_credentials(hass, username: str, password: str) -> tuple[str
     try:
     	# Try to connect to MyLight using the given credentials
         await api.async_login_test()
+        _LOGGER.info("MyLight150 config flow: connected successfully.")
 
         # Use the open session to retrieve the pricing type
         pricing_data = await api.async_call_api("/v3/contract/energy-pricing")
@@ -134,6 +136,7 @@ class MyLight150ConfigFlow(ConfigFlow, domain=DOMAIN):
                 data={
                     CONF_USERNAME: self._username,
                     CONF_PASSWORD: self._password,
+                    CONF_PRICING_TYPE: self._pricing_type,
                 },
                 options={
                     CONF_UPDATE_INTERVAL: int(max(
@@ -143,7 +146,6 @@ class MyLight150ConfigFlow(ConfigFlow, domain=DOMAIN):
                     CONF_UPDATE_INITIAL: user_input.get(
                         CONF_UPDATE_INITIAL, DEFAULT_UPDATE_INITIAL
                     ),
-                    CONF_PRICING_TYPE: self._pricing_type,
                     CONF_PRICING_BASE: user_input.get(CONF_PRICING_BASE, DEFAULT_PRICING_BASE),
                     CONF_PRICING_OFFPEAK: user_input.get(CONF_PRICING_OFFPEAK, DEFAULT_PRICING_OFFPEAK),
                 },
@@ -167,7 +169,7 @@ class MyLight150ConfigFlow(ConfigFlow, domain=DOMAIN):
             ): NumberSelector(_PRICING_SELECTOR),
         }
         # Only for offpeak pricing type
-        if self._pricing_type == "hphc":
+        if self._pricing_type == CONF_PRICING_TYPE_HPHC:
             schema[vol.Optional(
                 CONF_PRICING_OFFPEAK, default=DEFAULT_PRICING_OFFPEAK
             )] = NumberSelector(_PRICING_SELECTOR)
@@ -191,7 +193,7 @@ class MyLight150ConfigFlow(ConfigFlow, domain=DOMAIN):
             password = user_input[CONF_PASSWORD]
 
             try:
-                error_key, _ = await _validate_credentials(
+                error_key, pricing_type = await _validate_credentials(
                     self.hass,
                     reconfigure_entry.data[CONF_USERNAME],
                     password,
@@ -201,7 +203,7 @@ class MyLight150ConfigFlow(ConfigFlow, domain=DOMAIN):
                 else:
                     return self.async_update_reload_and_abort(
                         reconfigure_entry,
-                        data_updates={CONF_PASSWORD: password},
+                        data_updates={CONF_PASSWORD: password, CONF_PRICING_TYPE: pricing_type},
                     )
             except Exception:
                 _LOGGER.exception("MyLight150: reconfigure flow failed!")
@@ -232,7 +234,7 @@ class MyLight150OptionsFlowHandler(OptionsFlow):
         self, user_input: dict[str, Any] | None = None
     ) -> ConfigFlowResult:
         # pricing_type stored in the options at 1st config_flow
-        pricing_type = self.config_entry.options.get(
+        pricing_type = self.config_entry.data.get(
             CONF_PRICING_TYPE, DEFAULT_PRICING_TYPE
         )
 
@@ -240,8 +242,6 @@ class MyLight150OptionsFlowHandler(OptionsFlow):
             user_input[CONF_UPDATE_INTERVAL] = max(
                 int(user_input[CONF_UPDATE_INTERVAL]), MIN_UPDATE_INTERVAL
             )
-            # Keep the pricing_type (read-only here
-            user_input[CONF_PRICING_TYPE] = pricing_type
             return self.async_create_entry(title="", data=user_input)
 
         # Base Schema
@@ -270,8 +270,8 @@ class MyLight150OptionsFlowHandler(OptionsFlow):
             ): NumberSelector(_PRICING_SELECTOR),
         }
 
-        # Tarif HC uniquement si pricing_type == "hphc"
-        if pricing_type == "hphc":
+        # Tarif offpeak only if type is HPHC
+        if pricing_type == CONF_PRICING_TYPE_HPHC:
             schema[vol.Optional(
                 CONF_PRICING_OFFPEAK,
                 default=self.config_entry.options.get(CONF_PRICING_OFFPEAK, DEFAULT_PRICING_OFFPEAK),

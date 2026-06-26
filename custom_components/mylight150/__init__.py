@@ -33,6 +33,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     update_interval = entry.options.get(CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL)
     coordinator = MyLight150Coordinator(
         hass=hass,
+        entry=entry,
         api=api,
         update_interval_minutes=update_interval,
     )

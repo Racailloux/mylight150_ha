@@ -15,13 +15,28 @@
     },
     "step": {
       "user": {
+        "title": "MyLight150 - Account",
+        "description": "Enter your MyLight150 account credentials.",
         "data": {
-          "username": "Username",
-          "password": "Password",
+          "username": "Username (email)",
+          "password": "Password"
+        }
+      },
+      "options": {
+        "title": "MyLight150 - Settings",
+        "description": "Detected pricing type: **{pricing_type}**.\n\nEnter your electricity rates to enable cost calculation in the Energy dashboard.",
+        "data": {
           "update_interval": "Update interval",
-          "update_initial": "Update at startup"
+          "update_initial": "Update at startup",
+          "pricing_base": "Peak hours pricing (€/kWh)",
+          "pricing_offpeak": "Offpeak hours pricing (€/kWh)"
         },
-        "title": "MyLight150 Account Info"
+        "data_description": {
+          "update_interval": "Minutes between cloud polling updates.",
+          "update_initial": "Perform an update immediately upon startup.",
+          "pricing_base": "Your standard or peak hours electricity rate.",
+          "pricing_offpeak": "Your off-peak hours electricity rate (HC/HP contract only)."
+        }
       },
       "reconfigure": {
         "title": "Update MyLight150 Configuration",
@@ -35,14 +50,19 @@
   "options": {
     "step": {
       "init": {
-        "data": {
-          "update_initial": "Cloud Update at Startup",
-          "update_interval": "Update Interval"
-        },
         "title": "MyLight150 Options",
+        "description": "Detected pricing type: **{pricing_type}**.",
+        "data": {
+          "update_interval": "Update interval",
+          "update_initial": "Update at startup",
+          "pricing_base": "Peak hours pricing (€/kWh)",
+          "pricing_offpeak": "Offpeak hours pricing (€/kWh)"
+        },
         "data_description": {
+          "update_interval": "Minutes between cloud polling updates.",
           "update_initial": "Perform an update immediately upon startup.",
-          "update_interval": "Minutes between cloud polling updates."
+          "pricing_base": "Your standard or peak hours electricity rate.",
+          "pricing_offpeak": "Your off-peak hours electricity rate."
         }
       }
     }
@@ -60,7 +80,7 @@
       "injection": { "name": "Grid injection" },
       "load": { "name": "Load" },
       "msb_state": {
-        "name": "Virtual battery status", 
+        "name": "Virtual battery status",
         "state": {
           "charging": "Charging",
           "discharging": "Discharging",
@@ -94,9 +114,16 @@
       "energy_consumption": { "name": "Total energy consumption" },
       "energy_conso_from_solar": { "name": "Solar energy self-consumption" },
       "energy_conso_from_msb": { "name": "MSB energy out" },
-      "energy_conso_from_grid": { "name": "Grid energy consumption" }
-    },
-    "switch": {
+      "energy_conso_from_grid": { "name": "Grid energy consumption" },
+      "pricing_mode": {
+        "name": "Pricing mode",
+        "state": {
+          "base": "Base",
+          "peak": "Peak hours",
+          "offpeak": "Offpeak hours"
+        }
+      },
+      "current_pricing": { "name": "Current pricing" }
     }
   }
 }

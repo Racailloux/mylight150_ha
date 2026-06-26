@@ -3,6 +3,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
+from datetime import datetime, timedelta
 from typing import Any
 
 from homeassistant.components.sensor import (
@@ -17,31 +18,36 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
+from homeassistant.helpers.event import async_track_time_interval
 
 from .const import (
-    DOMAIN,
-    CONF_ENERGY_PROD_FROM_SOLAR,
-    CONF_ENERGY_PROD_TO_MSB,
-    CONF_ENERGY_PROD_TO_GRID,
-    CONF_ENERGY_CONSUMPTION,
-    CONF_ENERGY_CONSO_FROM_SOLAR,
-    CONF_ENERGY_CONSO_FROM_MSB,
     CONF_ENERGY_CONSO_FROM_GRID,
+    CONF_ENERGY_CONSO_FROM_MSB,
+    CONF_ENERGY_CONSO_FROM_SOLAR,
+    CONF_ENERGY_CONSUMPTION,
+    CONF_ENERGY_PROD_FROM_SOLAR,
+    CONF_ENERGY_PROD_TO_GRID,
+    CONF_ENERGY_PROD_TO_MSB,
+    CONF_PRICING_BASE,
+    CONF_PRICING_CURRENT,
+    CONF_PRICING_MODE,
+    CONF_PRICING_OFFPEAK,
+    CONF_PRICING_TYPE,
+    DEFAULT_PRICING_BASE,
+    DEFAULT_PRICING_OFFPEAK,
+    DEFAULT_PRICING_TYPE,
+    DOMAIN,
 )
 from .coordinator import MyLight150Coordinator
 
 _LOGGER = logging.getLogger(__name__)
 
 
-# ── Descriptions des sensors ─────────────────────────────────────────────────
-#
-# SensorEntityDescription est un dataclass HA standard.
-# On l'étend avec "data_key" pour pointer vers la clé dans coordinator.data.
-#
+# Sensors descriptions
 @dataclass(frozen=True, kw_only=True)
 class MyLight150SensorEntityDescription(SensorEntityDescription):
-    """Description étendue avec la clé dans coordinator.data."""
-    data_key: str  #key from dict returned by coordinator._parse_home_data()
+    """SensorEntityDescription extended with coordinator data_key."""
+    data_key: str
 
 
 # List all sensors
@@ -51,8 +57,8 @@ SENSORS: tuple[MyLight150SensorEntityDescription, ...] = (
     MyLight150SensorEntityDescription(
         key="solar_production",
         data_key="solar_production",
-        has_entity_name = True,
-        translation_key= "solar_production",
+        has_entity_name=True,
+        translation_key="solar_production",
         native_unit_of_measurement=UnitOfPower.KILO_WATT,
         device_class=SensorDeviceClass.POWER,
         state_class=SensorStateClass.MEASUREMENT,
@@ -61,8 +67,8 @@ SENSORS: tuple[MyLight150SensorEntityDescription, ...] = (
     MyLight150SensorEntityDescription(
         key="grid",
         data_key="grid",
-        has_entity_name = True,
-        translation_key= "grid",
+        has_entity_name=True,
+        translation_key="grid",
         native_unit_of_measurement=UnitOfPower.KILO_WATT,
         device_class=SensorDeviceClass.POWER,
         state_class=SensorStateClass.MEASUREMENT,
@@ -71,8 +77,8 @@ SENSORS: tuple[MyLight150SensorEntityDescription, ...] = (
     MyLight150SensorEntityDescription(
         key="injection",
         data_key="injection",
-        has_entity_name = True,
-        translation_key= "injection",
+        has_entity_name=True,
+        translation_key="injection",
         native_unit_of_measurement=UnitOfPower.KILO_WATT,
         device_class=SensorDeviceClass.POWER,
         state_class=SensorStateClass.MEASUREMENT,
@@ -81,8 +87,8 @@ SENSORS: tuple[MyLight150SensorEntityDescription, ...] = (
     MyLight150SensorEntityDescription(
         key="load",
         data_key="load",
-        has_entity_name = True,
-        translation_key= "load",
+        has_entity_name=True,
+        translation_key="load",
         native_unit_of_measurement=UnitOfPower.KILO_WATT,
         device_class=SensorDeviceClass.POWER,
         state_class=SensorStateClass.MEASUREMENT,
@@ -93,16 +99,15 @@ SENSORS: tuple[MyLight150SensorEntityDescription, ...] = (
     MyLight150SensorEntityDescription(
         key="msb_state",
         data_key="msb_state",
-        has_entity_name = True,
-        translation_key= "msb_state",
-        # Text status, no unit, no device class
+        has_entity_name=True,
+        translation_key="msb_state",
         icon="mdi:battery-sync",
     ),
     MyLight150SensorEntityDescription(
         key="msb_power",
         data_key="msb_power",
-        has_entity_name = True,
-        translation_key= "msb_power",
+        has_entity_name=True,
+        translation_key="msb_power",
         native_unit_of_measurement=UnitOfPower.KILO_WATT,
         device_class=SensorDeviceClass.POWER,
         state_class=SensorStateClass.MEASUREMENT,
@@ -111,8 +116,8 @@ SENSORS: tuple[MyLight150SensorEntityDescription, ...] = (
     MyLight150SensorEntityDescription(
         key="msb_autonomy",
         data_key="msb_autonomy",
-        has_entity_name = True,
-        translation_key= "msb_autonomy",
+        has_entity_name=True,
+        translation_key="msb_autonomy",
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         suggested_display_precision=0,
         device_class=SensorDeviceClass.ENERGY_STORAGE,
@@ -122,8 +127,8 @@ SENSORS: tuple[MyLight150SensorEntityDescription, ...] = (
     MyLight150SensorEntityDescription(
         key="msb_capacity",
         data_key="msb_capacity",
-        has_entity_name = True,
-        translation_key= "msb_capacity",
+        has_entity_name=True,
+        translation_key="msb_capacity",
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
         suggested_display_precision=0,
         device_class=SensorDeviceClass.ENERGY_STORAGE,
@@ -133,8 +138,8 @@ SENSORS: tuple[MyLight150SensorEntityDescription, ...] = (
     MyLight150SensorEntityDescription(
         key="msb_level",
         data_key="msb_level",
-        has_entity_name = True,
-        translation_key= "msb_level",
+        has_entity_name=True,
+        translation_key="msb_level",
         native_unit_of_measurement=PERCENTAGE,
         suggested_display_precision=0,
         device_class=SensorDeviceClass.BATTERY,
@@ -146,10 +151,10 @@ SENSORS: tuple[MyLight150SensorEntityDescription, ...] = (
     MyLight150SensorEntityDescription(
         key="savings",
         data_key="savings",
-        has_entity_name = True,
-        translation_key= "savings",
-        native_unit_of_measurement="EUR",
-        state_class=SensorStateClass.TOTAL_INCREASING,
+        has_entity_name=True,
+        translation_key="savings",
+        native_unit_of_measurement="€",
+        state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:piggy-bank",
     ),
 
@@ -157,17 +162,15 @@ SENSORS: tuple[MyLight150SensorEntityDescription, ...] = (
     MyLight150SensorEntityDescription(
         key="heatPump_mode",
         data_key="heatPump_mode",
-        has_entity_name = True,
-        translation_key= "heatpump_mode",
-        # Text status, no unit, no device class
+        has_entity_name=True,
+        translation_key="heatpump_mode",
         icon="mdi:heating-coil",
     ),
     MyLight150SensorEntityDescription(
         key="waterHeater_mode",
         data_key="waterHeater_mode",
-        has_entity_name = True,
-        translation_key= "waterheater_mode",
-        # Text status, no unit, no device class
+        has_entity_name=True,
+        translation_key="waterheater_mode",
         icon="mdi:water-boiler",
     ),
 
@@ -260,10 +263,17 @@ async def async_setup_entry(
 ) -> None:
     coordinator: MyLight150Coordinator = hass.data[DOMAIN][entry.entry_id]
 
-    async_add_entities(
-        MyLight150SensorEntity(coordinator, entry, description)
-        for description in SENSORS
-    )
+    # Common sensors
+    sensors: list = [
+        MyLight150SensorEntity(coordinator, entry, desc)
+        for desc in SENSORS
+    ]
+
+    # Pricing special sensors
+    sensors.append(MyLight150PricingModeSensorEntity(coordinator, entry))
+    sensors.append(MyLight150CurrentPricingSensorEntity(coordinator, entry))
+
+    async_add_entities(sensors)
 
 
 class MyLight150SensorEntity(CoordinatorEntity[MyLight150Coordinator], SensorEntity):
@@ -299,3 +309,170 @@ class MyLight150SensorEntity(CoordinatorEntity[MyLight150Coordinator], SensorEnt
         if self.coordinator.data is None:
             return None
         return self.coordinator.data.get(self.entity_description.data_key)
+
+
+class MyLight150PricingModeSensorEntity(CoordinatorEntity[MyLight150Coordinator], SensorEntity):
+
+    def __init__(
+        self,
+        coordinator: MyLight150Coordinator,
+        entry: ConfigEntry,
+    ) -> None:
+        super().__init__(coordinator)
+
+        # unique_id format : {domain}_{entry_id}_{sensor_key}
+        self._attr_unique_id = f"{DOMAIN}_{entry.entry_id}_{CONF_PRICING_MODE}"
+        self._attr_key=CONF_PRICING_MODE
+        self._attr_has_entity_name=True
+        self._attr_translation_key=CONF_PRICING_MODE
+        self._attr_icon="mdi:clock-time-eight-outline"
+        
+        # Device association named by installation code
+        installation_code = coordinator.installation_code or entry.entry_id
+        self._attr_device_info = DeviceInfo(
+            identifiers={(DOMAIN, installation_code)},
+            name=f"MyLight150 ({installation_code})",
+            manufacturer="MyLight Systems",
+            model="MySmartBattery",
+            configuration_url="https://client.mylight150.com",
+        )
+
+    async def async_added_to_hass(self) -> None:
+        await super().async_added_to_hass()
+        self._cancel_timer = async_track_time_interval(
+            self.hass,
+            self._async_update_time,
+            timedelta(minutes=1),
+        )
+
+    async def async_will_remove_from_hass(self) -> None:
+        if hasattr(self, "_cancel_timer"):
+            self._cancel_timer()
+
+    async def _async_update_time(self, _now=None) -> None:
+        self.async_write_ha_state()
+
+    @property
+    def native_value(self) -> Any:
+        """Return the current pricing mode "peak" or "offpeak" depending on current time."""
+        if self.coordinator.data is None:
+            return None
+
+        schedule = self.coordinator.hphc_schedule
+        if not schedule:
+            return "base"
+
+        return _compute_hphc_mode(schedule)
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        """Expose schedule data in attribute for potential automations."""
+        if self.coordinator.data is None:
+            return {}
+        return {
+            "schedule": self.coordinator.hphc_schedule,
+        }
+
+
+class MyLight150CurrentPricingSensorEntity(CoordinatorEntity[MyLight150Coordinator], SensorEntity):
+
+    def __init__(
+        self,
+        coordinator: MyLight150Coordinator,
+        entry: ConfigEntry,
+    ) -> None:
+        super().__init__(coordinator)
+        self._entry = entry
+        
+        # unique_id format : {domain}_{entry_id}_{sensor_key}
+        self._attr_unique_id = f"{DOMAIN}_{entry.entry_id}_{CONF_PRICING_CURRENT}"
+        self._attr_key=CONF_PRICING_CURRENT
+        self._attr_has_entity_name=True
+        self._attr_translation_key=CONF_PRICING_CURRENT
+        self._attr_state_class = SensorStateClass.MEASUREMENT
+        self._attr_native_unit_of_measurement = "€/kWh"
+        self._attr_suggested_display_precision = 3
+        self._attr_icon = "mdi:currency-eur"
+        
+        # Device association named by installation code
+        installation_code = coordinator.installation_code or entry.entry_id
+        self._attr_device_info = DeviceInfo(
+            identifiers={(DOMAIN, installation_code)},
+            name=f"MyLight150 ({installation_code})",
+            manufacturer="MyLight Systems",
+            model="MySmartBattery",
+            configuration_url="https://client.mylight150.com",
+        )
+
+    async def async_added_to_hass(self) -> None:
+        await super().async_added_to_hass()
+        self._cancel_timer = async_track_time_interval(
+            self.hass,
+            self._async_update_time,
+            timedelta(minutes=1),
+        )
+
+    async def async_will_remove_from_hass(self) -> None:
+        if hasattr(self, "_cancel_timer"):
+            self._cancel_timer()
+
+    async def _async_update_time(self, _now=None) -> None:
+        self.async_write_ha_state()
+    
+    @property
+    def native_value(self) -> float | None:
+        """Return the current pricing in €/kWh"""
+        options = self._entry.options
+        pricing_type = self._entry.data.get(CONF_PRICING_TYPE, DEFAULT_PRICING_TYPE)
+        tarif_base = options.get(CONF_PRICING_BASE, DEFAULT_PRICING_BASE)
+        tarif_offpeak = options.get(CONF_PRICING_OFFPEAK, DEFAULT_PRICING_OFFPEAK)
+
+        if pricing_type != "hphc": # Standard pricing
+            return tarif_base
+
+        # Peak/OffPeak mode: Calculate the current pricing
+        schedule = self.coordinator.hphc_schedule
+        if not schedule:
+            return tarif_base
+
+        current_mode = _compute_hphc_mode(schedule)
+        return tarif_offpeak if current_mode == "offpeak" else tarif_base
+
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        """Expose pricings configured for potential automations."""
+        options = self._entry.options
+        return {
+            "tarif_base": options.get(CONF_PRICING_BASE, DEFAULT_PRICING_BASE),
+            "tarif_offpeak": options.get(CONF_PRICING_OFFPEAK, DEFAULT_PRICING_OFFPEAK),
+            "pricing_type": options.get(CONF_PRICING_TYPE, DEFAULT_PRICING_TYPE),
+        }
+
+
+def _compute_hphc_mode(schedule: list[dict]) -> str:
+    now = datetime.now()
+    current_minutes = now.hour * 60 + now.minute
+
+    def _parse_hhmm(time_str: str) -> int:
+        """Convert time in number of minutes since midnight."""
+        parts = time_str.lower().replace("h", ":").split(":")
+        return int(parts[0]) * 60 + int(parts[1])
+
+    for period in schedule:
+        start = _parse_hhmm(period.get("start", "00h00"))
+        end   = _parse_hhmm(period.get("end",   "00h00"))
+        ptype = period.get("type", "peak").lower()
+        
+        # Manage midnight limit
+        if end == 0:
+            end = 24 * 60
+
+        if start < end:
+            if start <= current_minutes < end:
+                return ptype
+        else:
+            if current_minutes >= start or current_minutes < end:
+                return ptype
+
+    # Fallback
+    return "base"
