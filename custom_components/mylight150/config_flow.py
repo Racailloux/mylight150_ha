@@ -5,18 +5,14 @@ from typing import Any
 
 import voluptuous as vol
 
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.config_entries import (
     ConfigEntry,
     ConfigFlow,
     ConfigFlowResult,
     OptionsFlow,
 )
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
-
-from homeassistant.helpers.selector import (
-    NumberSelector,
-    NumberSelectorConfig,
-)
+from homeassistant.helpers.selector import NumberSelector, NumberSelectorConfig
 
 from .api import MyLight150ApiClient, MyLight150AuthError, MyLight150ApiError
 from .const import (
@@ -40,6 +36,7 @@ from .const import (
 
 _LOGGER = logging.getLogger(__name__)
 
+
 # Numeric selector for pricing inputs
 _PRICING_SELECTOR = NumberSelectorConfig(
     min=0.0,
@@ -48,6 +45,7 @@ _PRICING_SELECTOR = NumberSelectorConfig(
     unit_of_measurement="€/kWh",
     mode="box",
 )
+
 
 async def _validate_credentials(hass, username: str, password: str) -> tuple[str | None, str]:
     """Try to authenticate. Returns None on success, or an error key string on failure."""

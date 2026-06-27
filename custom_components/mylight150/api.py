@@ -18,7 +18,6 @@ import jwt
 from jwt.algorithms import RSAAlgorithm
 
 from homeassistant.core import HomeAssistant
-
 from .const import (
     OAUTH_URL,
     OAUTH_CLIENT_ID,
@@ -27,8 +26,6 @@ from .const import (
     OAUTH_REDIRECT_URI,
     API_SUBSCRIPTION_KEY,
     API_URL,
-    OAUTH_TENANT_NAME,
-    OAUTH_TENANT_ID,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -155,51 +152,17 @@ class MyLight150ApiClient:
             "refresh_token_expires_at": self._refresh_token_expires_at,
         }
 
-    # ------------------------------------------------------------------
-    # Token validation
-    # ------------------------------------------------------------------
-
-    async def _get_signing_key(self, token: str) -> Any:
-        """Fetch JWKS and return the public key matching the token's kid."""
-        jwks_url = f"{OAUTH_URL}/discovery/v2.0/keys"
-        async with self._session.get(jwks_url) as response:
-            response.raise_for_status()
-            jwks_data = await response.json()
-
-        header = jwt.get_unverified_header(token)
-        kid = header["kid"]
-        for key in jwks_data["keys"]:
-            if key["kid"] == kid:
-                return RSAAlgorithm.from_jwk(key)
-        raise MyLight150AuthError(f"Public key not found for kid: {kid}")
-
-
-    async def async_validate_token(self) -> bool:
-        """Validate a JWT and return its decoded payload, or None if invalid."""
-        try:
-            if not self._access_token:
-                _LOGGER.debug("MyLight150: No access token to validate")
-                return False
-            signing_key = await self._get_signing_key(self._access_token)
-
-            _LOGGER.debug(f"MyLight150: Access token valid ({self._access_token[:50]})")
-            return True
-        except jwt.ExpiredSignatureError:
-            _LOGGER.debug("MyLight150: Token expired")
-            return False
-        except jwt.InvalidTokenError as err:
-            _LOGGER.debug("MyLight150: Invalid JWT: %s", err)
-            return False
-
 
     # ------------------------------------------------------------------
     # OAuth2 PKCE login flow
     # ------------------------------------------------------------------
 
+
     async def _get_token_from_login(self) -> str:
         """Call full B2C login through request in a executor thread."""
         _LOGGER.debug(f"MyLight150: Starting executor thread to proceed to a full login for account: {self._username}")
         return await self._hass.async_add_executor_job(self._sync_login)
+
 
     def _sync_login(self) -> str:
         session = requests.Session()

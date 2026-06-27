@@ -40,7 +40,6 @@ CONF_ENERGY_CONSO_FROM_SOLAR = "energy_conso_from_solar"
 CONF_ENERGY_CONSO_FROM_MSB = "energy_conso_from_msb"
 CONF_ENERGY_CONSO_FROM_GRID = "energy_conso_from_grid"
 
-
 REFRESH_DATA_FAILED_EVENT = "refresh_failed"
 REFRESH_DATA_COMPLETED_EVENT = "refresh_completed"
 
@@ -52,6 +51,9 @@ DEFAULT_PRICING_BASE = 0.23
 DEFAULT_PRICING_OFFPEAK = 0.14
 DEFAULT_PRICING_TYPE = "base"
 
+
+# Platform list to be loaded (other sensors (binary,etc) can be added later.
+#PLATFORMS: list[Platform] = [Platform.SENSOR]
 PLATFORMS: list[Platform] = [
 #    Platform.BINARY_SENSOR,
     Platform.SENSOR,

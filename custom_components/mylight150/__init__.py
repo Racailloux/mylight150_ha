@@ -1,4 +1,4 @@
-"""Intégration MyLight150 pour Home Assistant."""
+"""Integration MyLight150 for Home Assistant."""
 
 from __future__ import annotations
 
@@ -10,12 +10,18 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .api import MyLight150ApiClient
-from .const import CONF_UPDATE_INTERVAL, CONF_UPDATE_INITIAL, CONF_USERNAME, CONF_PASSWORD, DEFAULT_UPDATE_INTERVAL, DOMAIN
+from .const import (
+    CONF_UPDATE_INTERVAL,
+    CONF_USERNAME,
+    CONF_PASSWORD,
+    DEFAULT_UPDATE_INTERVAL,
+    DOMAIN
+)
 from .coordinator import MyLight150Coordinator
 
 _LOGGER = logging.getLogger(__name__)
 
-# Liste des plateformes à charger (on ajoutera binary_sensor, etc. plus tard)
+# Platform list to be loaded (other sensors (binary,etc) can be added later.
 PLATFORMS: list[Platform] = [Platform.SENSOR]
 
 

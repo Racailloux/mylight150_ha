@@ -1,4 +1,4 @@
-"""MyLight150 diagnostics — collect debug informations."""
+"""MyLight150 diagnostics — collect debug and API informations."""
 
 from __future__ import annotations
 

@@ -1,4 +1,4 @@
-"""Sensors MyLight150."""
+"""Sensors for MyLight150 integration."""
 from __future__ import annotations
 
 import logging
@@ -17,8 +17,8 @@ from homeassistant.const import UnitOfPower, PERCENTAGE, UnitOfEnergy
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
-from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.helpers.event import async_track_time_interval
+from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import (
     CONF_ENERGY_CONSO_FROM_GRID,
