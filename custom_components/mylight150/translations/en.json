@@ -24,7 +24,7 @@
       },
       "options": {
         "title": "MyLight150 - Settings",
-        "description": "Detected pricing type: **{pricing_type}**.\n\nEnter your electricity rates to enable cost calculation in the Energy dashboard.",
+        "description": "Detected pricing type: **{pricing_type}**.\n\nEnter pricing informations to allow energy dashboard costs calculations.",
         "data": {
           "update_interval": "Update interval",
           "update_initial": "Update at startup",
@@ -39,7 +39,7 @@
         }
       },
       "reconfigure": {
-        "title": "Update MyLight150 Configuration",
+        "title": "MyLight150 - Update configuration",
         "description": "Update settings for account **{username}**.",
         "data": {
           "password": "Password"
@@ -65,12 +65,6 @@
           "pricing_offpeak": "Your off-peak hours electricity rate."
         }
       }
-    }
-  },
-  "services": {
-    "refresh_cloud_data": {
-      "name": "Refresh Cloud Data",
-      "description": "Retrieves current cloud data."
     }
   },
   "entity": {

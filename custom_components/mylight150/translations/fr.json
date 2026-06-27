@@ -26,7 +26,7 @@
       },
       "options": {
         "title": "MyLight150 - Réglages",
-        "description": "Type de tarification détectée : **{pricing_type}**.\n\nEntrez votre tarification électrique pour permettre de calculer les coûts dans le dashboard.",
+        "description": "Type de tarification détectée : **{pricing_type}**.\n\nEntrez votre tarification électrique pour permettre de calculer les coûts dans le dashboard Energie.",
         "data": {
           "update_interval": "Intervalle de mise à jour",
           "update_initial": "Mise à jour au démarrage",
@@ -52,8 +52,8 @@
   "options": {
     "step": {
       "init": {
-        "title": "Options de MyLight150",
-        "description": "Type de tarification détectée : **{pricing_type}**.",
+        "title": "MyLight150 - Mise à jour de la configuration",
+        "description": "Type de tarification détectée : **{pricing_type}**.\n\nEntrez votre tarification électrique pour permettre de calculer les coûts dans le dashboard Energie.",
         "data": {
           "update_initial": "Mise à jour au démarrage",
           "update_interval": "Intervalle de mises à jour",
@@ -67,12 +67,6 @@
           "pricing_offpeak": "Votre tarif heures creuses (contrat HC/HP uniquement)."
         }
       }
-    }
-  },
-  "services": {
-    "refresh_cloud_data": {
-      "name": "Actualiser les données cloud",
-      "description": "Récupère les données cloud actuelles."
     }
   },
   "entity": {
