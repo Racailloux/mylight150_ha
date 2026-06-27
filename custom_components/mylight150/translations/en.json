@@ -51,7 +51,7 @@
     "step": {
       "init": {
         "title": "MyLight150 Options",
-        "description": "Detected pricing type: **{pricing_type}**.",
+        "description": "Detected pricing type: **{pricing_type}**.\n\nEnter pricing informations to allow energy dashboard costs calculations.",
         "data": {
           "update_interval": "Update interval",
           "update_initial": "Update at startup",
