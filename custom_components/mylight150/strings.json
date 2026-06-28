@@ -1,0 +1,123 @@
+{
+  "config": {
+    "abort": {
+      "invalid_credentials": "Invalid credentials",
+      "user_already_configured": "Account has already been configured",
+      "reconfigure_successful": "Configuration updated successfully",
+      "already_configured": "This account is already configured."
+    },
+    "create_entry": {},
+    "error": {
+      "invalid_credentials": "Invalid credentials",
+      "invalid_username": "Invalid username",
+      "unexpected": "Unexpected error communicating with MyLight150 server",
+      "user_already_configured": "Account has already been configured"
+    },
+    "step": {
+      "user": {
+        "title": "MyLight150 - Account",
+        "description": "Enter your MyLight150 account credentials.",
+        "data": {
+          "username": "Username (email)",
+          "password": "Password"
+        }
+      },
+      "options": {
+        "title": "MyLight150 - Settings",
+        "description": "Detected pricing type: **{pricing_type}**.\n\nEnter pricing informations to allow energy dashboard costs calculations.",
+        "data": {
+          "update_interval": "Update interval",
+          "update_initial": "Update at startup",
+          "pricing_base": "Peak hours pricing (€/kWh)",
+          "pricing_offpeak": "Offpeak hours pricing (€/kWh)"
+        },
+        "data_description": {
+          "update_interval": "Minutes between cloud polling updates.",
+          "update_initial": "Perform an update immediately upon startup.",
+          "pricing_base": "Your standard or peak hours electricity rate.",
+          "pricing_offpeak": "Your off-peak hours electricity rate (HC/HP contract only)."
+        }
+      },
+      "reconfigure": {
+        "title": "MyLight150 - Update configuration",
+        "description": "Update settings for account **{username}**.",
+        "data": {
+          "password": "Password"
+        }
+      }
+    }
+  },
+  "options": {
+    "step": {
+      "init": {
+        "title": "MyLight150 Options",
+        "description": "Detected pricing type: **{pricing_type}**.\n\nEnter pricing informations to allow energy dashboard costs calculations.",
+        "data": {
+          "update_interval": "Update interval",
+          "update_initial": "Update at startup",
+          "pricing_base": "Peak hours pricing (€/kWh)",
+          "pricing_offpeak": "Offpeak hours pricing (€/kWh)"
+        },
+        "data_description": {
+          "update_interval": "Minutes between cloud polling updates.",
+          "update_initial": "Perform an update immediately upon startup.",
+          "pricing_base": "Your standard or peak hours electricity rate.",
+          "pricing_offpeak": "Your off-peak hours electricity rate."
+        }
+      }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "solar_production": { "name": "Solar production" },
+      "grid": { "name": "Grid power" },
+      "injection": { "name": "Grid injection" },
+      "load": { "name": "Load" },
+      "msb_state": {
+        "name": "Virtual battery status",
+        "state": {
+          "charging": "Charging",
+          "discharging": "Discharging",
+          "idle": "Idle",
+          "full": "Full"
+        }
+      },
+      "msb_power": { "name": "Virtual battery power" },
+      "msb_autonomy": { "name": "Virtual battery autonomy" },
+      "msb_capacity": { "name": "Virtual battery capacity" },
+      "msb_level": { "name": "Virtual battery level" },
+      "savings": { "name": "Monthly money saving" },
+      "heatpump_mode": {
+        "name": "Heat pump mode",
+        "state": {
+          "off": "Off",
+          "on": "On"
+        }
+      },
+      "waterheater_mode": {
+        "name": "Water heater mode",
+        "state": {
+          "off": "Off",
+          "smart": "Smart",
+          "comfort": "Comfort"
+        }
+      },
+      "energy_prod_from_solar": { "name": "Solar energy production" },
+      "energy_prod_to_msb": { "name": "MSB energy in" },
+      "energy_prod_to_grid": { "name": "Grid energy injection" },
+      "energy_consumption": { "name": "Total energy consumption" },
+      "energy_conso_from_solar": { "name": "Solar energy self-consumption" },
+      "energy_conso_from_msb": { "name": "MSB energy out" },
+      "energy_conso_from_grid": { "name": "Grid energy consumption" },
+      "pricing_mode": {
+        "name": "Pricing mode",
+        "state": {
+          "base": "Base",
+          "peak": "Peak hours",
+          "offpeak": "Offpeak hours"
+        }
+      },
+      "current_pricing": { "name": "Current pricing" }
+    }
+  }
+}
