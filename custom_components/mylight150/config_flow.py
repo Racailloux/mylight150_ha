@@ -9,10 +9,9 @@ from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.config_entries import (
     ConfigEntry,
     ConfigFlow,
-    ConfigFlowResult,
     OptionsFlow,
 )
-from homeassistant.helpers.selector import NumberSelector, NumberSelectorConfig
+from homeassistant.helpers.selector import NumberSelector, NumberSelectorConfig, NumberSelectorMode
 
 from .api import MyLight150ApiClient, MyLight150AuthError, MyLight150ApiError
 from .const import (
@@ -43,14 +42,13 @@ _PRICING_SELECTOR = NumberSelectorConfig(
     max=2.0,
     step=0.001,
     unit_of_measurement="€/kWh",
-    mode="box",
+    mode=NumberSelectorMode.BOX,
 )
 
 
 async def _validate_credentials(hass, username: str, password: str) -> tuple[str | None, str]:
     """Try to authenticate. Returns None on success, or an error key string on failure."""
-    session = async_get_clientsession(hass)
-    api = MyLight150ApiClient(hass, session, username, password)
+    api = MyLight150ApiClient(hass, username, password)
     try:
     	# Try to connect to MyLight using the given credentials
         await api.async_login_test()
@@ -87,7 +85,7 @@ class MyLight150ConfigFlow(ConfigFlow, domain=DOMAIN):
     # Step 1: Credential input & validation
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
-    ) -> ConfigFlowResult:
+    ):
         _errors: dict[str, str] = {}
 
         if user_input is not None:
@@ -126,7 +124,7 @@ class MyLight150ConfigFlow(ConfigFlow, domain=DOMAIN):
     # Step 2: Options (pooling & pricing)
     async def async_step_options(
         self, user_input: dict[str, Any] | None = None
-    ) -> ConfigFlowResult:
+    ):
         
         if user_input is not None:
             return self.async_create_entry(
@@ -151,25 +149,25 @@ class MyLight150ConfigFlow(ConfigFlow, domain=DOMAIN):
         # Base schema common for every pricing type
         schema: dict = {
             vol.Required(
-                CONF_UPDATE_INTERVAL, default=DEFAULT_UPDATE_INTERVAL
+                CONF_UPDATE_INTERVAL, default=DEFAULT_UPDATE_INTERVAL # type: ignore # voluptuous stubs incorrects
             ): NumberSelector(NumberSelectorConfig(
                 min=MIN_UPDATE_INTERVAL,
                 max=MAX_UPDATE_INTERVAL,
-                mode="slider",
+                mode=NumberSelectorMode.SLIDER,
                 step=1,
                 unit_of_measurement="min",
             )),
             vol.Optional(
-                CONF_UPDATE_INITIAL, default=DEFAULT_UPDATE_INITIAL
+                CONF_UPDATE_INITIAL, default=DEFAULT_UPDATE_INITIAL # type: ignore # voluptuous stubs incorrects
             ): bool,
             vol.Optional(
-                CONF_PRICING_BASE, default=DEFAULT_PRICING_BASE
+                CONF_PRICING_BASE, default=DEFAULT_PRICING_BASE # type: ignore # voluptuous stubs incorrects
             ): NumberSelector(_PRICING_SELECTOR),
         }
         # Only for offpeak pricing type
         if self._pricing_type == CONF_PRICING_TYPE_HPHC:
             schema[vol.Optional(
-                CONF_PRICING_OFFPEAK, default=DEFAULT_PRICING_OFFPEAK
+                CONF_PRICING_OFFPEAK, default=DEFAULT_PRICING_OFFPEAK # type: ignore # voluptuous stubs incorrects
             )] = NumberSelector(_PRICING_SELECTOR)
 
         return self.async_show_form(
@@ -183,7 +181,7 @@ class MyLight150ConfigFlow(ConfigFlow, domain=DOMAIN):
     # Reconfiguration of the integration: password only
     async def async_step_reconfigure(
         self, user_input: dict[str, Any] | None = None
-    ) -> ConfigFlowResult:
+    ):
         _errors: dict[str, str] = {}
         reconfigure_entry = self._get_reconfigure_entry()
 
@@ -220,9 +218,10 @@ class MyLight150ConfigFlow(ConfigFlow, domain=DOMAIN):
             },
             errors=_errors,
         )
+    
 
     @staticmethod
-    def async_get_options_flow(configentry: ConfigEntry) -> MyLight150OptionsFlowHandler:
+    def async_get_options_flow(config_entry: ConfigEntry) -> MyLight150OptionsFlowHandler:
         return MyLight150OptionsFlowHandler()
 
 
@@ -230,11 +229,9 @@ class MyLight150ConfigFlow(ConfigFlow, domain=DOMAIN):
 class MyLight150OptionsFlowHandler(OptionsFlow):
     async def async_step_init(
         self, user_input: dict[str, Any] | None = None
-    ) -> ConfigFlowResult:
+    ):
         # pricing_type stored in the options at 1st config_flow
-        pricing_type = self.config_entry.data.get(
-            CONF_PRICING_TYPE, DEFAULT_PRICING_TYPE
-        )
+        pricing_type = self.config_entry.data.get(CONF_PRICING_TYPE, DEFAULT_PRICING_TYPE)
 
         if user_input is not None:
             user_input[CONF_UPDATE_INTERVAL] = max(
@@ -252,7 +249,7 @@ class MyLight150OptionsFlowHandler(OptionsFlow):
             ): NumberSelector(NumberSelectorConfig(
                 min=MIN_UPDATE_INTERVAL,
                 max=MAX_UPDATE_INTERVAL,
-                mode="slider",
+                mode=NumberSelectorMode.SLIDER,
                 step=1,
                 unit_of_measurement="min",
             )),
@@ -264,7 +261,8 @@ class MyLight150OptionsFlowHandler(OptionsFlow):
             ): bool,
             vol.Optional(
                 CONF_PRICING_BASE,
-                default=self.config_entry.options.get(CONF_PRICING_BASE, DEFAULT_PRICING_BASE),
+                default=self.config_entry.options.get(
+                    CONF_PRICING_BASE, DEFAULT_PRICING_BASE),
             ): NumberSelector(_PRICING_SELECTOR),
         }
 
@@ -272,7 +270,8 @@ class MyLight150OptionsFlowHandler(OptionsFlow):
         if pricing_type == CONF_PRICING_TYPE_HPHC:
             schema[vol.Optional(
                 CONF_PRICING_OFFPEAK,
-                default=self.config_entry.options.get(CONF_PRICING_OFFPEAK, DEFAULT_PRICING_OFFPEAK),
+                default=self.config_entry.options.get(
+                    CONF_PRICING_OFFPEAK, DEFAULT_PRICING_OFFPEAK),
             )] = NumberSelector(_PRICING_SELECTOR)
 
         return self.async_show_form(

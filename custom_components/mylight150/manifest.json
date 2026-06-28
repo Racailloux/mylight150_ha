@@ -9,6 +9,6 @@
   "iot_class": "cloud_polling",
   "issue_tracker": "https://github.com/Racailloux/mylight150_ha/issues",
   "loggers": ["mylight150"],
-  "requirements": ["aiohttp>=3.8.0", "pyjwt>=2.8.0", "cryptography>=41.0.0"],
+  "requirements": [],
   "version": "0.4.0"
 }

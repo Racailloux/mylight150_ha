@@ -7,7 +7,6 @@ import logging
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .api import MyLight150ApiClient
 from .const import (
@@ -15,21 +14,17 @@ from .const import (
     CONF_USERNAME,
     CONF_PASSWORD,
     DEFAULT_UPDATE_INTERVAL,
-    DOMAIN
+    DOMAIN,
+    PLATFORMS
 )
 from .coordinator import MyLight150Coordinator
 
 _LOGGER = logging.getLogger(__name__)
 
-# Platform list to be loaded (other sensors (binary,etc) can be added later.
-PLATFORMS: list[Platform] = [Platform.SENSOR]
-
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # API instanciation
-    session = async_get_clientsession(hass)
     api = MyLight150ApiClient(
-        session=session,
         username=entry.data[CONF_USERNAME],
         password=entry.data[CONF_PASSWORD],
         hass=hass,

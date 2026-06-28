@@ -1,5 +1,4 @@
 from __future__ import annotations
-from datetime import timedelta
 
 from homeassistant.const import CONF_PASSWORD, CONF_USERNAME, Platform
 from logging import Logger, getLogger
@@ -43,17 +42,16 @@ CONF_ENERGY_CONSO_FROM_GRID = "energy_conso_from_grid"
 REFRESH_DATA_FAILED_EVENT = "refresh_failed"
 REFRESH_DATA_COMPLETED_EVENT = "refresh_completed"
 
-MIN_UPDATE_INTERVAL = 10
-MAX_UPDATE_INTERVAL = 30
-DEFAULT_UPDATE_INTERVAL = 10
-DEFAULT_UPDATE_INITIAL = True
-DEFAULT_PRICING_BASE = 0.23
-DEFAULT_PRICING_OFFPEAK = 0.14
-DEFAULT_PRICING_TYPE = "base"
+MIN_UPDATE_INTERVAL: int = 10
+MAX_UPDATE_INTERVAL: int = 30
+DEFAULT_UPDATE_INTERVAL: int = 10
+DEFAULT_UPDATE_INITIAL: bool = True
+DEFAULT_PRICING_BASE: float = 0.23
+DEFAULT_PRICING_OFFPEAK: float = 0.14
+DEFAULT_PRICING_TYPE: str = "base"
 
 
 # Platform list to be loaded (other sensors (binary,etc) can be added later.
-#PLATFORMS: list[Platform] = [Platform.SENSOR]
 PLATFORMS: list[Platform] = [
 #    Platform.BINARY_SENSOR,
     Platform.SENSOR,

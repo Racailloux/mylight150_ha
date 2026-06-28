@@ -6,16 +6,11 @@ import base64
 import hashlib
 import logging
 import secrets
-import requests
 from datetime import datetime, timezone
-from zoneinfo import ZoneInfo
-import json
 
-import aiohttp
-from aiohttp import ClientSession, ClientResponseError, ClientError
+from requests import Session
 from urllib.parse import parse_qs
-import jwt
-from jwt.algorithms import RSAAlgorithm
+from zoneinfo import ZoneInfo
 
 from homeassistant.core import HomeAssistant
 from .const import (
@@ -42,33 +37,43 @@ class MyLight150ApiError(Exception):
 class MyLight150ApiClient:
     """Async client for the MyLight150 API."""
 
-    def __init__(self, hass: HomeAssistant, session: ClientSession, username: str, password: str) -> None:
+    def __init__(self, hass: HomeAssistant, username: str, password: str) -> None:
         self._hass = hass
-        self._session = session
         self._username = username
         self._password = password
+        self._session: Session = Session()
         # Token & token expiration storage
         self._access_token: str | None = None
         self._refresh_token: str | None = None
         self._token_expires_at: float = 0.0
         self._refresh_token_expires_at: float = 0.0
 
-    # ------------------------------------------------------------------
-    # Public interface
-    # ------------------------------------------------------------------
 
+    # Public interfaces
     async def async_login_test(self) -> bool:
         """Full OAuth2 PKCE login flow. Returns True on success."""
         _LOGGER.debug(f"Login test for account: {self._username}")
         try:
-            self._access_token = await self._get_token_from_login()
+            # Test connection from from zero: avoid token validity checks
+            self._access_token = await self._async_login()
             _LOGGER.debug("Login successful!")
-            _LOGGER.debug((f"Access token: (validity: "
-                           f"{datetime.fromtimestamp(self._token_expires_at, ZoneInfo("Europe/Paris")).strftime('%Y-%m-%d %H:%M:%S')} (Paris)) "
-                           f"{self._access_token[:100]}..."))
-            _LOGGER.debug((f"Refresh token: (validity: "
-                           f"{datetime.fromtimestamp(self._refresh_token_expires_at, ZoneInfo("Europe/Paris")).strftime('%Y-%m-%d %H:%M:%S')} (Paris)) "
-                           f"{self._refresh_token[:100]}..."))
+
+            access_token_preview = (
+                f"{self._access_token[:100]}..."
+                if self._access_token
+                else "None"
+            )
+            refresh_token_preview = (
+                f"{self._refresh_token[:100]}..."
+                if self._refresh_token
+                else "None"
+            )
+            _LOGGER.debug(f"Access token: (validity: "
+                          f"{datetime.fromtimestamp(self._token_expires_at, ZoneInfo('Europe/Paris')).strftime('%Y-%m-%d %H:%M:%S')} (Paris)) "
+                          f"{access_token_preview}...\n"
+                          f"Refresh token: (validity: "
+                          f"{datetime.fromtimestamp(self._refresh_token_expires_at, ZoneInfo('Europe/Paris')).strftime('%Y-%m-%d %H:%M:%S')} (Paris)) "
+                          f"{refresh_token_preview}...")
             return self._access_token is not None
         except MyLight150AuthError:
             raise
@@ -76,28 +81,37 @@ class MyLight150ApiClient:
             raise MyLight150AuthError(f"Login failed: {err}") from err
 
 
-    async def async_get_valid_token(self) -> str:
-        """Return a valid access token, refreshing or re-logging if needed."""
+    async def async_get_token(self) -> str:
+        """Return a valid access token, or None if failed. Refreshing or re-logging if needed."""
         now = datetime.now(timezone.utc).timestamp()
-        _LOGGER.debug((f"MyLight150: Now time : {now} /"            
+        _LOGGER.debug((f"MyLight150: Get valid token: Now time : {now} /"            
                        f" Access token validity: {self._token_expires_at} /"
                        f" Refresh token validity: {self._refresh_token_expires_at}"))
 
+        # Check if access token is still valid
         if self._access_token and self._token_expires_at > now:
             _LOGGER.debug(f"Token is still valid for account: {self._username} (token: {self._access_token[:20]}...)")
             return self._access_token
-
+        
+        # Access token expired, check if refresh token is still valid
         if self._refresh_token and self._refresh_token_expires_at > now:
             _LOGGER.debug("MyLight150: Access token expired but refresh token still available, refreshing...")
-            return await self._get_token_from_refresh()
-
+            return await self._async_refresh_access_token()
+        
+        # Everything expired, do a full OAuth2 PKCE login
         _LOGGER.debug("MyLight150: No valid token, performing full login...")
-        return await self._get_token_from_login()
-    
+        return await self._async_login()
+
 
     async def async_call_api(self, endpoint: str) -> dict[str, Any]:
-        """Call a MyLight150 API endpoint and return the JSON response."""
-        token = await self.async_get_valid_token()
+        """Call API endpoint through request in a executor thread."""
+        _LOGGER.debug(f"MyLight150: Starting executor thread to proceed to an access token refresh for account: {self._username}")
+        token = await self.async_get_token()
+        return await self._hass.async_add_executor_job(self._sync_call_api, endpoint, token)
+
+
+    def _sync_call_api(self, endpoint: str, token: str) -> dict[str, Any]:
+        """Call API endpoint request and return the data responsed."""
         url = f"{API_URL}{endpoint}"
         headers = {
             "Authorization": f"Bearer {token}",
@@ -112,35 +126,30 @@ class MyLight150ApiClient:
                 "Chrome/120.0.0.0 Safari/537.36"
             ),
         }
+        _LOGGER.debug(f"API request URL: {url[:100]}")
 
-        try:
-            async with self._session.get(url, headers=headers, timeout=10) as response:
-                if response.status == 401:
-                    raise MyLight150ApiError(f"Token rejected by API for {endpoint} ({response.status})")
-                response.raise_for_status()
-
-                return await response.json()
-        except MyLight150AuthError:
-            raise
-        except ClientResponseError as err:
-            raise MyLight150ApiError(f"API error {err.status} on {endpoint}") from err
-        except ClientError as err:
-            raise MyLight150ApiError(f"Connection error on {endpoint}: {err}") from err
+        response = self._session.get(url, headers=headers, timeout=10)
+        if response.status_code != 200:
+            _LOGGER.debug(f"MyLight150: API request failed ({response.status_code}), while trying to get endpoint: '{endpoint}'.")
+            _LOGGER.debug(f"MyLight150: Response text: {response.text[:200]}")
+            return {}
+        
+        return response.json()
 
 
+    # Persistence methods
     def restore_tokens(
         self,
         access_token: str,
         refresh_token: str,
-        not_before: float,
-        expires_in: int,
-        refresh_token_expires_in: int,
+        access_token_expires_at: int,
+        refresh_token_expires_at: int,
     ) -> None:
         """Restore tokens previously persisted in the HA config entry."""
         self._access_token = access_token
         self._refresh_token = refresh_token
-        self._token_expires_at = not_before + expires_in
-        self._refresh_token_expires_at = not_before + refresh_token_expires_in
+        self._token_expires_at = access_token_expires_at
+        self._refresh_token_expires_at = refresh_token_expires_at
 
 
     def get_token_data(self) -> dict[str, Any]:
@@ -153,20 +162,17 @@ class MyLight150ApiClient:
         }
 
 
-    # ------------------------------------------------------------------
     # OAuth2 PKCE login flow
-    # ------------------------------------------------------------------
-
-
-    async def _get_token_from_login(self) -> str:
+    async def _async_login(self) -> str:
         """Call full B2C login through request in a executor thread."""
         _LOGGER.debug(f"MyLight150: Starting executor thread to proceed to a full login for account: {self._username}")
         return await self._hass.async_add_executor_job(self._sync_login)
 
 
     def _sync_login(self) -> str:
-        session = requests.Session()
-        session.headers.update({
+        # New connection, recreate a new session
+        self._session = Session()
+        self._session.headers.update({
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
         })
 
@@ -189,14 +195,14 @@ class MyLight150ApiClient:
         )
         _LOGGER.debug(f"MyLight150: Formular request URL: {form_url[:100]}...")
 
-        response = session.get(form_url)
+        response = self._session.get(form_url)
         if response.status_code != 200:
             _LOGGER.debug(f"MyLight150: Step 1 failed! Response code: {response.status_code}")
             _LOGGER.debug(f"Response text: {response.text[:200]}")
             raise MyLight150AuthError(f"MyLight150: Step 1 failed: {response.status_code}")
 
-        csrf_token = session.cookies.get("x-ms-cpim-csrf")
-        trans_token = session.cookies.get("x-ms-cpim-trans")
+        csrf_token = self._session.cookies.get("x-ms-cpim-csrf")
+        trans_token = self._session.cookies.get("x-ms-cpim-trans")
         if not csrf_token or not trans_token:
             _LOGGER.debug(f"Step 1: Missing token")
             raise MyLight150AuthError("Step 1: Missing token")
@@ -219,7 +225,7 @@ class MyLight150ApiClient:
         }
         _LOGGER.debug(f"MyLight150: Self asserted request URL: {self_asserted_url[:100]}...")
 
-        response = session.post(self_asserted_url, data=data, headers=headers)
+        response = self._session.post(self_asserted_url, data=data, headers=headers)
         if response.status_code != 200:
             _LOGGER.debug(f"MyLight150: Step 2 failed! Response code: {response.status_code}")
             _LOGGER.debug(f"MyLight150: Response text: {response.text[:200]}")
@@ -238,7 +244,7 @@ class MyLight150ApiClient:
         }
         _LOGGER.debug(f"Confirmation request URL: {confirmation_url[:100]}...")
 
-        response = session.get(confirmation_url, headers=headers, allow_redirects=False)
+        response = self._session.get(confirmation_url, headers=headers, allow_redirects=False)
         if response.status_code != 302:
             _LOGGER.debug(f"MyLight150: Step 3 failed! Response code: {response.status_code}")
             _LOGGER.debug(f"MyLight150: Response text: {response.text[:200]}")
@@ -264,7 +270,7 @@ class MyLight150ApiClient:
         }
         _LOGGER.debug(f"Token request URL: {token_url[:100]}...")
 
-        response = session.post(token_url, data=data, allow_redirects=False)
+        response = self._session.post(token_url, data=data, allow_redirects=False)
         if response.status_code != 200:
             _LOGGER.debug(f"MyLight150: Step 4 failed! Response code: {response.status_code}")
             _LOGGER.debug(f"MyLight150: Response text: {response.text[:200]}")
@@ -283,15 +289,18 @@ class MyLight150ApiClient:
         self._refresh_token_expires_at = not_before + int(
             token_data.get("refresh_token_expires_in", 0)
         )
-        _LOGGER.debug(f"MyLight150: Successful login for account: {self._username}")
+        _LOGGER.debug(f"MyLight150: Successful login for account: '{self._username}'")
         return access_token
 
 
-    # ------------------------------------------------------------------
-    # Token refresh
-    # ------------------------------------------------------------------
+    # Token refresh methods
+    async def _async_refresh_access_token(self) -> str:
+        """Call refresh access token process through request in a executor thread."""
+        _LOGGER.debug(f"MyLight150: Starting executor thread to proceed to an access token refresh for account: {self._username}")
+        return await self._hass.async_add_executor_job(self._sync_refresh_access_token)
 
-    async def _get_token_from_refresh(self) -> str:
+
+    def _sync_refresh_access_token(self) -> str:
         """Use refresh_token to get a new access_token."""
         url = f"{OAUTH_URL}/oauth2/v2.0/token"
         data = {
@@ -300,19 +309,20 @@ class MyLight150ApiClient:
             "refresh_token": self._refresh_token,
             "scope": OAUTH_SCOPE,
         }
+        _LOGGER.debug(f"Token refresh request URL: {url[:100]}...")
 
-        try:
-            async with self._session.post(url, data=data) as response:
-                if response.status != 200:
-                    _LOGGER.warning(f"MyLight150: Token refresh failed ({response.status}), will re-login")
-                    return await self._get_token_from_login()
-                token_data = await response.json()
-        except ClientError as err:
-            raise MyLight150ApiError(f"Token refresh connection error: {err}") from err
-
+        response = self._session.post(url, data=data, allow_redirects=False)
+        if response.status_code != 200:
+            _LOGGER.debug(f"MyLight150: Token refresh failed ({response.status_code}), will try a full login.")
+            _LOGGER.debug(f"MyLight150: Response text: {response.text[:200]}")
+            return self._sync_login()
+        
+        token_data = response.json()
         access_token = token_data.get("access_token")
+
         if not access_token:
-            return await self._get_token_from_login()
+            _LOGGER.debug(f"MyLight150: Access token not found during refresh, will try a full login. : {token_data[:100]}...")
+            return self._sync_login()
 
         self._access_token = access_token
         self._refresh_token = token_data.get("refresh_token", self._refresh_token)
@@ -322,5 +332,5 @@ class MyLight150ApiClient:
             token_data.get("refresh_token_expires_in", 0)
         )
 
-        _LOGGER.debug("MyLight150: Token refreshed successfully")
+        _LOGGER.debug(f"MyLight150: Token refreshed successfully for account: '{self._username}'")
         return access_token

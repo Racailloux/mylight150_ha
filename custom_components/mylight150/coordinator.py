@@ -450,7 +450,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
         ### TEMP
 
         # Nothing to do, avoid API request
-        if is_first_refresh_of_day is not True and self._hphc_schedule:
+        if is_first_refresh_of_day is not True and self.hphc_schedule:
             return True
         
         """Fetch pricing data at first morning update."""
