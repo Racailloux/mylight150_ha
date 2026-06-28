@@ -105,11 +105,11 @@ async def _async_fetch_diagnostic_endpoints(
         # Replace the {code} placeholder with the actual installation code
         endpoint = endpoint_template.replace("{code}", code)
         try:
-            _LOGGER.debug("Diagnostics: appel %s", endpoint)
+            _LOGGER.debug("Diagnostics: API call of '%s'", endpoint)
             results[key] = await coordinator._api.async_call_api(endpoint)
         except Exception as err:
             # Catching all exceptions to prevent the diagnostic from being blocked
             results[key] = {"error": str(err)}
-            _LOGGER.debug("Diagnostics: Error on requesting %s : %s", endpoint, err)
+            _LOGGER.warning("Diagnostics: Error on requesting %s : %s", endpoint, err)
 
     return results

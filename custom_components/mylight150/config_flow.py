@@ -52,23 +52,23 @@ async def _validate_credentials(hass, username: str, password: str) -> tuple[str
     try:
     	# Try to connect to MyLight using the given credentials
         await api.async_login_test()
-        _LOGGER.info("MyLight150 config flow: connected successfully.")
+        _LOGGER.info("Config flow: Connection test successful!")
 
         # Use the open session to retrieve the pricing type
         pricing_data = await api.async_call_api("/v3/contract/energy-pricing")
         pricing_type = pricing_data.get("current", DEFAULT_PRICING_TYPE)
-        _LOGGER.debug("MyLight150 config flow: pricing_type detected = %s", pricing_type)
+        _LOGGER.debug("Config flow: pricing_type detected = %s", pricing_type)
         
         return None, pricing_type
 
     except MyLight150AuthError:
-        _LOGGER.debug("MyLight150 config flow: invalid_credentials")
+        _LOGGER.debug("Config flow: invalid_credentials.")
         return "invalid_credentials", DEFAULT_PRICING_TYPE
     except MyLight150ApiError:
-        _LOGGER.debug("MyLight150 config flow: cannot_connect")
+        _LOGGER.debug("Config flow: API connection failed.")
         return "cannot_connect", DEFAULT_PRICING_TYPE
     except Exception:
-        _LOGGER.exception("MyLight150 config flow: unexpected error during login")
+        _LOGGER.exception("Config flow: unexpected error during login.")
         return "unexpected", DEFAULT_PRICING_TYPE
 
 
@@ -109,7 +109,7 @@ class MyLight150ConfigFlow(ConfigFlow, domain=DOMAIN):
                     return await self.async_step_options()
 
             except Exception:
-                _LOGGER.exception("MyLight150: config flow failed")
+                _LOGGER.exception("Config flow failed.")
                 _errors["base"] = "unexpected"
 
         return self.async_show_form(
@@ -202,7 +202,7 @@ class MyLight150ConfigFlow(ConfigFlow, domain=DOMAIN):
                         data_updates={CONF_PASSWORD: password, CONF_PRICING_TYPE: pricing_type},
                     )
             except Exception:
-                _LOGGER.exception("MyLight150: reconfigure flow failed!")
+                _LOGGER.exception("Reconfigure flow failed!")
                 _errors["base"] = "unexpected"
 
         return self.async_show_form(

@@ -60,12 +60,12 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
 
     async def _async_update_data(self) -> dict[str, Any]:
         """Cyclic refresh every N minutes from config."""
-        _LOGGER.info("MyLight150: Start retrieving data")
+        _LOGGER.info("Coordinator starts retrieving data")
         try:
             # Fetch installation code if not already done
             if not self.installation_code:
                 self.installation_code = await self._async_update_installation_code()
-                _LOGGER.debug("MyLight150: Installation code: %s", self.installation_code)
+                _LOGGER.debug("Installation code: %s", self.installation_code)
 
             data: dict[str, Any] = {}
 
@@ -108,16 +108,16 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
         stored = await self._store.async_load()
         if stored:
             self._persistent.update(stored)
-            _LOGGER.debug("MyLight150: Persistent data loaded: %s", self._persistent)
+            _LOGGER.debug("Persistent data loaded: %s", self._persistent)
         else:
             self._persistent = {}
-            _LOGGER.debug("MyLight150: No persistent data found, starting fresh.")
+            _LOGGER.debug("No persistent data found, starting fresh.")
 
 
     async def _async_save_persistent_data(self) -> None:
         """Save persistent data to .storage/ at every first morning update."""
         await self._store.async_save(self._persistent)
-        _LOGGER.debug("MyLight150: Persistent data saved: %s", self._persistent)
+        _LOGGER.debug("Persistent data saved: %s", self._persistent)
 
 
     # API Calls to MyLight150 endpoints
@@ -132,12 +132,12 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
                     href = link.get("href", "")
                     code = href.rstrip("/").split("/")[-1]
                     if code:
-                        _LOGGER.debug(f"MyLight150: Installation code '{code}' found.")
+                        _LOGGER.debug(f"Installation code '{code}' found.")
                         return code
         except Exception as err:
-            _LOGGER.warning("MyLight150: Error while retrieving /v2 : %s", err)
+            _LOGGER.warning("Error while retrieving '/v2' : %s", err)
 
-        raise UpdateFailed("MyLight150: Installation code not found in /v2")
+        raise UpdateFailed("Installation code not found in '/v2'.")
     
 
     async def _async_update_home_data(self) -> dict[str, Any]:
@@ -171,11 +171,11 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             if parsed.get("msb_state", "idle") == "charging":
                 parsed["msb_power"] = parsed.get("msb_power", 0.0) * -1
 
-            _LOGGER.debug("MyLight150: Data parsed for live home: %s", parsed)
+            _LOGGER.debug("Data parsed for live home: %s", parsed)
             return parsed
         
         except Exception as err:
-            _LOGGER.warning("MyLight150: Error while retrieving %s : %s", endpoint, err)
+            _LOGGER.warning("Error while retrieving %s : %s", endpoint, err)
             return {}
 
 
@@ -183,8 +183,6 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
         """Fetch device data from /v3/equipments endpoint."""
         try:
             data = await self._api.async_call_api("/v3/equipments")
-        
-            """Parse device data from /v3/equipments endpoint."""
             equipments = data.get("equipments", [])
 
             parsed: dict[str, Any] = {}
@@ -195,11 +193,11 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
                 if equipment_type and current_mode:
                     parsed.update({f"{equipment_type}_mode": current_mode})
 
-            _LOGGER.debug("MyLight150: Data parsed for equipments: %s", parsed)
+            _LOGGER.debug("Data parsed for equipments: %s", parsed)
             return parsed
         
         except Exception as err:
-            _LOGGER.warning("MyLight150: Error while retrieving /v3/equipments : %s", err)
+            _LOGGER.warning("Error while retrieving '/v3/equipments' : %s", err)
             return {}
 
 
@@ -217,13 +215,13 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
         )
 
         if self._persistent is None or self._persistent == {}:
-            _LOGGER.debug("MyLight150: No persistent data found, start loading historical data...")
+            _LOGGER.debug("No persistent data found, start loading historical data...")
             self._persistent: dict[str, Any] = {}
 
         
         if is_first_refresh_of_day:
             _LOGGER.debug(
-                "MyLight150: 1st refresh of day %s — fetching yesterday's final value (%s)",
+                "First refresh of day %s — fetching yesterday's final value (%s).",
                 strf_today, strf_yesterday,
             )
 
@@ -246,7 +244,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             self._persistent[CONF_ENERGY_CONSO_FROM_GRID]  = self._persistent.get(CONF_ENERGY_CONSO_FROM_GRID, 0.0)  + yesterday_data.get(CONF_ENERGY_CONSO_FROM_GRID, 0.0)
             await self._async_save_persistent_data()
         
-        _LOGGER.debug("MyLight150: Fetching energy data for date: %s", strf_today)
+        _LOGGER.debug("Fetching energy data for date: %s", strf_today)
         daily: dict[str, Any] = {}
         data = await self._async_get_energy_production_days(strf_today)
         if data:
@@ -267,7 +265,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
         }
 
 
-        _LOGGER.debug(f"MyLight150 total energy data retrieved: {total}")
+        _LOGGER.debug(f"Total energies data retrieved: {total}")
 
         return total
 
@@ -284,7 +282,6 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             return 0.0
         
         try:
-            _LOGGER.debug(f"MyLight150: endpoints: {endpoint}")
             data = await self._api.async_call_api(endpoint)
             breakdown = data.get("breakdown", {})
 
@@ -295,7 +292,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             }
                     
         except Exception as err:
-            _LOGGER.warning("MyLight150: Error while retrieving energy production data : %s from endpoint:%s", err, endpoint)
+            _LOGGER.warning("Error while retrieving energy production data : %s from endpoint: '%s'.", err, endpoint)
             return {}
 
 
@@ -311,7 +308,6 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             return 0.0
         
         try:
-            _LOGGER.debug(f"MyLight150: endpoints: {endpoint}")
             data = await self._api.async_call_api(endpoint)
             breakdown = data.get("breakdown", {})
 
@@ -323,7 +319,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             }
                     
         except Exception as err:
-            _LOGGER.warning("MyLight150: Error while retrieving energy consumption data : %s from endpoint:%s", err, endpoint)
+            _LOGGER.warning("Error while retrieving energy consumption data : %s from endpoint: '%s'.", err, endpoint)
             return {}
 
 
@@ -339,7 +335,6 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             return 0.0
         
         try:
-            _LOGGER.debug(f"MyLight150: endpoints: {endpoint}")
             data = await self._api.async_call_api(endpoint)
             breakdown = data.get("breakdown", {})
 
@@ -350,7 +345,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             }
                     
         except Exception as err:
-            _LOGGER.warning("MyLight150: Error while retrieving energy production data : %s from endpoint:%s", err, endpoint)
+            _LOGGER.warning("MyLight150: Error while retrieving energy production data : %s from endpoint: '%s'.", err, endpoint)
             return {}
 
 
@@ -366,7 +361,6 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             return 0.0
         
         try:
-            _LOGGER.debug(f"MyLight150: endpoints: {endpoint}")
             data = await self._api.async_call_api(endpoint)
             breakdown = data.get("breakdown", {})
 
@@ -378,7 +372,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             }
                     
         except Exception as err:
-            _LOGGER.warning("MyLight150: Error while retrieving energy consumption data : %s from endpoint:%s", err, endpoint)
+            _LOGGER.warning("Error while retrieving energy consumption data : %s from endpoint: '%s'.", err, endpoint)
             return {}
 
 
@@ -394,7 +388,6 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             return 0.0
         
         try:
-            _LOGGER.debug(f"MyLight150: endpoints: {endpoint}")
             data = await self._api.async_call_api(endpoint)
             breakdown = data.get("breakdown", {})
 
@@ -405,7 +398,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             }
                     
         except Exception as err:
-            _LOGGER.debug("MyLight150: Error while retrieving energy production data : %s from endpoint:%s", err, endpoint)
+            _LOGGER.debug("Error while retrieving energy production data : %s from endpoint: '%s'.", err, endpoint)
             return {}
 
 
@@ -421,7 +414,6 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             return 0.0
         
         try:
-            _LOGGER.debug(f"MyLight150: endpoints: {endpoint}")
             data = await self._api.async_call_api(endpoint)
             breakdown = data.get("breakdown", {})
 
@@ -433,7 +425,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             }
                     
         except Exception as err:
-            _LOGGER.debug("MyLight150: Error while retrieving energy consumption data : %s from endpoint:%s", err, endpoint)
+            _LOGGER.debug("Error while retrieving energy consumption data : %s from endpoint: '%s'.", err, endpoint)
             return {}
 
 
@@ -455,11 +447,10 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
         
         """Fetch pricing data at first morning update."""
         endpoint = "/v3/contract/energy-pricing"
-        _LOGGER.debug(f"MyLight150: endpoints: {endpoint}")
         try:
             pricing_data = await self._api.async_call_api(endpoint)
         except Exception as err:
-            _LOGGER.warning("MyLight150: Error while retrieving pricing data : %s from endpoint:%s", err, endpoint)
+            _LOGGER.warning("Error while retrieving pricing data : %s from endpoint: '%s'.", err, endpoint)
             return False
         
         # Update pricing type at 1st refresh of the day
@@ -470,14 +461,14 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
                 pricing_type_stored = self._entry.data.get(CONF_PRICING_TYPE, DEFAULT_PRICING_TYPE)
 
                 if pricing_type != pricing_type_stored:
-                    _LOGGER.info(f"MyLight150: Pricing type change detected! Configuration was '{pricing_type_stored}', new pricing is '{pricing_type}'")
+                    _LOGGER.info(f"Pricing type change detected! Configuration was '{pricing_type_stored}', new pricing is '{pricing_type}'.")
                     entry_data = self._entry.data.copy()
                     entry_data[CONF_PRICING_TYPE] = pricing_type
                     self._hass.config_entries.async_update_entry(self._entry, data=entry_data)
                     await self._hass.config_entries.async_reload(self._entry.entry_id)
 
             except Exception as err:
-                _LOGGER.warning("MyLight150: Error while updating pricing type : %s", err)
+                _LOGGER.warning("Error while updating pricing type : %s", err)
                 return False
 
         # Update schedule table at 1st refresh of the day or if never retrieved since last reboot
@@ -485,9 +476,9 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             try:
                 schedule = pricing_data.get("schedule", {})
                 self.hphc_schedule = schedule.get("breakdown", [])
-                _LOGGER.debug("MyLight150: peak/offpeak schedule loaded: %s", self.hphc_schedule)
+                _LOGGER.debug("peak/offpeak schedule loaded: %s", self.hphc_schedule)
             except Exception as err:
-                _LOGGER.warning("MyLight150: Error while retrieving pricing schedule : %s.", err)
+                _LOGGER.warning("Error while retrieving pricing schedule : %s", err)
     
         return True
 
