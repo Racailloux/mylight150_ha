@@ -96,9 +96,9 @@ This will be the base of all entity ID structure : mylight150_<installation_code
 ## Informations wanted
 **⚠️ Some features needs users data to be implemented**
 As the maintainers don't get all MyLight150 options, if you own some that are not implemented, you are welvcome to contact us. Diagnotics data will be needed
-* MyBattery  (support and logs needed from owners)<br/>
+* MyBattery<br/>
   Integration of the MyBattery option
-* evCharger  (support and logs needed from owners)<br/>
+* evCharger<br/>
   Integration of the car charger equipment
 
 
