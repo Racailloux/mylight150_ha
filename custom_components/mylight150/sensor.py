@@ -75,16 +75,6 @@ SENSORS: tuple[MyLight150SensorEntityDescription, ...] = (
         icon="mdi:transmission-tower",
     ),
     MyLight150SensorEntityDescription(
-        key="injection",
-        data_key="injection",
-        has_entity_name=True,
-        translation_key="injection",
-        native_unit_of_measurement=UnitOfPower.KILO_WATT,
-        device_class=SensorDeviceClass.POWER,
-        state_class=SensorStateClass.MEASUREMENT,
-        icon="mdi:transmission-tower-export",
-    ),
-    MyLight150SensorEntityDescription(
         key="load",
         data_key="load",
         has_entity_name=True,
@@ -251,7 +241,6 @@ SENSORS: tuple[MyLight150SensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.TOTAL_INCREASING,
         icon="mdi:transmission-tower-export",
-        entity_registry_enabled_default=False,
     ),
 )
 
@@ -386,9 +375,9 @@ class MyLight150CurrentPricingSensorEntity(CoordinatorEntity[MyLight150Coordinat
         
         # unique_id format : {domain}_{entry_id}_{sensor_key}
         self._attr_unique_id = f"{DOMAIN}_{entry.entry_id}_{CONF_PRICING_CURRENT}"
-        self._attr_key=CONF_PRICING_CURRENT
-        self._attr_has_entity_name=True
-        self._attr_translation_key=CONF_PRICING_CURRENT
+        self._attr_key = CONF_PRICING_CURRENT
+        self._attr_has_entity_name = True
+        self._attr_translation_key = CONF_PRICING_CURRENT
         self._attr_state_class = SensorStateClass.MEASUREMENT
         self._attr_native_unit_of_measurement = "€/kWh"
         self._attr_suggested_display_precision = 3

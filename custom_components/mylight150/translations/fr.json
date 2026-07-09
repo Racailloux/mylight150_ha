@@ -73,7 +73,6 @@
     "sensor": {
       "solar_production": { "name": "Production solaire" },
       "grid": { "name": "Puissance réseau" },
-      "injection": { "name": "Injection réseau" },
       "load": { "name": "Consommation" },
       "msb_state": {
         "name": "État de la batterie virtuelle",

@@ -71,7 +71,6 @@
     "sensor": {
       "solar_production": { "name": "Solar production" },
       "grid": { "name": "Grid power" },
-      "injection": { "name": "Grid injection" },
       "load": { "name": "Load" },
       "msb_state": {
         "name": "Virtual battery status",

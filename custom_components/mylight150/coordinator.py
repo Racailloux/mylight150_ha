@@ -154,8 +154,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             parsed: dict[str, Any] = {
                 # Live powers (kW)
                 "solar_production":  data.get("solarProduction", {}).get("value"),
-                "grid":              data.get("grid", {}).get("value"),
-                "injection":         data.get("injection", {}).get("value"),
+                "grid":              data.get("grid", {}).get("value") - data.get("injection", {}).get("value"),
                 "load":              data.get("load", {}).get("value"),
                 # MySmartBattery (virtual battery)
                 "msb_state":         data.get("msb", {}).get("state"),
