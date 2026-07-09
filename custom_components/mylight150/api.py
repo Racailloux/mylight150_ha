@@ -116,8 +116,8 @@ class MyLight150ApiClient:
 
         response = self._session.get(url, headers=headers, timeout=10)
         if response.status_code != 200:
-            _LOGGER.warning(f"API request failed ({response.status_code}), while trying to get endpoint: '{endpoint}'.")
-            _LOGGER.debug(f"Response text: {response.text[:200]}")
+            _LOGGER.warning(f"API request failed ({response.status_code})")
+            _LOGGER.debug(f"API request failed while trying to get endpoint: '{endpoint}'.Response text: {response.text[:200]}")
             return {}
         
         return response.json()
