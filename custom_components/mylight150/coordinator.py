@@ -135,7 +135,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
                         _LOGGER.debug(f"Installation code '{code}' found.")
                         return code
         except Exception as err:
-            _LOGGER.warning("Error while retrieving '/v2' : %s", err)
+            _LOGGER.warning("Error while retrieving installation code: %s", err)
 
         raise UpdateFailed("Installation code not found in '/v2'.")
     
@@ -175,7 +175,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             return parsed
         
         except Exception as err:
-            _LOGGER.warning("Error while retrieving %s : %s", endpoint, err)
+            _LOGGER.warning("Error while retrieving home data: %s", err)
             return {}
 
 
@@ -197,7 +197,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             return parsed
         
         except Exception as err:
-            _LOGGER.warning("Error while retrieving '/v3/equipments' : %s", err)
+            _LOGGER.warning("Error while retrieving equipment: %s", err)
             return {}
 
 
@@ -292,7 +292,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             }
                     
         except Exception as err:
-            _LOGGER.warning("Error while retrieving energy production data : %s from endpoint: '%s'.", err, endpoint)
+            _LOGGER.warning("Error while retrieving energy production data : %s", err)
             return {}
 
 
@@ -319,7 +319,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             }
                     
         except Exception as err:
-            _LOGGER.warning("Error while retrieving energy consumption data : %s from endpoint: '%s'.", err, endpoint)
+            _LOGGER.warning("Error while retrieving energy consumption data : %s", err)
             return {}
 
 
@@ -345,7 +345,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             }
                     
         except Exception as err:
-            _LOGGER.warning("MyLight150: Error while retrieving energy production data : %s from endpoint: '%s'.", err, endpoint)
+            _LOGGER.warning("MyLight150: Error while retrieving energy production data : %s", err)
             return {}
 
 
@@ -372,7 +372,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             }
                     
         except Exception as err:
-            _LOGGER.warning("Error while retrieving energy consumption data : %s from endpoint: '%s'.", err, endpoint)
+            _LOGGER.warning("Error while retrieving energy consumption data : %s", err)
             return {}
 
 
@@ -398,7 +398,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             }
                     
         except Exception as err:
-            _LOGGER.debug("Error while retrieving energy production data : %s from endpoint: '%s'.", err, endpoint)
+            _LOGGER.debug("Error while retrieving energy production data : %s", err)
             return {}
 
 
@@ -425,7 +425,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             }
                     
         except Exception as err:
-            _LOGGER.debug("Error while retrieving energy consumption data : %s from endpoint: '%s'.", err, endpoint)
+            _LOGGER.debug("Error while retrieving energy consumption data : %s", err)
             return {}
 
 
@@ -450,7 +450,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
         try:
             pricing_data = await self._api.async_call_api(endpoint)
         except Exception as err:
-            _LOGGER.warning("Error while retrieving pricing data : %s from endpoint: '%s'.", err, endpoint)
+            _LOGGER.warning("Error while retrieving pricing data : %s", err)
             return False
         
         # Update pricing type at 1st refresh of the day
