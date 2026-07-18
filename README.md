@@ -12,11 +12,9 @@
 
 The `MyLight150` component provides an integration with the MyLight150 cloud service. It adds sensors such as power, battery status, ... that you can find on the mobile applications.
 
-**Note:** This integration will not manage actions on the system, but retrieve data to integrate them into your domotic environment.
+**Note:** This integration will not manage actions on the system, but retrieve data to integrate them into your Home Assistant environment.
+Energy board can be feed by all informations from sensors.
 
-ℹ️ Diagnotics data is searched, especially from people who has options (evCharger, MyBattery, etc.)
-
-⚠️ This integration is in beta testing until v1.0.0. All data could be wiped from one update to the other.
 
 ## Installation
 
@@ -33,32 +31,32 @@ Alternatively, installation can be done manually by copying the files in this re
 5. Restart Home Assistant.
 6. Add the integration to Home Assistant (see **Configuration**).
 
+
 ## Configuration
 
 Configuration is done through the Home Assistant UI.
-
 To add the integration, go to **Settings ➤ Devices & Services ➤ Integrations**, click **➕ Add Integration**, and search for "MyLight150".
 
-### Configuration Variables
-
-| Name              | Type     | Default | Description                                                                                                                                       |
-| ----------------- | -------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Username`        | `string` | –       | The username associated with your MyLight150 account.                                                                                             |
-| `Password`        | `string` | –       | The password for your MyLight150 account.                                                                                                         |
-| `Update Interval` | `int`    | `10`    | Frequency (in minutes) to fetch status data from MyLight.<br>Minimum allowed is 10 minutes.<br>\* _Can be updated later via the CONFIGURE menu._  |
-| `Scan at startup` | `bool`   | `True`  | Aloow to do a full data update at every restart of Home Assistant._                                                                               |
+| Name                    | Type     | Default | Description                                                                                                                                       |
+| ----------------------- | -------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Username`              | `string` | –       | The username associated with your MyLight150 account.                                                                                             |
+| `Password`              | `string` | –       | The password for your MyLight150 account.                                                                                                         |
+| `Update Interval`       | `int`    | `10`    | Frequency (in minutes) to fetch status data from MyLight.<br>Minimum allowed is 10 minutes.<br>\* _Can be updated later via the CONFIGURE menu._  |
+| `Scan at startup`       | `bool`   | `True`  | Aloow to do a full data update at every restart of Home Assistant._                                                                               |
+| `Peak hours pricing`    | `float`   | `0.23` | Base pricing, or peak hours pricing, if Peak/OffPeak pricing is detected._                                                                        |
+| `Offpeak hours pricing` | `float`   | `0.14` | Offpeak hours pricing, if Peak/OffPeak pricing is detected._                                                                                      |
 
 
 ## Options
 
 Find configuration options under **Settings ➤ Devices & Services ➤ Integrations ➤ MyLight150 ➤ Configure**:
 
-
-| Name              | Type     | Default | Description                                                                                                                                       |
-| ----------------- | -------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Update Interval` | `int`    | `10`    | Frequency (in minutes) to fetch status data from MyLight.<br>Minimum allowed is 10 minutes.<br>\* _Can be updated later via the CONFIGURE menu._  |
-| `Scan at startup` | `bool`   | `True`  | Allow to do a full data update at every restart of Home Assistant._                                                                               |
-
+| Name                    | Type      | Default | Description                                                                                                                                       |
+| ----------------------- | --------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Update Interval`       | `int`     | `10`    | Frequency (in minutes) to fetch status data from MyLight.<br>Minimum allowed is 10 minutes.<br>\* _Can be updated later via the CONFIGURE menu._  |
+| `Scan at startup`       | `bool`    | `True`  | Allow to do a full data update at every restart of Home Assistant._                                                                               |
+| `Peak hours pricing`    | `float`   | `0.23`  | Base pricing, or peak hours pricing, if Peak/OffPeak pricing is detected._                                                                        |
+| `Offpeak hours pricing` | `float`   | `0.14`  | Offpeak hours pricing, if Peak/OffPeak pricing is detected._                                                                                      |
 
 
 ## Provided Entities
@@ -94,12 +92,13 @@ This will be the base of all entity ID structure : mylight150_<installation_code
 | `sensor.mylight150_<installation_code>_pricing_mode`            | Current pringin mode, depending on the contract.             |  -   | `text`             |
 | `sensor.mylight150_<installation_code>_current_pricing`         | Current pricing value. Pricing needs to be configured.       | €/kWh| `measurement`      |
 
-## Features roadmap
 
-**Features needing users data to be implemented**
-* MyBattery  (support and logs needed from owners)<br/>
+## Informations wanted
+**⚠️ Some features needs users data to be implemented**
+As the maintainers don't get all MyLight150 options, if you own some that are not implemented, you are welvcome to contact us. Diagnotics data will be needed
+* MyBattery<br/>
   Integration of the MyBattery option
-* evCharger  (support and logs needed from owners)<br/>
+* evCharger<br/>
   Integration of the car charger equipment
 
 
@@ -108,6 +107,7 @@ This will be the base of all entity ID structure : mylight150_<installation_code
 * [HACS](https://hacs.xyz/) : Home Assistant Community Store gives you a powerful UI to handle downloads of all your custom needs.
 * [MyLight150] : Electricity provider with virtual battery support.
 * [hassio MyLight integration](https://github.com/acesyde/hassio_mylight_integration) : MyLight system integration for previous API from MtLight System
+
 
 ---
 
