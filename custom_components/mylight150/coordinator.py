@@ -436,10 +436,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             self._last_refresh_date is not None
             and self._last_refresh_date < today
         )
-        ### TEMP
-        is_first_refresh_of_day = True
-        ### TEMP
-
+        
         # Nothing to do, avoid API request
         if is_first_refresh_of_day is not True and self.hphc_schedule:
             return True
