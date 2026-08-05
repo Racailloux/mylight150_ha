@@ -116,7 +116,8 @@
           "offpeak": "Offpeak hours"
         }
       },
-      "current_pricing": { "name": "Current pricing" }
+      "current_pricing": { "name": "Current pricing" },
+      "money_pot": { "name": "Moneypot balance" }
     }
   }
 }

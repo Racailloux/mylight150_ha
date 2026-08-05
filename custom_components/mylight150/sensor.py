@@ -147,6 +147,15 @@ SENSORS: tuple[MyLight150SensorEntityDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:piggy-bank",
     ),
+    MyLight150SensorEntityDescription(
+        key="money_pot",
+        data_key="money_pot",
+        has_entity_name=True,
+        translation_key="money_pot",
+        native_unit_of_measurement="€",
+        state_class=SensorStateClass.MEASUREMENT,
+        icon="mdi:piggy-bank",
+    ),
 
     # Equipments sensors
     MyLight150SensorEntityDescription(

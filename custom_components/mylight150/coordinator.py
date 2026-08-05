@@ -69,6 +69,9 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
 
             data: dict[str, Any] = {}
 
+            # Update pricing informations if needed
+            await self._async_update_pricing_data()
+
             # Fetch realtime home data and parse it for sensors
             parsed_data = await self._async_update_home_data()
             if parsed_data:
@@ -84,9 +87,10 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             if parsed_data:
                 data.update(parsed_data)
 
-            # Update pricing informations if needed
-            await self._async_update_pricing_data()
-                
+            # Update money-pot informations if needed
+            parsed_data = await self._async_update_moneypot_data()
+            if parsed_data:
+                data.update(parsed_data)
 
             # Fetch other data if needed in the future..
 
@@ -96,9 +100,10 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             return data
 
         except MyLight150AuthError as err:
-            raise UpdateFailed(f"Authentification error: {err}") from err
+            _LOGGER.warning(f"Authentification error: {err}", err)
         except MyLight150ApiError as err:
-            raise UpdateFailed(f"API error: {err}") from err
+            _LOGGER.warning(f"API error: {err}", err)
+        return {}
 
 
     # Persistency
@@ -137,7 +142,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
         except Exception as err:
             _LOGGER.warning("Error while retrieving installation code: %s", err)
 
-        raise UpdateFailed("Installation code not found in '/v2'.")
+        return {}
     
 
     async def _async_update_home_data(self) -> dict[str, Any]:
@@ -175,7 +180,8 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
         
         except Exception as err:
             _LOGGER.warning("Error while retrieving home data: %s", err)
-            return {}
+
+        return {}
 
 
     async def _async_update_devices_data(self) -> dict[str, Any]:
@@ -478,3 +484,19 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
     
         return True
 
+
+    async def _async_update_moneypot_data(self) -> dict[str, Any]:
+        """Fetch instant data from /v3/money-pot endpoint."""
+        try:
+            data = await self._api.async_call_api("/v3/money-pot")
+            
+            parsed: dict[str, Any] = {
+                "money_pot": data.get("payload", {}).get("balance", {}).get("value"),
+            }
+            _LOGGER.debug("Data parsed for money-pot: %s", parsed)
+            return parsed
+        
+        except Exception as err:
+            _LOGGER.warning("Error while retrieving money-pot data: %s", err)
+
+        return {}

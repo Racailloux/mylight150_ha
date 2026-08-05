@@ -118,7 +118,8 @@
           "offpeak": "Heures creuses"
         }
       },
-      "current_pricing": { "name": "Tarif actuel" }
+      "current_pricing": { "name": "Tarif actuel" },
+      "money_pot": { "name": "Solde de la cagnotte" }
     }
   }
 }
