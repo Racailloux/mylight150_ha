@@ -25,6 +25,7 @@ TO_REDACT = {
 # List of endpoints to call for diagnostics. Each tuple contains a key and the endpoint path.
 DIAGNOSTIC_ENDPOINTS: list[tuple[str, str]] = [
     # General information about the API and installation
+    ("root",                            "/"),
     ("v2",                              "/v2"),
     ("v2_installation",                 "/v2/installations/{code}"),
     ("v3_contract_energy-pricing",      "/v3/contract/energy-pricing"),
@@ -54,8 +55,12 @@ DIAGNOSTIC_ENDPOINTS: list[tuple[str, str]] = [
     ("v3_equipments_waterHeater03",     "/v3/equipments/waterHeater03/waterHeater"),
     ("v3_consumption_hvacAirToWater05", "/v3/consumption/hvacAirToWater05?aggregation=Week"),
     ("v3_consumption_waterHeater03",    "/v3/consumption/waterHeater03?aggregation=Week"),
+    # MB (MyBattery)
+    ("v3_mb",                           "/v3/mb"),
+    ("v3_mb_legacy",                    "/v3/mb/legacy"),
     # MSB (MySmartBattery)
     ("v3_msb_legacy",                   "/v3/msb/legacy"),
+    ("v3_virtual_battery_state",        "/v3/virtual-battery/state"),
 ]
 
 
