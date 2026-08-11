@@ -109,7 +109,7 @@ SENSORS: tuple[MyLight150SensorEntityDescription, ...] = (
         has_entity_name=True,
         translation_key="msb_autonomy",
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
-        suggested_display_precision=0,
+        suggested_display_precision=1,
         device_class=SensorDeviceClass.ENERGY_STORAGE,
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:battery",
@@ -137,16 +137,7 @@ SENSORS: tuple[MyLight150SensorEntityDescription, ...] = (
         icon="mdi:battery",
     ),
 
-    # Savings sensor
-    MyLight150SensorEntityDescription(
-        key="savings",
-        data_key="savings",
-        has_entity_name=True,
-        translation_key="savings",
-        native_unit_of_measurement="€",
-        state_class=SensorStateClass.MEASUREMENT,
-        icon="mdi:piggy-bank",
-    ),
+    # Money sensors
     MyLight150SensorEntityDescription(
         key="money_pot",
         data_key="money_pot",
@@ -295,7 +286,7 @@ class MyLight150SensorEntity(CoordinatorEntity[MyLight150Coordinator], SensorEnt
         installation_code = coordinator.installation_code or entry.entry_id
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, installation_code)},
-            name=f"MyLight150 ({installation_code})",
+            name="MyLight150",
             manufacturer="MyLight Systems",
             model="MySmartBattery",
             configuration_url="https://client.mylight150.com",
