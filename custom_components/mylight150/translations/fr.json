@@ -104,11 +104,11 @@
         }
       },
       "energy_prod_from_solar": { "name": "Energie solaire produite" },
-      "energy_prod_to_msb": { "name": "Energie MSB injectée" },
+      "energy_prod_to_msb": { "name": "Energie batterie virtuelle injectée" },
       "energy_prod_to_grid": { "name": "Energie réseau injectée" },
       "energy_consumption": { "name": "Energie totale consommée" },
       "energy_conso_from_solar": { "name": "Energie solaire auto-consommée" },
-      "energy_conso_from_msb": { "name": "Energie MSB consommée" },
+      "energy_conso_from_msb": { "name": "Energie batterie virtuelle consommée" },
       "energy_conso_from_grid": { "name": "Energie réseau consommée" },
       "pricing_mode": {
         "name": "Mode de tarif",
