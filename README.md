@@ -76,7 +76,6 @@ This will be the base of all entity ID structure : mylight150_<installation_code
 | `sensor.mylight150_<installation_code>_msb_power`               | Virtual battery power                                        | kW   | `measurement`      |
 | `sensor.mylight150_<installation_code>_msb_autonomy`            | Virtual battery autonomy                                     | kWh  | `measurement`      |
 | `sensor.mylight150_<installation_code>_msb_capacity`            | Virtual battery capacity                                     | kWh  | `measurement`      |
-| `sensor.mylight150_<installation_code>_savings`                 | Monthly money saved                                          | EUR  | `measurement`      |
 | `sensor.mylight150_<installation_code>_money_pot`               | Current value of your money pot                              | EUR  | `measurement`      |
 | | | | |
 | `sensor.mylight150_<installation_code>_heatPump_mode`           | Current heat pump mode                                       |  -   | `text`             |
