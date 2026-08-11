@@ -72,6 +72,11 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             # Update pricing informations if needed
             await self._async_update_pricing_data()
 
+            # Fetch virtual battery data and parse it for sensors
+            parsed_data = await self._async_update_vbattery_data()
+            if parsed_data:
+                data.update(parsed_data)
+
             # Fetch realtime home data and parse it for sensors
             parsed_data = await self._async_update_home_data()
             if parsed_data:
@@ -142,7 +147,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
         except Exception as err:
             _LOGGER.warning("Error while retrieving installation code: %s", err)
 
-        return {}
+        return ""
     
 
     async def _async_update_home_data(self) -> dict[str, Any]:
@@ -151,35 +156,42 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
         try:
             data = await self._api.async_call_api(endpoint)
         
-            """Parse device data from /v2/installations/{code}/home?msb=msb01 endpoint."""
-            if data.get("msb", {}).get("capacity", {}).get("value"):
-                msb_level = 100.0 * (float)(data.get("msb", {}).get("autonomy", {}).get("value")) / (float)(data.get("msb", {}).get("capacity", {}).get("value"))
-            else: msb_level = 0.0
-            
             parsed: dict[str, Any] = {
                 # Live powers (kW)
                 "solar_production":  data.get("solarProduction", {}).get("value"),
                 "grid":              data.get("grid", {}).get("value") - data.get("injection", {}).get("value"),
                 "load":              data.get("load", {}).get("value"),
-                # MySmartBattery (virtual battery)
-                "msb_state":         data.get("msb", {}).get("state"),
-                "msb_power":         data.get("msb", {}).get("power", {}).get("value"),
-                "msb_autonomy":      data.get("msb", {}).get("autonomy", {}).get("value"),
-                "msb_capacity":      data.get("msb", {}).get("capacity", {}).get("value"),
-                "msb_level":         msb_level,
-                # Saving (weekly display)
-                "savings":           data.get("savings", {}).get("amount", {}).get("value"),
-                # Timestamp of the data (UTC)
-                "timestamp":         data.get("timestamp"),
             }
-            if parsed.get("msb_state", "idle") == "charging":
-                parsed["msb_power"] = parsed.get("msb_power", 0.0) * -1
 
             _LOGGER.debug("Data parsed for live home: %s", parsed)
             return parsed
         
         except Exception as err:
             _LOGGER.warning("Error while retrieving home data: %s", err)
+
+        return {}
+
+    
+    async def _async_update_vbattery_data(self) -> dict[str, Any]:
+        """Fetch instant data from /v3/virtual-battery/state endpoint."""
+        try:
+            data = await self._api.async_call_api("/v3/virtual-battery/state")
+
+            parsed: dict[str, Any] = {
+                "msb_state":         data.get("status", {}).get("state", "unknown"),
+                "msb_power":         data.get("status", {}).get("socEvolutionInkW", 0),
+                "msb_autonomy":      data.get("status", {}).get("socInkWh", 0),
+                "msb_capacity":      data.get("status", {}).get("capacity", 0),
+                "msb_level":         data.get("status", {}).get("socInPercentage", 0),
+            }
+            if parsed.get("msb_state", "idle") == "charging":
+                parsed["msb_power"] = parsed.get("msb_power", 0.0) * -1
+
+            _LOGGER.debug("Data parsed for virtual battery: %s", parsed)
+            return parsed
+        
+        except Exception as err:
+            _LOGGER.warning("Error while retrieving virtual battery data: %s", err)
 
         return {}
 
