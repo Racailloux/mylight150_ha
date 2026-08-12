@@ -182,7 +182,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
                 "msb_power":         data.get("status", {}).get("socEvolutionInkW", 0),
                 "msb_autonomy":      data.get("status", {}).get("socInkWh", 0),
                 "msb_capacity":      data.get("status", {}).get("capacity", 0),
-                "msb_level":         data.get("status", {}).get("socInPercentage", 0),
+                "msb_level":         data.get("status", {}).get("socInkWh", 0) / data.get("status", {}).get("capacity", 0) * 100.0,
             }
             if parsed.get("msb_state", "idle") == "charging":
                 parsed["msb_power"] = parsed.get("msb_power", 0.0) * -1
