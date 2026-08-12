@@ -23,3 +23,21 @@ jobs:
         uses: hacs/action@main
         with:
           category: integration
+
+  validate-ruff:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: astral-sh/setup-uv@v3
+      - run: uvx ruff check .
+      - run: uvx ruff format --check .
+
+  validate-mypy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+      - run: pip install mypy
+      - run: mypy custom_components/mylight150
