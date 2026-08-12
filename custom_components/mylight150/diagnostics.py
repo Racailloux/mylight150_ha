@@ -16,6 +16,8 @@ _LOGGER = logging.getLogger(__name__)
 
 # Keys to hide in the report — never expose credentials
 TO_REDACT = {
+    "entry_id",
+    "title",
     "access_token",
     CONF_PASSWORD,
     CONF_USERNAME,
