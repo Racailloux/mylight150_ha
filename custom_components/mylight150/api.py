@@ -1,26 +1,26 @@
 """API client for MyLight150 integration with Home Assistant."""
 from __future__ import annotations
 
-from typing import Any
 import base64
 import hashlib
 import logging
 import secrets
 from datetime import datetime, timezone
 
-from requests import Session
+from typing import Any
 from urllib.parse import parse_qs
 from zoneinfo import ZoneInfo
 
 from homeassistant.core import HomeAssistant
+from requests import Session
 from .const import (
-    OAUTH_URL,
-    OAUTH_CLIENT_ID,
-    OAUTH_SCOPE,
-    OAUTH_POLICY_NAME,
-    OAUTH_REDIRECT_URI,
     API_SUBSCRIPTION_KEY,
     API_URL,
+    OAUTH_CLIENT_ID,
+    OAUTH_POLICY_NAME,
+    OAUTH_REDIRECT_URI,
+    OAUTH_SCOPE,
+    OAUTH_URL,
 )
 
 _LOGGER = logging.getLogger(__name__)
@@ -71,9 +71,9 @@ class MyLight150ApiClient:
     async def async_get_token(self) -> str:
         """Return a valid access token, or None if failed. Refreshing or re-logging if needed."""
         now = datetime.now(timezone.utc).timestamp()
-        _LOGGER.debug((f"Current tokens validities: (current time: {now}) "            
-                       f"Access token: {self._token_expires_at} / "
-                       f"Refresh token: {self._refresh_token_expires_at}"))
+        _LOGGER.debug(f"Current tokens validities: (current time: {now}) "            
+                      f"Access token: {self._token_expires_at} / "
+                      f"Refresh token: {self._refresh_token_expires_at}")
 
         # Check if access token is still valid
         if self._access_token and self._token_expires_at > now:
@@ -189,7 +189,7 @@ class MyLight150ApiClient:
         csrf_token = self._session.cookies.get("x-ms-cpim-csrf")
         trans_token = self._session.cookies.get("x-ms-cpim-trans")
         if not csrf_token or not trans_token:
-            _LOGGER.warning(f"Step 1 failed! Missing token")
+            _LOGGER.warning("Step 1 failed! Missing token")
             raise MyLight150AuthError("Step 1: Missing token")
 
         # Step 2
@@ -239,7 +239,7 @@ class MyLight150ApiClient:
         auth_code = params.get("code", [None])[0]
         if not auth_code:
             _LOGGER.warning(f"Step 3 failed! Missing auth_code in redirect URL: {redirect_url[:100]}...")
-            raise MyLight150AuthError(f"Step 3: Missing auth_code in redirect URL")
+            raise MyLight150AuthError("Step 3: Missing auth_code in redirect URL")
 
         # Step 4
         token_url = f"{OAUTH_URL}/oauth2/v2.0/token"
@@ -262,7 +262,7 @@ class MyLight150ApiClient:
         access_token = token_data.get("access_token")
         if not access_token:
             _LOGGER.warning(f"Step 4 failed! Missing access_token in response: {token_data[:100]}...")
-            raise MyLight150AuthError(f"Step 4: Missing access_token in response")
+            raise MyLight150AuthError("Step 4: Missing access_token in response")
 
         self._access_token = access_token
         self._refresh_token = token_data.get("refresh_token")

@@ -5,17 +5,16 @@ from __future__ import annotations
 import logging
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import Platform
 from homeassistant.core import HomeAssistant
 
 from .api import MyLight150ApiClient
 from .const import (
+    CONF_PASSWORD,
     CONF_UPDATE_INTERVAL,
     CONF_USERNAME,
-    CONF_PASSWORD,
     DEFAULT_UPDATE_INTERVAL,
     DOMAIN,
-    PLATFORMS
+    PLATFORMS,
 )
 from .coordinator import MyLight150Coordinator
 
@@ -61,7 +60,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     if unload_ok:
         # Cancel the coordinator's scheduled tasks and remove it
-        coordinator: MyLight150Coordinator = hass.data[DOMAIN].pop(entry.entry_id)
+        hass.data[DOMAIN].pop(entry.entry_id)
 
     return unload_ok
 

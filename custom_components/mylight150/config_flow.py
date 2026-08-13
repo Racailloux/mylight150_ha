@@ -5,7 +5,6 @@ from typing import Any
 
 import voluptuous as vol
 
-from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.config_entries import (
     ConfigEntry,
     ConfigFlow,
@@ -16,16 +15,16 @@ from homeassistant.helpers.selector import NumberSelector, NumberSelectorConfig,
 from .api import MyLight150ApiClient, MyLight150AuthError, MyLight150ApiError
 from .const import (
     CONF_PASSWORD,
-    CONF_PRICING_TYPE,
-    CONF_PRICING_TYPE_HPHC,
     CONF_PRICING_BASE,
     CONF_PRICING_OFFPEAK,
+    CONF_PRICING_TYPE,
+    CONF_PRICING_TYPE_HPHC,
     CONF_UPDATE_INITIAL,
     CONF_UPDATE_INTERVAL,
     CONF_USERNAME,
-    DEFAULT_PRICING_TYPE,
     DEFAULT_PRICING_BASE,
     DEFAULT_PRICING_OFFPEAK,
+    DEFAULT_PRICING_TYPE,
     DEFAULT_UPDATE_INITIAL,
     DEFAULT_UPDATE_INTERVAL,
     DOMAIN,
