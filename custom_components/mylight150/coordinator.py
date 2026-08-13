@@ -46,7 +46,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
         self.installation_code: str | None = None
         self._last_refresh_date: date | None = None
         # Init storage for long term persistency
-        self._store = Store(hass, STORAGE_VERSION, STORAGE_KEY)
+        self._store: Store[dict[str, Any]] = Store(hass, STORAGE_VERSION, STORAGE_KEY)
         self._persistent: dict[str, Any] = {}
         self.hphc_schedule: list[dict] = []
 
@@ -233,7 +233,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
 
         if self._persistent is None or self._persistent == {}:
             _LOGGER.debug("No persistent data found, start loading historical data...")
-            self._persistent: dict[str, Any] = {}
+            self._persistent = {}
 
         
         if is_first_refresh_of_day:
