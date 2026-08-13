@@ -7,9 +7,11 @@ from typing import Any
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers.storage import Store
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from homeassistant.util import dt as dt_util
+from requests.exceptions import JSONDecodeError, RequestException
 
 from .api import MyLight150ApiClient, MyLight150ApiError, MyLight150AuthError
 from .const import (
