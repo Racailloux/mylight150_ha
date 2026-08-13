@@ -114,7 +114,7 @@ async def _async_fetch_diagnostic_endpoints(
         try:
             _LOGGER.debug("Diagnostics: API call of '%s'", endpoint)
             results[key] = await coordinator._api.async_call_api(endpoint)
-        except Exception as err:
+        except Exception as err: # noqa: BLE001
             # Catching all exceptions to prevent the diagnostic from being blocked
             results[key] = {"error": str(err)}
             _LOGGER.warning("Diagnostics: Error on requesting: %s", err)

@@ -145,7 +145,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
                     if code:
                         _LOGGER.debug(f"Installation code '{code}' found.")
                         return code
-        except Exception as err:
+        except (MyLight150AuthError, MyLight150ApiError, RequestException, JSONDecodeError) as err:
             _LOGGER.warning("Error while retrieving installation code: %s", err)
 
         return ""
@@ -167,7 +167,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             _LOGGER.debug("Data parsed for live home: %s", parsed)
             return parsed
         
-        except Exception as err:
+        except (MyLight150AuthError, MyLight150ApiError, RequestException, JSONDecodeError) as err:
             _LOGGER.warning("Error while retrieving home data: %s", err)
 
         return {}
@@ -191,7 +191,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             _LOGGER.debug("Data parsed for virtual battery: %s", parsed)
             return parsed
         
-        except Exception as err:
+        except (MyLight150AuthError, MyLight150ApiError, RequestException, JSONDecodeError) as err:
             _LOGGER.warning("Error while retrieving virtual battery data: %s", err)
 
         return {}
@@ -214,7 +214,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             _LOGGER.debug("Data parsed for equipments: %s", parsed)
             return parsed
         
-        except Exception as err:
+        except (MyLight150AuthError, MyLight150ApiError, RequestException, JSONDecodeError) as err:
             _LOGGER.warning("Error while retrieving equipment: %s", err)
             return {}
 
@@ -309,7 +309,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
                 CONF_ENERGY_PROD_TO_GRID:    _dest(breakdown, "injection"),
             }
                     
-        except Exception as err:
+        except (MyLight150AuthError, MyLight150ApiError, RequestException, JSONDecodeError) as err:
             _LOGGER.warning("Error while retrieving energy production data : %s", err)
             return {}
 
@@ -336,7 +336,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
                 CONF_ENERGY_CONSO_FROM_GRID:  _src(breakdown, "grid"),
             }
                     
-        except Exception as err:
+        except (MyLight150AuthError, MyLight150ApiError, RequestException, JSONDecodeError) as err:
             _LOGGER.warning("Error while retrieving energy consumption data : %s", err)
             return {}
 
@@ -362,7 +362,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
                 CONF_ENERGY_PROD_TO_GRID:    _dest(breakdown, "injection"),
             }
                     
-        except Exception as err:
+        except (MyLight150AuthError, MyLight150ApiError, RequestException, JSONDecodeError) as err:
             _LOGGER.warning("MyLight150: Error while retrieving energy production data : %s", err)
             return {}
 
@@ -389,7 +389,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
                 CONF_ENERGY_CONSO_FROM_GRID:  _src(breakdown, "grid"),
             }
                     
-        except Exception as err:
+        except (MyLight150AuthError, MyLight150ApiError, RequestException, JSONDecodeError) as err:
             _LOGGER.warning("Error while retrieving energy consumption data : %s", err)
             return {}
 
@@ -415,7 +415,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
                 CONF_ENERGY_PROD_TO_GRID:    _dest(breakdown, "injection"),
             }
                     
-        except Exception as err:
+        except (MyLight150AuthError, MyLight150ApiError, RequestException, JSONDecodeError) as err:
             _LOGGER.debug("Error while retrieving energy production data : %s", err)
             return {}
 
@@ -442,7 +442,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
                 CONF_ENERGY_CONSO_FROM_GRID:  _src(breakdown, "grid"),
             }
                     
-        except Exception as err:
+        except (MyLight150AuthError, MyLight150ApiError, RequestException, JSONDecodeError) as err:
             _LOGGER.debug("Error while retrieving energy consumption data : %s", err)
             return {}
 
@@ -464,7 +464,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
         endpoint = "/v3/contract/energy-pricing"
         try:
             pricing_data = await self._api.async_call_api(endpoint)
-        except Exception as err:
+        except (MyLight150AuthError, MyLight150ApiError, RequestException, JSONDecodeError) as err:
             _LOGGER.warning("Error while retrieving pricing data : %s", err)
             return False
         
@@ -482,7 +482,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
                     self._hass.config_entries.async_update_entry(self._entry, data=entry_data)
                     await self._hass.config_entries.async_reload(self._entry.entry_id)
 
-            except Exception as err:
+            except (AttributeError, TypeError, HomeAssistantError) as err:
                 _LOGGER.warning("Error while updating pricing type : %s", err)
                 return False
 
@@ -492,7 +492,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
                 schedule = pricing_data.get("schedule", {})
                 self.hphc_schedule = schedule.get("breakdown", [])
                 _LOGGER.debug("peak/offpeak schedule loaded: %s", self.hphc_schedule)
-            except Exception as err:
+            except (AttributeError, TypeError) as err:
                 _LOGGER.warning("Error while retrieving pricing schedule : %s", err)
     
         return True
@@ -509,7 +509,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             _LOGGER.debug("Data parsed for money-pot: %s", parsed)
             return parsed
         
-        except Exception as err:
+        except (MyLight150AuthError, MyLight150ApiError, RequestException, JSONDecodeError) as err:
             _LOGGER.warning("Error while retrieving money-pot data: %s", err)
 
         return {}
