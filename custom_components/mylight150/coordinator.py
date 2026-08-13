@@ -2,13 +2,14 @@
 from __future__ import annotations
 
 import logging
-from datetime import date, datetime, timedelta
+from datetime import date, timedelta
 from typing import Any
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.storage import Store
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
+from homeassistant.util import dt as dt_util
 
 from .api import MyLight150ApiClient, MyLight150ApiError, MyLight150AuthError
 from .const import (
@@ -100,7 +101,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             # Fetch other data if needed in the future..
 
             # Update date after having updated all dependent data
-            self._last_refresh_date = datetime.now().date()
+            self._last_refresh_date = dt_util.now().date()
 
             return data
 
@@ -220,7 +221,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
 
     async def _async_update_energy_data(self) -> dict[str, Any]:
         """Fetch all energy data from /v3/consumption and /v3/production endpoints."""
-        today = datetime.now().date()
+        today = dt_util.now().date()
         yesterday = today - timedelta(days=1)
 
         strf_today = today.strftime('%Y-%m-%d')
@@ -448,7 +449,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
 
     async def _async_update_pricing_data(self) -> bool:
         """Fetch pricing data at first morning update."""
-        today = datetime.now().date()
+        today = dt_util.now().date()
 
         is_first_refresh_of_day = (
             self._last_refresh_date is not None

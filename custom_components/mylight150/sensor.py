@@ -3,7 +3,7 @@ from __future__ import annotations
 
 import logging
 from dataclasses import dataclass
-from datetime import datetime, timedelta
+from datetime import timedelta
 from typing import Any
 
 from homeassistant.components.sensor import (
@@ -19,6 +19,7 @@ from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
+from homeassistant.util import dt as dt_util
 
 from .const import (
     CONF_ENERGY_CONSO_FROM_GRID,
@@ -439,7 +440,7 @@ class MyLight150CurrentPricingSensorEntity(CoordinatorEntity[MyLight150Coordinat
 
 
 def _compute_hphc_mode(schedule: list[dict]) -> str:
-    now = datetime.now()
+    now = dt_util.now()
     current_minutes = now.hour * 60 + now.minute
 
     def _parse_hhmm(time_str: str) -> int:
