@@ -1,4 +1,5 @@
 """API client for MyLight150 integration with Home Assistant."""
+
 from __future__ import annotations
 
 import base64
@@ -48,7 +49,6 @@ class MyLight150ApiClient:
         self._token_expires_at: float = 0.0
         self._refresh_token_expires_at: float = 0.0
 
-
     # Public interfaces
     async def async_login_test(self) -> bool:
         """Full OAuth2 PKCE login flow. Returns True on success."""
@@ -57,27 +57,32 @@ class MyLight150ApiClient:
             # Test connection from from zero: avoid token validity checks
             self._access_token = await self._async_login()
             _LOGGER.debug("Login successful!")
-            _LOGGER.debug(f"Access token validity: "
-                          f"{datetime.fromtimestamp(self._token_expires_at, ZoneInfo('Europe/Paris')).strftime('%Y-%m-%d %H:%M:%S')} (Paris)) / "
-                          f"Refresh token validity: "
-                          f"{datetime.fromtimestamp(self._refresh_token_expires_at, ZoneInfo('Europe/Paris')).strftime('%Y-%m-%d %H:%M:%S')} (Paris))")
+            _LOGGER.debug(
+                f"Access token validity: "
+                f"{datetime.fromtimestamp(self._token_expires_at, ZoneInfo('Europe/Paris')).strftime('%Y-%m-%d %H:%M:%S')} (Paris)) / "
+                f"Refresh token validity: "
+                f"{datetime.fromtimestamp(self._refresh_token_expires_at, ZoneInfo('Europe/Paris')).strftime('%Y-%m-%d %H:%M:%S')} (Paris))"
+            )
             return self._access_token is not None
         except MyLight150AuthError:
             raise
         except Exception as err:
             raise MyLight150AuthError(f"Login failed: {err}") from err
 
-
     async def async_get_token(self) -> str:
         """Return a valid access token, or None if failed. Refreshing or re-logging if needed."""
         now = datetime.now(timezone.utc).timestamp()
-        _LOGGER.debug(f"Current tokens validities: (current time: {now}) "            
-                      f"Access token: {self._token_expires_at} / "
-                      f"Refresh token: {self._refresh_token_expires_at}")
+        _LOGGER.debug(
+            f"Current tokens validities: (current time: {now}) "            
+            f"Access token: {self._token_expires_at} / "
+            f"Refresh token: {self._refresh_token_expires_at}"
+        )
 
         # Check if access token is still valid
         if self._access_token and self._token_expires_at > now:
-            _LOGGER.debug(f"Token is still valid for account: {self._username} (token: {self._access_token[:20]}...)")
+            _LOGGER.debug(
+                f"Token is still valid for account: {self._username} (token: {self._access_token[:20]}...)"
+            )
             return self._access_token
         
         # Access token expired, check if refresh token is still valid
@@ -89,13 +94,15 @@ class MyLight150ApiClient:
         _LOGGER.debug("No valid token, performing full login...")
         return await self._async_login()
 
-
     async def async_call_api(self, endpoint: str) -> dict[str, Any]:
         """Call API endpoint through request in a executor thread."""
-        _LOGGER.debug(f"Starting executor thread to proceed to an access token refresh for account: {self._username}")
+        _LOGGER.debug(
+            f"Starting executor thread to proceed to an access token refresh for account: {self._username}"
+        )
         token = await self.async_get_token()
-        return await self._hass.async_add_executor_job(self._sync_call_api, endpoint, token)
-
+        return await self._hass.async_add_executor_job(
+            self._sync_call_api, endpoint, token
+        )
 
     def _sync_call_api(self, endpoint: str, token: str) -> dict[str, Any]:
         """Call API endpoint request and return the data responsed."""
@@ -117,9 +124,10 @@ class MyLight150ApiClient:
         response = self._session.get(url, headers=headers, timeout=10)
         if response.status_code != 200:
             _LOGGER.warning(f"API request failed ({response.status_code})")
-            _LOGGER.debug(f"API request failed while trying to get endpoint: '{endpoint}'.Response text: {response.text[:200]}")
+            _LOGGER.debug(
+                f"API request failed while trying to get endpoint: '{endpoint}'.Response text: {response.text[:200]}"
+            )
             return {}
-        
         return response.json()
 
 
@@ -137,7 +145,6 @@ class MyLight150ApiClient:
         self._token_expires_at = access_token_expires_at
         self._refresh_token_expires_at = refresh_token_expires_at
 
-
     def get_token_data(self) -> dict[str, Any]:
         """Return token data suitable for persistence in the HA config entry."""
         return {
@@ -147,27 +154,31 @@ class MyLight150ApiClient:
             "refresh_token_expires_at": self._refresh_token_expires_at,
         }
 
-
     # OAuth2 PKCE login flow
     async def _async_login(self) -> str:
         """Call full B2C login through request in a executor thread."""
-        _LOGGER.debug(f"Starting executor thread to proceed to a full login for account: {self._username}")
+        _LOGGER.debug(
+            f"Starting executor thread to proceed to a full login for account: {self._username}"
+        )
         return await self._hass.async_add_executor_job(self._sync_login)
-
 
     def _sync_login(self) -> str:
         # New connection, recreate a new session
         self._session = Session()
-        self._session.headers.update({
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-        })
+        self._session.headers.update(
+            {
+                "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+            }
+        )
 
         # PKCE
         code_verifier = secrets.token_urlsafe(64)
         code_challenge = (
             base64.urlsafe_b64encode(
                 hashlib.sha256(code_verifier.encode()).digest()
-            ).decode().rstrip("=")
+            )
+            .decode()
+            .rstrip("=")
         )
 
         # Step 1
@@ -227,7 +238,9 @@ class MyLight150ApiClient:
             "x-ms-cpim-trans": trans_token,
         }
 
-        response = self._session.get(confirmation_url, headers=headers, allow_redirects=False)
+        response = self._session.get(
+            confirmation_url, headers=headers, allow_redirects=False
+        )
         if response.status_code != 302:
             _LOGGER.warning(f"Step 3 failed! Response code: {response.status_code}")
             _LOGGER.debug(f"Response text: {response.text[:200]}")
@@ -238,7 +251,9 @@ class MyLight150ApiClient:
         params = parse_qs(fragment)
         auth_code = params.get("code", [None])[0]
         if not auth_code:
-            _LOGGER.warning(f"Step 3 failed! Missing auth_code in redirect URL: {redirect_url[:100]}...")
+            _LOGGER.warning(
+                f"Step 3 failed! Missing auth_code in redirect URL: {redirect_url[:100]}..."
+            )
             raise MyLight150AuthError("Step 3: Missing auth_code in redirect URL")
 
         # Step 4
@@ -254,7 +269,9 @@ class MyLight150ApiClient:
 
         response = self._session.post(token_url, data=data, allow_redirects=False)
         if response.status_code != 200:
-            _LOGGER.warning(f"Step 4 failed! Response code: {response.status_code}")
+            _LOGGER.warning(
+                f"Step 4 failed! Response code: {response.status_code}"
+            )
             _LOGGER.debug(f"Response text: {response.text[:200]}")
             raise MyLight150AuthError(f"Step 4 failed: {response.status_code}")
 
@@ -274,13 +291,13 @@ class MyLight150ApiClient:
         _LOGGER.debug(f"Successful login for account: '{self._username}'.")
         return access_token
 
-
     # Token refresh methods
     async def _async_refresh_access_token(self) -> str:
         """Call refresh access token process through request in a executor thread."""
-        _LOGGER.debug(f"Starting executor thread to proceed to an access token refresh for account: {self._username}")
+        _LOGGER.debug(
+            f"Starting executor thread to proceed to an access token refresh for account: {self._username}"
+        )
         return await self._hass.async_add_executor_job(self._sync_refresh_access_token)
-
 
     def _sync_refresh_access_token(self) -> str:
         """Use refresh_token to get a new access_token."""
@@ -294,15 +311,19 @@ class MyLight150ApiClient:
 
         response = self._session.post(url, data=data, allow_redirects=False)
         if response.status_code != 200:
-            _LOGGER.debug(f"Token refresh failed ({response.status_code}), will try a full login.")
+            _LOGGER.debug(
+                f"Token refresh failed ({response.status_code}), will try a full login."
+            )
             _LOGGER.debug(f"Response text: {response.text[:200]}")
             return self._sync_login()
-        
+
         token_data = response.json()
         access_token = token_data.get("access_token")
 
         if not access_token:
-            _LOGGER.debug(f"Access token not found during refresh, will trying a full login. : {token_data[:100]}...")
+            _LOGGER.debug(
+                f"Access token not found during refresh, will trying a full login. : {token_data[:100]}..."
+            )
             return self._sync_login()
 
         self._access_token = access_token
