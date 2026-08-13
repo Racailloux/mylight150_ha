@@ -9,9 +9,13 @@ from homeassistant.config_entries import (
     ConfigFlow,
     OptionsFlow,
 )
-from homeassistant.helpers.selector import NumberSelector, NumberSelectorConfig, NumberSelectorMode
+from homeassistant.helpers.selector import (
+    NumberSelector,
+    NumberSelectorConfig,
+    NumberSelectorMode,
+)
 
-from .api import MyLight150ApiClient, MyLight150AuthError, MyLight150ApiError
+from .api import MyLight150ApiClient, MyLight150ApiError, MyLight150AuthError
 from .const import (
     CONF_PASSWORD,
     CONF_PRICING_BASE,
