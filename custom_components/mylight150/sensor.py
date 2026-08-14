@@ -300,7 +300,6 @@ class MyLight150SensorEntity(CoordinatorEntity[MyLight150Coordinator], SensorEnt
 class MyLight150PricingModeSensorEntity(
     CoordinatorEntity[MyLight150Coordinator], SensorEntity
 ):
-
     def __init__(
         self,
         coordinator: MyLight150Coordinator,
@@ -365,7 +364,6 @@ class MyLight150PricingModeSensorEntity(
 class MyLight150CurrentPricingSensorEntity(
     CoordinatorEntity[MyLight150Coordinator], SensorEntity
 ):
-
     def __init__(
         self,
         coordinator: MyLight150Coordinator,

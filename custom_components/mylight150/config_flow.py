@@ -159,7 +159,7 @@ class MyLight150ConfigFlow(ConfigFlow, domain=DOMAIN):
         schema: dict = {
             vol.Required(
                 CONF_UPDATE_INTERVAL,
-                default=DEFAULT_UPDATE_INTERVAL  # type: ignore # voluptuous stubs incorrects
+                default=DEFAULT_UPDATE_INTERVAL,  # type: ignore # voluptuous stubs incorrects
             ): NumberSelector(
                 NumberSelectorConfig(
                     min=MIN_UPDATE_INTERVAL,
@@ -171,11 +171,11 @@ class MyLight150ConfigFlow(ConfigFlow, domain=DOMAIN):
             ),
             vol.Optional(
                 CONF_UPDATE_INITIAL,
-                default=DEFAULT_UPDATE_INITIAL  # type: ignore # voluptuous stubs incorrects
+                default=DEFAULT_UPDATE_INITIAL,  # type: ignore # voluptuous stubs incorrects
             ): bool,
             vol.Optional(
                 CONF_PRICING_BASE,
-                default=DEFAULT_PRICING_BASE  # type: ignore # voluptuous stubs incorrects
+                default=DEFAULT_PRICING_BASE,  # type: ignore # voluptuous stubs incorrects
             ): NumberSelector(_PRICING_SELECTOR),
         }
         # Only for offpeak pricing type
@@ -183,7 +183,7 @@ class MyLight150ConfigFlow(ConfigFlow, domain=DOMAIN):
             schema[
                 vol.Optional(
                     CONF_PRICING_OFFPEAK,
-                    default=DEFAULT_PRICING_OFFPEAK  # type: ignore # voluptuous stubs incorrects
+                    default=DEFAULT_PRICING_OFFPEAK,  # type: ignore # voluptuous stubs incorrects
                 )
             ] = NumberSelector(_PRICING_SELECTOR)
 

@@ -56,7 +56,7 @@ DIAGNOSTIC_ENDPOINTS: list[tuple[str, str]] = [
     ("v3_equipments_waterHeater03", "/v3/equipments/waterHeater03/waterHeater"),
     (
         "v3_consumption_hvacAirToWater05",
-        "/v3/consumption/hvacAirToWater05?aggregation=Week"
+        "/v3/consumption/hvacAirToWater05?aggregation=Week",
     ),
     ("v3_consumption_waterHeater03", "/v3/consumption/waterHeater03?aggregation=Week"),
     # MB (MyBattery)
