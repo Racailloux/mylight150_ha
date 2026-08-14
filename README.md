@@ -7,106 +7,109 @@
 [![GitHub Activity][commits-shield]][commits] 
 ![Project Maintenance][maintenance-shield]
 
+🌐 [English](README_EN.md) | **Français**
+
 
 ## Description
 
-The `MyLight150` component provides an integration with the MyLight150 cloud service. It adds sensors such as power, battery status, ... that you can find on the mobile applications.
+Le composant `MyLight150` permet une intégration avec le service cloud MyLight150. Il ajoute des capteurs tels que la puissance, l'état de la batterie, etc., que vous pouvez retrouver dans les applications mobiles.
 
-**Note:** This integration will not manage actions on the system, but retrieve data to integrate them into your Home Assistant environment.
-Energy board can be feed by all informations from sensors.
+**Remarque :** Cette intégration ne permet pas de gérer des actions sur votre système, mais uniquement de récupérer des données pour les intégrer dans votre environnement **Home Assistant**.
+Le tableau de bord énergie peut être alimenté par les capteurs fournis par l'intégration.
 
 
 ## Installation
 
-There are two ways this integration can be installed into [Home Assistant](https://www.home-assistant.io).
+Il existe deux méthodes pour installer cette intégration dans [Home Assistant](https://www.home-assistant.io) :
 
-The easiest and recommended way is to install the integration using [HACS](https://hacs.xyz), which makes future updates easy to track and install.
+### Méthode recommandée : Via HACS
+La méthode la plus simple et recommandée est d'utiliser [HACS](https://hacs.xyz), qui facilite le suivi et l'installation des mises à jour futures.
 
-Alternatively, installation can be done manually by copying the files in this repository into the `custom_components` directory in the Home Assistant configuration directory:
+### Méthode manuelle
+Sinon, vous pouvez installer manuellement l'intégration en copiant les fichiers de ce dépôt dans le répertoire `custom_components` de votre installation Home Assistant :
 
-1. Open the configuration directory of your Home Assistant installation.
-2. If you do not have a `custom_components` directory, create it.
-3. In the `custom_components` directory, create a new directory called `mylight150_ha`.
-4. Copy all files from the `custom_components/mylight150_ha/` directory in this repository into the `mylight150_ha` directory.
-5. Restart Home Assistant.
-6. Add the integration to Home Assistant (see **Configuration**).
+1. Ouvrez le répertoire de configuration de votre installation **Home Assistant**.
+2. Si vous n'avez pas de répertoire `custom_components`, créez-le.
+3. Dans le répertoire `custom_components`, créez un nouveau répertoire nommé `mylight150`.
+4. Copiez tous les fichiers du répertoire `custom_components/mylight150_ha/` de ce dépôt dans le répertoire `mylight150`.
+5. Redémarrez Home Assistant.
+6. Ajoutez l'intégration à Home Assistant (voir **Configuration**).
 
 
 ## Configuration
 
-Configuration is done through the Home Assistant UI.
-To add the integration, go to **Settings ➤ Devices & Services ➤ Integrations**, click **➕ Add Integration**, and search for "MyLight150".
+La configuration se fait via l'interface utilisateur de **Home Assistant**.
+Pour ajouter l'intégration, allez dans **Paramètres ➤ Appareils et services ➤ Intégrations**, cliquez sur **➕ Ajouter une intégration**, puis recherchez **"MyLight150"**.
 
-| Name                    | Type     | Default | Description                                                                                                                                       |
-| ----------------------- | -------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Username`              | `string` | –       | The username associated with your MyLight150 account.                                                                                             |
-| `Password`              | `string` | –       | The password for your MyLight150 account.                                                                                                         |
-| `Update Interval`       | `int`    | `10`    | Frequency (in minutes) to fetch status data from MyLight.<br>Minimum allowed is 10 minutes.<br>\* _Can be updated later via the CONFIGURE menu._  |
-| `Scan at startup`       | `bool`   | `True`  | Aloow to do a full data update at every restart of Home Assistant._                                                                               |
-| `Peak hours pricing`    | `float`   | `0.23` | Base pricing, or peak hours pricing, if Peak/OffPeak pricing is detected._                                                                        |
-| `Offpeak hours pricing` | `float`   | `0.14` | Offpeak hours pricing, if Peak/OffPeak pricing is detected._                                                                                      |
+| Nom                     | Type     | Défaut  | Description                                                                                                                                               |
+| ----------------------- | -------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------  |
+| `Username`              | `string` | –       | Nom d'utilisateur associé à votre compte MyLight150.                                                                                                      |
+| `Password`              | `string` | –       | Mot de passe de votre compte MyLight150.                                                                                                                  |
+| `Update Interval`       | `int`    | `10`    | Fréquence (min) de récupération des données depuis MyLight.<br>Min. autorisé : 10 mins.<br>\* _Peut être modifié ultérieurement via le menu CONFIGURER._  |
+| `Scan at startup`       | `bool`   | `True`  | Permet d'effectuer une mise à jour complète des données à chaque redémarrage de Home Assistant.                                                           |
+| `Peak hours pricing`    | `float`   | `0.23` | Tarif de base ou tarif des heures pleines, si un tarif heures pleines/heures creuses est détecté.                                                         |
+| `Offpeak hours pricing` | `float`   | `0.14` | Tarif des heures creuses, si un tarif heures pleines/heures creuses est détecté.                                                                          |
 
 
 ## Options
 
-Find configuration options under **Settings ➤ Devices & Services ➤ Integrations ➤ MyLight150 ➤ Configure**:
+Vous trouverez les options de configuration sous **Paramètres ➤ Appareils et services ➤ Intégrations ➤ MyLight150 ➤ Configurer** :
 
-| Name                    | Type      | Default | Description                                                                                                                                       |
-| ----------------------- | --------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Update Interval`       | `int`     | `10`    | Frequency (in minutes) to fetch status data from MyLight.<br>Minimum allowed is 10 minutes.<br>\* _Can be updated later via the CONFIGURE menu._  |
-| `Scan at startup`       | `bool`    | `True`  | Allow to do a full data update at every restart of Home Assistant._                                                                               |
-| `Peak hours pricing`    | `float`   | `0.23`  | Base pricing, or peak hours pricing, if Peak/OffPeak pricing is detected._                                                                        |
-| `Offpeak hours pricing` | `float`   | `0.14`  | Offpeak hours pricing, if Peak/OffPeak pricing is detected._                                                                                      |
+| Nom                     | Type      | Défaut  | Description                                                                                                                                                 |
+| ----------------------- | --------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Update Interval`       | `int`     | `10`    | Fréquence (min) pour récupérer les données depuis MyLight.<br>Le minimum autorisé est 10 minutes.<br>* _Modifiable ultérieurement via le menu CONFIGURER._  |
+| `Scan at startup`       | `bool`    | `True`  | Permet d'effectuer une mise à jour complète des données à chaque redémarrage de Home Assistant.                                                             |
+| `Peak hours pricing`    | `float`   | `0.23`  | Tarif de base ou tarif des heures pleines, si un tarif heures pleines/heures creuses est détecté.                                                           |
+| `Offpeak hours pricing` | `float`   | `0.14`  | Tarif des heures creuses, si un tarif heures pleines/heures creuses est détecté.                                                                            |
 
 
-## Provided Entities
+## Entités fournies
 
-The device will take the name of 'MyLight150 <installation_code>' where the installation code is a unique ID that MyLight150 generate for your own installation.
-This will be the base of all entity ID structure : mylight150_<installation_code>_entity_name
+L'appareil portera le nom "MyLight150 <installation_code>", où installation_code est un identifiant unique généré par MyLight150 pour votre installation.
+Cela servira de base pour la structure des identifiants des entités : mylight150_<installation_code>_entity_name.
 
-### Sensors
 
-| Entity ID                                                       | Description                                                  | Unit | State Class        |
-| --------------------------------------------------------------- | ------------------------------------------------------------ | ---- | ------------------ |
-| `sensor.mylight150_<installation_code>_solar_production`        | Current solar production                                     | kW   | `measurement`      |
-| `sensor.mylight150_<installation_code>_grid`                    | Current grid power                                           | kW   | `measurement`      |
-| `sensor.mylight150_<installation_code>_injection`               | Current power injected on the grid                           | kW   | `measurement`      |
-| `sensor.mylight150_<installation_code>_load`                    | Current power consumption                                    | kW   | `measurement`      |
-| `sensor.mylight150_<installation_code>_msb_state`               | Virtual battery status                                       |  -   | `text`             |
-| `sensor.mylight150_<installation_code>_msb_power`               | Virtual battery power                                        | kW   | `measurement`      |
-| `sensor.mylight150_<installation_code>_msb_autonomy`            | Virtual battery autonomy                                     | kWh  | `measurement`      |
-| `sensor.mylight150_<installation_code>_msb_capacity`            | Virtual battery capacity                                     | kWh  | `measurement`      |
-| `sensor.mylight150_<installation_code>_money_pot`               | Current value of your money pot                              | EUR  | `measurement`      |
+### Capteurs
+
+| ID de l'entité                                                  | Description                                                                        | Unité | State Class        |
+| --------------------------------------------------------------- | ---------------------------------------------------------------------------------- | ----- | ------------------ |
+| `sensor.mylight150_<installation_code>_solar_production`        | Production solaire actuelle                                                        | kW    | `measurement`      |
+| `sensor.mylight150_<installation_code>_grid`                    | Puissance actuelle du réseau                                                       | kW    | `measurement`      |
+| `sensor.mylight150_<installation_code>_injection`               | Puissance actuelle injectée sur le réseau                                          | kW    | `measurement`      |
+| `sensor.mylight150_<installation_code>_load`                    | Consommation électrique actuelle                                                   | kW    | `measurement`      |
+| `sensor.mylight150_<installation_code>_msb_state`               | État de la batterie virtuelle                                                      |   -   | `text`             |
+| `sensor.mylight150_<installation_code>_msb_power`               | Puissance de la batterie virtuelle                                                 | kW    | `measurement`      |
+| `sensor.mylight150_<installation_code>_msb_autonomy`            | Autonomie de la batterie virtuelle                                                 | kWh   | `measurement`      |
+| `sensor.mylight150_<installation_code>_msb_capacity`            | Capacité de la batterie virtuelle                                                  | kWh   | `measurement`      |
+| `sensor.mylight150_<installation_code>_money_pot`               | Valeur actuelle de votre cagnotte                                                  | EUR   | `measurement`      |
 | | | | |
-| `sensor.mylight150_<installation_code>_heatPump_mode`           | Current heat pump mode                                       |  -   | `text`             |
-| `sensor.mylight150_<installation_code>_waterHeater_mode`        | Current water heater mode                                    |  -   | `text`             |
+| `sensor.mylight150_<installation_code>_heatPump_mode`           | Mode actuel de la pompe à chaleur                                                  |   -   | `text`             |
+| `sensor.mylight150_<installation_code>_waterHeater_mode`        | Mode actuel du chauffe-eau                                                         |   -   | `text`             |
 | | | | |
-| `sensor.mylight150_<installation_code>_energy_prod_from_solar ` | Solar energy production since integration installation       | kWh  | `total_increasing` |
-| `sensor.mylight150_<installation_code>_energy_prod_to_msb`      | MSB energy in since integration installation                 | kWh  | `total_increasing` |
-| `sensor.mylight150_<installation_code>_energy_prod_to_grid`     | Grid energy injection since integration installation         | kWh  | `total_increasing` |
-| `sensor.mylight150_<installation_code>_energy_consumption`      | Total energy consumption since integration installation      | kWh  | `total_increasing` |
-| `sensor.mylight150_<installation_code>_energy_conso_from_solar` | Solar energy self-consumption since integration installation | kWh  | `total_increasing` |
-| `sensor.mylight150_<installation_code>_energy_conso_from_msb`   | MSB energy out since integration installation                | kWh  | `total_increasing` |
-| `sensor.mylight150_<installation_code>_energy_conso_from_grid`  | Grid energy consumption since integration installation       | kWh  | `total_increasing` |
+| `sensor.mylight150_<installation_code>_energy_prod_from_solar ` | Production d'énergie solaire depuis l'installation de l'intégration                | kWh   | `total_increasing` |
+| `sensor.mylight150_<installation_code>_energy_prod_to_msb`      | Énergie stockée dans la batterie virtuelle depuis l'installation de l'intégration  | kWh   | `total_increasing` |
+| `sensor.mylight150_<installation_code>_energy_prod_to_grid`     | Injection d'énergie dans le réseau depuis l'installation de l'intégration          | kWh   | `total_increasing` |
+| `sensor.mylight150_<installation_code>_energy_consumption`      | Consommation totale d'énergie depuis l'installation de l'intégration               | kWh   | `total_increasing` |
+| `sensor.mylight150_<installation_code>_energy_conso_from_solar` | Autoconsommation d'énergie solaire depuis l'installation de l'intégration          | kWh   | `total_increasing` |
+| `sensor.mylight150_<installation_code>_energy_conso_from_msb`   | Énergie restituée par la batterie virtuelle depuis l'installation de l'intégration | kWh   | `total_increasing` |
+| `sensor.mylight150_<installation_code>_energy_conso_from_grid`  | Consommation d'énergie du réseau depuis l'installation de l'intégration            | kWh   | `total_increasing` |
 | | | | |
-| `sensor.mylight150_<installation_code>_pricing_mode`            | Current pringin mode, depending on the contract.             |  -   | `text`             |
-| `sensor.mylight150_<installation_code>_current_pricing`         | Current pricing value. Pricing needs to be configured.       | €/kWh| `measurement`      |
+| `sensor.mylight150_<installation_code>_pricing_mode`            | Mode tarifaire actuel, selon le contrat.                                           |  -    | `text`             |
+| `sensor.mylight150_<installation_code>_current_pricing`         | Valeur tarifaire actuelle. Les tarifs doivent être configurés.                     | €/kWh | `measurement`      |
 
 
-## Informations wanted
-**⚠️ Some features needs users data to be implemented**
-As the maintainers don't get all MyLight150 options, if you own some that are not implemented, you are welvcome to contact us. Diagnotics data will be needed
-* MyBattery<br/>
-  Integration of the MyBattery option
-* evCharger<br/>
-  Integration of the car charger equipment
+## Informations recherchées
+⚠️ **Certaines fonctionnalités nécessitent des données utilisateurs pour être implémentées.**
+Les développeurs n'ont pas accès à toutes les options de MyLight150. Si vous possédez des fonctionnalités non implémentées, n'hésitez pas à nous contacter. Des données de diagnostic seront nécessaires.
+* MyBattery :<br> Intégration de l'option MyBattery.
+* evCharger :br Intégration de l'équipement de charge pour voiture électrique.
 
 
-## Credits
-* [Home Assistant](https://github.com/home-assistant) : Home Assistant open-source powerful domotic plateform.
-* [HACS](https://hacs.xyz/) : Home Assistant Community Store gives you a powerful UI to handle downloads of all your custom needs.
-* [MyLight150] : Electricity provider with virtual battery support.
-* [hassio MyLight integration](https://github.com/acesyde/hassio_mylight_integration) : MyLight system integration for previous API from MtLight System
+## Remerciements
+* [Home Assistant](https://github.com/home-assistant) : Plateforme domotique open-source puissante.
+* [HACS](https://hacs.xyz/) : Home Assistant Community Store offre une interface puissante pour gérer les téléchargements de tous vos besoins personnalisés.
+* [MyLight150] : Fournisseur d'électricité avec support de batterie virtuelle.
+* [hassio MyLight integration](https://github.com/acesyde/hassio_mylight_integration) : Intégration de MyLight System pour l'ancienne API de MyLight System (MyHome).
 
 
 ---
