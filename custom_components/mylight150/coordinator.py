@@ -290,7 +290,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
                 CONF_ENERGY_CONSO_FROM_GRID, 0.0
             ) + yesterday_data.get(CONF_ENERGY_CONSO_FROM_GRID, 0.0)
             await self._async_save_persistent_data()
-        
+
         _LOGGER.debug("Fetching energy data for date: %s", strf_today)
         daily: dict[str, Any] = {}
         data = await self._async_get_energy_production_days(strf_today)
@@ -324,7 +324,8 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             + daily.get(CONF_ENERGY_CONSO_FROM_MSB, 0.0),
             CONF_ENERGY_CONSO_FROM_GRID: self._persistent.get(
                 CONF_ENERGY_CONSO_FROM_GRID, 0.0
-            ) + daily.get(CONF_ENERGY_CONSO_FROM_GRID, 0.0),
+            )
+            + daily.get(CONF_ENERGY_CONSO_FROM_GRID, 0.0),
         }
 
         _LOGGER.debug(f"Total energies data retrieved: {total}")
