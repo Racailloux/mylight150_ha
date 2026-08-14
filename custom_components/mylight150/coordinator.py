@@ -178,7 +178,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             _LOGGER.warning("Error while retrieving home data: %s", err)
 
         return {}
-    
+
     async def _async_update_vbattery_data(self) -> dict[str, Any]:
         """Fetch instant data from /v3/virtual-battery/state endpoint."""
         try:
@@ -304,22 +304,24 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
         total = {
             CONF_ENERGY_PROD_FROM_SOLAR: self._persistent.get(
                 CONF_ENERGY_PROD_FROM_SOLAR, 0.0
-            ) + daily.get(CONF_ENERGY_PROD_FROM_SOLAR, 0.0),
-            CONF_ENERGY_PROD_TO_MSB: self._persistent.get(
-                CONF_ENERGY_PROD_TO_MSB, 0.0
-            ) + daily.get(CONF_ENERGY_PROD_TO_MSB, 0.0),
+            )
+            + daily.get(CONF_ENERGY_PROD_FROM_SOLAR, 0.0),
+            CONF_ENERGY_PROD_TO_MSB: self._persistent.get(CONF_ENERGY_PROD_TO_MSB, 0.0)
+            + daily.get(CONF_ENERGY_PROD_TO_MSB, 0.0),
             CONF_ENERGY_PROD_TO_GRID: self._persistent.get(
                 CONF_ENERGY_PROD_TO_GRID, 0.0
-            ) + daily.get(CONF_ENERGY_PROD_TO_GRID, 0.0),
-            CONF_ENERGY_CONSUMPTION: self._persistent.get(
-                CONF_ENERGY_CONSUMPTION, 0.0
-            ) + daily.get(CONF_ENERGY_CONSUMPTION, 0.0),
+            )
+            + daily.get(CONF_ENERGY_PROD_TO_GRID, 0.0),
+            CONF_ENERGY_CONSUMPTION: self._persistent.get(CONF_ENERGY_CONSUMPTION, 0.0)
+            + daily.get(CONF_ENERGY_CONSUMPTION, 0.0),
             CONF_ENERGY_CONSO_FROM_SOLAR: self._persistent.get(
                 CONF_ENERGY_CONSO_FROM_SOLAR, 0.0
-            ) + daily.get(CONF_ENERGY_CONSO_FROM_SOLAR, 0.0),
+            )
+            + daily.get(CONF_ENERGY_CONSO_FROM_SOLAR, 0.0),
             CONF_ENERGY_CONSO_FROM_MSB: self._persistent.get(
                 CONF_ENERGY_CONSO_FROM_MSB, 0.0
-            ) + daily.get(CONF_ENERGY_CONSO_FROM_MSB, 0.0),
+            )
+            + daily.get(CONF_ENERGY_CONSO_FROM_MSB, 0.0),
             CONF_ENERGY_CONSO_FROM_GRID: self._persistent.get(
                 CONF_ENERGY_CONSO_FROM_GRID, 0.0
             ) + daily.get(CONF_ENERGY_CONSO_FROM_GRID, 0.0),
@@ -389,7 +391,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             MyLight150AuthError,
             MyLight150ApiError,
             RequestException,
-            JSONDecodeError
+            JSONDecodeError,
         ) as err:
             _LOGGER.warning("Error while retrieving energy consumption data : %s", err)
             return {}
@@ -474,8 +476,8 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
 
             return {
                 CONF_ENERGY_PROD_FROM_SOLAR: breakdown.get("total", 0.0),
-                CONF_ENERGY_PROD_TO_MSB:     _dest(breakdown, "virtualBattery"),
-                CONF_ENERGY_PROD_TO_GRID:    _dest(breakdown, "injection"),
+                CONF_ENERGY_PROD_TO_MSB: _dest(breakdown, "virtualBattery"),
+                CONF_ENERGY_PROD_TO_GRID: _dest(breakdown, "injection"),
             }
 
         except (
@@ -523,8 +525,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
         today = dt_util.now().date()
 
         is_first_refresh_of_day = (
-            self._last_refresh_date is not None
-            and self._last_refresh_date < today
+            self._last_refresh_date is not None and self._last_refresh_date < today
         )
 
         # Nothing to do, avoid API request
