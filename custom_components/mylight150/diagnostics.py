@@ -31,7 +31,6 @@ DIAGNOSTIC_ENDPOINTS: list[tuple[str, str]] = [
     ("v2", "/v2"),
     ("v2_installation", "/v2/installations/{code}"),
     ("v3_contract_energy-pricing", "/v3/contract/energy-pricing"),
-     
     # Live data
     ("v2_home", "/v2/installations/{code}/home?msb=msb01"),
     # Options from contracts (MSB, MSP, MSH, etc.)
@@ -55,7 +54,10 @@ DIAGNOSTIC_ENDPOINTS: list[tuple[str, str]] = [
     ("v3_equipments", "/v3/equipments"),
     ("v3_equipments_hvacAirToWater05", "/v3/equipments/hvacAirToWater05/heatPump"),
     ("v3_equipments_waterHeater03", "/v3/equipments/waterHeater03/waterHeater"),
-    ("v3_consumption_hvacAirToWater05", "/v3/consumption/hvacAirToWater05?aggregation=Week"),
+    (
+        "v3_consumption_hvacAirToWater05",
+        "/v3/consumption/hvacAirToWater05?aggregation=Week"
+    ),
     ("v3_consumption_waterHeater03", "/v3/consumption/waterHeater03?aggregation=Week"),
     # MB (MyBattery)
     ("v3_mb", "/v3/mb"),
@@ -99,12 +101,11 @@ async def async_get_config_entry_diagnostics(
             else None,
         },
         # Last data parsed during the last coordinator update
-        "last_data": coordinator.data
-        if coordinator.data
-        else "No data available",
+        "last_data": coordinator.data if coordinator.data else "No data available",
         # Raw dump from the list of endpoints
         "api_dump": await _async_fetch_diagnostic_endpoints(coordinator),
     }
+
 
 async def _async_fetch_diagnostic_endpoints(
     coordinator: MyLight150Coordinator,

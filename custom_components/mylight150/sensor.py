@@ -242,6 +242,7 @@ SENSORS: tuple[MyLight150SensorEntityDescription, ...] = (
     ),
 )
 
+
 async def async_setup_entry(
     hass: HomeAssistant,
     entry: ConfigEntry,
@@ -259,6 +260,7 @@ async def async_setup_entry(
     sensors.append(MyLight150CurrentPricingSensorEntity(coordinator, entry))
 
     async_add_entities(sensors)
+
 
 class MyLight150SensorEntity(CoordinatorEntity[MyLight150Coordinator], SensorEntity):
     """Sensor entites for MyLight150. Auto pooling is handled by the coordinator."""
@@ -294,6 +296,7 @@ class MyLight150SensorEntity(CoordinatorEntity[MyLight150Coordinator], SensorEnt
             return None
         return self.coordinator.data.get(self.entity_description.data_key)
 
+
 class MyLight150PricingModeSensorEntity(
     CoordinatorEntity[MyLight150Coordinator], SensorEntity
 ):
@@ -311,7 +314,7 @@ class MyLight150PricingModeSensorEntity(
         self._attr_has_entity_name = True
         self._attr_translation_key = CONF_PRICING_MODE
         self._attr_icon = "mdi:clock-time-eight-outline"
-        
+
         # Device association named by installation code
         installation_code = coordinator.installation_code or entry.entry_id
         self._attr_device_info = DeviceInfo(
@@ -357,6 +360,7 @@ class MyLight150PricingModeSensorEntity(
         return {
             "schedule": self.coordinator.hphc_schedule,
         }
+
 
 class MyLight150CurrentPricingSensorEntity(
     CoordinatorEntity[MyLight150Coordinator], SensorEntity

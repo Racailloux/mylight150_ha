@@ -126,7 +126,7 @@ class MyLight150ConfigFlow(ConfigFlow, domain=DOMAIN):
 
     # Step 2: Options (pooling & pricing)
     async def async_step_options(self, user_input: dict[str, Any] | None = None):
-        
+
         if user_input is not None:
             return self.async_create_entry(
                 title=self._username,
@@ -138,7 +138,9 @@ class MyLight150ConfigFlow(ConfigFlow, domain=DOMAIN):
                 options={
                     CONF_UPDATE_INTERVAL: int(
                         max(
-                            user_input.get(CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL),
+                            user_input.get(
+                                CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL
+                            ),
                             MIN_UPDATE_INTERVAL,
                         )
                     ),
@@ -157,9 +159,9 @@ class MyLight150ConfigFlow(ConfigFlow, domain=DOMAIN):
         schema: dict = {
             vol.Required(
                 CONF_UPDATE_INTERVAL,
-                default=DEFAULT_UPDATE_INTERVAL # type: ignore # voluptuous stubs incorrects
+                default=DEFAULT_UPDATE_INTERVAL  # type: ignore # voluptuous stubs incorrects
             ): NumberSelector(
-                    NumberSelectorConfig(
+                NumberSelectorConfig(
                     min=MIN_UPDATE_INTERVAL,
                     max=MAX_UPDATE_INTERVAL,
                     mode=NumberSelectorMode.SLIDER,
@@ -169,19 +171,19 @@ class MyLight150ConfigFlow(ConfigFlow, domain=DOMAIN):
             ),
             vol.Optional(
                 CONF_UPDATE_INITIAL,
-                default=DEFAULT_UPDATE_INITIAL # type: ignore # voluptuous stubs incorrects
+                default=DEFAULT_UPDATE_INITIAL  # type: ignore # voluptuous stubs incorrects
             ): bool,
             vol.Optional(
                 CONF_PRICING_BASE,
-                default=DEFAULT_PRICING_BASE # type: ignore # voluptuous stubs incorrects
+                default=DEFAULT_PRICING_BASE  # type: ignore # voluptuous stubs incorrects
             ): NumberSelector(_PRICING_SELECTOR),
         }
         # Only for offpeak pricing type
         if self._pricing_type == CONF_PRICING_TYPE_HPHC:
             schema[
                 vol.Optional(
-                    CONF_PRICING_OFFPEAK, 
-                    default=DEFAULT_PRICING_OFFPEAK # type: ignore # voluptuous stubs incorrects
+                    CONF_PRICING_OFFPEAK,
+                    default=DEFAULT_PRICING_OFFPEAK  # type: ignore # voluptuous stubs incorrects
                 )
             ] = NumberSelector(_PRICING_SELECTOR)
 
@@ -214,7 +216,7 @@ class MyLight150ConfigFlow(ConfigFlow, domain=DOMAIN):
                         reconfigure_entry,
                         data_updates={
                             CONF_PASSWORD: password,
-                            CONF_PRICING_TYPE: pricing_type
+                            CONF_PRICING_TYPE: pricing_type,
                         },
                     )
             except Exception:
@@ -236,10 +238,10 @@ class MyLight150ConfigFlow(ConfigFlow, domain=DOMAIN):
             },
             errors=_errors,
         )
-    
+
     @staticmethod
     def async_get_options_flow(
-        config_entry: ConfigEntry
+        config_entry: ConfigEntry,
     ) -> MyLight150OptionsFlowHandler:
         return MyLight150OptionsFlowHandler()
 

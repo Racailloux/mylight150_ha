@@ -1,4 +1,5 @@
 """MyLight150 DataUpdateCoordinator."""
+
 from __future__ import annotations
 
 import logging
@@ -31,6 +32,7 @@ STORAGE_KEY = "mylight150_past_energies"
 STORAGE_VERSION = 1
 
 _LOGGER = logging.getLogger(__name__)
+
 
 class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
     """Coordinator MyLight150 — coordinate cyclic API calls."""
@@ -140,7 +142,12 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
                     if code:
                         _LOGGER.debug(f"Installation code '{code}' found.")
                         return code
-        except (MyLight150AuthError, MyLight150ApiError, RequestException, JSONDecodeError) as err:
+        except (
+            MyLight150AuthError,
+            MyLight150ApiError,
+            RequestException,
+            JSONDecodeError
+        ) as err:
             _LOGGER.warning("Error while retrieving installation code: %s", err)
 
         return ""
@@ -153,15 +160,20 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
         
             parsed: dict[str, Any] = {
                 # Live powers (kW)
-                "solar_production":  data.get("solarProduction", {}).get("value"),
-                "grid":              data.get("grid", {}).get("value") - data.get("injection", {}).get("value"),
-                "load":              data.get("load", {}).get("value"),
+                "solar_production": data.get("solarProduction", {}).get("value"),
+                "grid": data.get("grid", {}).get("value") - data.get("injection", {}).get("value"),
+                "load": data.get("load", {}).get("value"),
             }
 
             _LOGGER.debug("Data parsed for live home: %s", parsed)
             return parsed
         
-        except (MyLight150AuthError, MyLight150ApiError, RequestException, JSONDecodeError) as err:
+        except (
+            MyLight150AuthError,
+            MyLight150ApiError,
+            RequestException,
+            JSONDecodeError
+        ) as err:
             _LOGGER.warning("Error while retrieving home data: %s", err)
 
         return {}
@@ -173,11 +185,11 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             data = await self._api.async_call_api("/v3/virtual-battery/state")
 
             parsed: dict[str, Any] = {
-                "msb_state":         data.get("status", {}).get("state", "unknown"),
-                "msb_power":         data.get("status", {}).get("socEvolutionInkW", 0),
-                "msb_autonomy":      data.get("status", {}).get("socInkWh", 0),
-                "msb_capacity":      data.get("status", {}).get("capacity", 0),
-                "msb_level":         data.get("status", {}).get("socInkWh", 0) / data.get("status", {}).get("capacity", 0) * 100.0,
+                "msb_state": data.get("status", {}).get("state", "unknown"),
+                "msb_power": data.get("status", {}).get("socEvolutionInkW", 0),
+                "msb_autonomy": data.get("status", {}).get("socInkWh", 0),
+                "msb_capacity": data.get("status", {}).get("capacity", 0),
+                "msb_level": data.get("status", {}).get("socInkWh", 0) / data.get("status", {}).get("capacity", 0) * 100.0,
             }
             if parsed.get("msb_state", "idle") == "charging":
                 parsed["msb_power"] = parsed.get("msb_power", 0.0) * -1
@@ -185,7 +197,12 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             _LOGGER.debug("Data parsed for virtual battery: %s", parsed)
             return parsed
         
-        except (MyLight150AuthError, MyLight150ApiError, RequestException, JSONDecodeError) as err:
+        except (
+            MyLight150AuthError,
+            MyLight150ApiError,
+            RequestException,
+            JSONDecodeError
+        ) as err:
             _LOGGER.warning("Error while retrieving virtual battery data: %s", err)
 
         return {}
@@ -207,7 +224,12 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             _LOGGER.debug("Data parsed for equipments: %s", parsed)
             return parsed
         
-        except (MyLight150AuthError, MyLight150ApiError, RequestException, JSONDecodeError) as err:
+        except (
+            MyLight150AuthError,
+            MyLight150ApiError,
+            RequestException,
+            JSONDecodeError
+        ) as err:
             _LOGGER.warning("Error while retrieving equipment: %s", err)
             return {}
 
@@ -220,8 +242,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
         strf_yesterday = yesterday.strftime('%Y-%m-%d')
 
         is_first_refresh_of_day = (
-            self._last_refresh_date is not None
-            and self._last_refresh_date < today
+            self._last_refresh_date is not None and self._last_refresh_date < today
         )
 
         if self._persistent is None or self._persistent == {}:
@@ -245,13 +266,13 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
                 yesterday_data.update(data)
 
             # Save in long term persistancy
-            self._persistent[CONF_ENERGY_PROD_FROM_SOLAR]  = self._persistent.get(CONF_ENERGY_PROD_FROM_SOLAR, 0.0)  + yesterday_data.get(CONF_ENERGY_PROD_FROM_SOLAR, 0.0)
-            self._persistent[CONF_ENERGY_PROD_TO_MSB]      = self._persistent.get(CONF_ENERGY_PROD_TO_MSB, 0.0)      + yesterday_data.get(CONF_ENERGY_PROD_TO_MSB, 0.0)
-            self._persistent[CONF_ENERGY_PROD_TO_GRID]     = self._persistent.get(CONF_ENERGY_PROD_TO_GRID, 0.0)     + yesterday_data.get(CONF_ENERGY_PROD_TO_GRID, 0.0)
-            self._persistent[CONF_ENERGY_CONSUMPTION]      = self._persistent.get(CONF_ENERGY_CONSUMPTION, 0.0)      + yesterday_data.get(CONF_ENERGY_CONSUMPTION, 0.0)
+            self._persistent[CONF_ENERGY_PROD_FROM_SOLAR] = self._persistent.get(CONF_ENERGY_PROD_FROM_SOLAR, 0.0) + yesterday_data.get(CONF_ENERGY_PROD_FROM_SOLAR, 0.0)
+            self._persistent[CONF_ENERGY_PROD_TO_MSB] = self._persistent.get(CONF_ENERGY_PROD_TO_MSB, 0.0) + yesterday_data.get(CONF_ENERGY_PROD_TO_MSB, 0.0)
+            self._persistent[CONF_ENERGY_PROD_TO_GRID] = self._persistent.get(CONF_ENERGY_PROD_TO_GRID, 0.0) + yesterday_data.get(CONF_ENERGY_PROD_TO_GRID, 0.0)
+            self._persistent[CONF_ENERGY_CONSUMPTION] = self._persistent.get(CONF_ENERGY_CONSUMPTION, 0.0) + yesterday_data.get(CONF_ENERGY_CONSUMPTION, 0.0)
             self._persistent[CONF_ENERGY_CONSO_FROM_SOLAR] = self._persistent.get(CONF_ENERGY_CONSO_FROM_SOLAR, 0.0) + yesterday_data.get(CONF_ENERGY_CONSO_FROM_SOLAR, 0.0)
-            self._persistent[CONF_ENERGY_CONSO_FROM_MSB]   = self._persistent.get(CONF_ENERGY_CONSO_FROM_MSB, 0.0)   + yesterday_data.get(CONF_ENERGY_CONSO_FROM_MSB, 0.0)
-            self._persistent[CONF_ENERGY_CONSO_FROM_GRID]  = self._persistent.get(CONF_ENERGY_CONSO_FROM_GRID, 0.0)  + yesterday_data.get(CONF_ENERGY_CONSO_FROM_GRID, 0.0)
+            self._persistent[CONF_ENERGY_CONSO_FROM_MSB] = self._persistent.get(CONF_ENERGY_CONSO_FROM_MSB, 0.0) + yesterday_data.get(CONF_ENERGY_CONSO_FROM_MSB, 0.0)
+            self._persistent[CONF_ENERGY_CONSO_FROM_GRID] = self._persistent.get(CONF_ENERGY_CONSO_FROM_GRID, 0.0) + yesterday_data.get(CONF_ENERGY_CONSO_FROM_GRID, 0.0)
             await self._async_save_persistent_data()
         
         _LOGGER.debug("Fetching energy data for date: %s", strf_today)
@@ -265,13 +286,13 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
 
         # Generate sum of past and daily energies
         total = {
-            CONF_ENERGY_PROD_FROM_SOLAR:  self._persistent.get(CONF_ENERGY_PROD_FROM_SOLAR, 0.0)  + daily.get(CONF_ENERGY_PROD_FROM_SOLAR, 0.0),
-            CONF_ENERGY_PROD_TO_MSB:      self._persistent.get(CONF_ENERGY_PROD_TO_MSB, 0.0)      + daily.get(CONF_ENERGY_PROD_TO_MSB, 0.0),
-            CONF_ENERGY_PROD_TO_GRID:     self._persistent.get(CONF_ENERGY_PROD_TO_GRID, 0.0)     + daily.get(CONF_ENERGY_PROD_TO_GRID, 0.0),
-            CONF_ENERGY_CONSUMPTION:      self._persistent.get(CONF_ENERGY_CONSUMPTION, 0.0)      + daily.get(CONF_ENERGY_CONSUMPTION, 0.0),
+            CONF_ENERGY_PROD_FROM_SOLAR: self._persistent.get(CONF_ENERGY_PROD_FROM_SOLAR, 0.0) + daily.get(CONF_ENERGY_PROD_FROM_SOLAR, 0.0),
+            CONF_ENERGY_PROD_TO_MSB: self._persistent.get(CONF_ENERGY_PROD_TO_MSB, 0.0) + daily.get(CONF_ENERGY_PROD_TO_MSB, 0.0),
+            CONF_ENERGY_PROD_TO_GRID: self._persistent.get(CONF_ENERGY_PROD_TO_GRID, 0.0) + daily.get(CONF_ENERGY_PROD_TO_GRID, 0.0),
+            CONF_ENERGY_CONSUMPTION: self._persistent.get(CONF_ENERGY_CONSUMPTION, 0.0) + daily.get(CONF_ENERGY_CONSUMPTION, 0.0),
             CONF_ENERGY_CONSO_FROM_SOLAR: self._persistent.get(CONF_ENERGY_CONSO_FROM_SOLAR, 0.0) + daily.get(CONF_ENERGY_CONSO_FROM_SOLAR, 0.0),
-            CONF_ENERGY_CONSO_FROM_MSB:   self._persistent.get(CONF_ENERGY_CONSO_FROM_MSB, 0.0)   + daily.get(CONF_ENERGY_CONSO_FROM_MSB, 0.0),
-            CONF_ENERGY_CONSO_FROM_GRID:  self._persistent.get(CONF_ENERGY_CONSO_FROM_GRID, 0.0)  + daily.get(CONF_ENERGY_CONSO_FROM_GRID, 0.0),
+            CONF_ENERGY_CONSO_FROM_MSB: self._persistent.get(CONF_ENERGY_CONSO_FROM_MSB, 0.0) + daily.get(CONF_ENERGY_CONSO_FROM_MSB, 0.0),
+            CONF_ENERGY_CONSO_FROM_GRID: self._persistent.get(CONF_ENERGY_CONSO_FROM_GRID, 0.0) + daily.get(CONF_ENERGY_CONSO_FROM_GRID, 0.0),
         }
 
 
@@ -296,11 +317,16 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
 
             return {
                 CONF_ENERGY_PROD_FROM_SOLAR: breakdown.get("total", 0.0),
-                CONF_ENERGY_PROD_TO_MSB:     _dest(breakdown, "virtualBattery"),
-                CONF_ENERGY_PROD_TO_GRID:    _dest(breakdown, "injection"),
+                CONF_ENERGY_PROD_TO_MSB: _dest(breakdown, "virtualBattery"),
+                CONF_ENERGY_PROD_TO_GRID: _dest(breakdown, "injection"),
             }
                     
-        except (MyLight150AuthError, MyLight150ApiError, RequestException, JSONDecodeError) as err:
+        except (
+            MyLight150AuthError,
+            MyLight150ApiError,
+            RequestException,
+            JSONDecodeError
+        ) as err:
             _LOGGER.warning("Error while retrieving energy production data : %s", err)
             return {}
 
@@ -320,10 +346,10 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             breakdown = data.get("breakdown", {})
 
             return {
-                CONF_ENERGY_CONSUMPTION:      breakdown.get("total", {}).get("energy", 0.0),
+                CONF_ENERGY_CONSUMPTION: breakdown.get("total", {}).get("energy", 0.0),
                 CONF_ENERGY_CONSO_FROM_SOLAR: _src(breakdown, "selfConsumption"),
-                CONF_ENERGY_CONSO_FROM_MSB:   _src(breakdown, "virtualBattery"),
-                CONF_ENERGY_CONSO_FROM_GRID:  _src(breakdown, "grid"),
+                CONF_ENERGY_CONSO_FROM_MSB: _src(breakdown, "virtualBattery"),
+                CONF_ENERGY_CONSO_FROM_GRID: _src(breakdown, "grid"),
             }
                     
         except (MyLight150AuthError, MyLight150ApiError, RequestException, JSONDecodeError) as err:
@@ -351,7 +377,12 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
                 CONF_ENERGY_PROD_TO_GRID:    _dest(breakdown, "injection"),
             }
                     
-        except (MyLight150AuthError, MyLight150ApiError, RequestException, JSONDecodeError) as err:
+        except (
+            MyLight150AuthError,
+            MyLight150ApiError,
+            RequestException,
+            JSONDecodeError
+        ) as err:
             _LOGGER.warning("MyLight150: Error while retrieving energy production data : %s", err)
             return {}
 
@@ -371,13 +402,18 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             breakdown = data.get("breakdown", {})
 
             return {
-                CONF_ENERGY_CONSUMPTION:      breakdown.get("total", {}).get("energy", 0.0),
+                CONF_ENERGY_CONSUMPTION: breakdown.get("total", {}).get("energy", 0.0),
                 CONF_ENERGY_CONSO_FROM_SOLAR: _src(breakdown, "selfConsumption"),
-                CONF_ENERGY_CONSO_FROM_MSB:   _src(breakdown, "virtualBattery"),
-                CONF_ENERGY_CONSO_FROM_GRID:  _src(breakdown, "grid"),
+                CONF_ENERGY_CONSO_FROM_MSB: _src(breakdown, "virtualBattery"),
+                CONF_ENERGY_CONSO_FROM_GRID: _src(breakdown, "grid"),
             }
                     
-        except (MyLight150AuthError, MyLight150ApiError, RequestException, JSONDecodeError) as err:
+        except (
+            MyLight150AuthError,
+            MyLight150ApiError,
+            RequestException,
+            JSONDecodeError
+        ) as err:
             _LOGGER.warning("Error while retrieving energy consumption data : %s", err)
             return {}
 
@@ -402,7 +438,12 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
                 CONF_ENERGY_PROD_TO_GRID:    _dest(breakdown, "injection"),
             }
                     
-        except (MyLight150AuthError, MyLight150ApiError, RequestException, JSONDecodeError) as err:
+        except (
+            MyLight150AuthError,
+            MyLight150ApiError,
+            RequestException,
+            JSONDecodeError
+        ) as err:
             _LOGGER.debug("Error while retrieving energy production data : %s", err)
             return {}
 
@@ -422,13 +463,18 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             breakdown = data.get("breakdown", {})
 
             return {
-                CONF_ENERGY_CONSUMPTION:      breakdown.get("total", {}).get("energy", 0.0),
+                CONF_ENERGY_CONSUMPTION: breakdown.get("total", {}).get("energy", 0.0),
                 CONF_ENERGY_CONSO_FROM_SOLAR: _src(breakdown, "selfConsumption"),
-                CONF_ENERGY_CONSO_FROM_MSB:   _src(breakdown, "virtualBattery"),
-                CONF_ENERGY_CONSO_FROM_GRID:  _src(breakdown, "grid"),
+                CONF_ENERGY_CONSO_FROM_MSB: _src(breakdown, "virtualBattery"),
+                CONF_ENERGY_CONSO_FROM_GRID: _src(breakdown, "grid"),
             }
                     
-        except (MyLight150AuthError, MyLight150ApiError, RequestException, JSONDecodeError) as err:
+        except (
+            MyLight150AuthError,
+            MyLight150ApiError,
+            RequestException,
+            JSONDecodeError
+        ) as err:
             _LOGGER.debug("Error while retrieving energy consumption data : %s", err)
             return {}
 
@@ -449,7 +495,12 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
         endpoint = "/v3/contract/energy-pricing"
         try:
             pricing_data = await self._api.async_call_api(endpoint)
-        except (MyLight150AuthError, MyLight150ApiError, RequestException, JSONDecodeError) as err:
+        except (
+            MyLight150AuthError,
+            MyLight150ApiError,
+            RequestException,
+            JSONDecodeError
+        ) as err:
             _LOGGER.warning("Error while retrieving pricing data : %s", err)
             return False
         
@@ -493,7 +544,12 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             _LOGGER.debug("Data parsed for money-pot: %s", parsed)
             return parsed
         
-        except (MyLight150AuthError, MyLight150ApiError, RequestException, JSONDecodeError) as err:
+        except (
+            MyLight150AuthError,
+            MyLight150ApiError,
+            RequestException,
+            JSONDecodeError
+        ) as err:
             _LOGGER.warning("Error while retrieving money-pot data: %s", err)
 
         return {}
