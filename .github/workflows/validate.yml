@@ -1,43 +1,66 @@
-name: Validate
+name: "Validate"
 
 on:
-  push:
-  pull_request:
+  workflow_dispatch:
   schedule:
     - cron: "0 0 * * *"
-  workflow_dispatch:
+  push:
+    branches: ["main"]
+  pull_request:
+    branches: ["main"]
 
 jobs:
-  validate-hassfest:
-    runs-on: ubuntu-latest
+  hassfest:
+    name: "Hassfest Validation"
+    runs-on: "ubuntu-latest"
     steps:
-      - uses: actions/checkout@v6
-      - name: Hassfest validation
-        uses: home-assistant/actions/hassfest@master
-
-  validate-hacs:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      - name: HACS validation
-        uses: hacs/action@main
+      - name: Checkout repository
+        uses: actions/checkout@v7
         with:
-          category: integration
+          fetch-depth: 0
+      - name: Run hassfest validation
+        uses: "home-assistant/actions/hassfest@master"
+
+  hacs:
+    name: "HACS Validation"
+    runs-on: "ubuntu-latest"
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - name: Run HACS validation
+        uses: "hacs/action@main"
+        with:
+          category: "integration"
 
   validate-ruff:
+    name: "Ruff Linting & Formatting"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: astral-sh/setup-uv@v3
-      - run: uvx ruff check .
-      - run: uvx ruff format --check .
+      - name: Checkout repository
+        uses: actions/checkout@v7
+      - name: Setup UV (without cache)
+        uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d  # v10.0.1
+        with:
+          enable-cache: false  # Deactivate cache
+          cache-dependency-glob: ""  # Deactivate dependancy file search
+      - name: Run Ruff check
+        run: uvx ruff check .
+      - name: Run Ruff format check
+        run: uvx ruff format --check .
 
   validate-mypy:
+    name: "Mypy Type Checking"
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v6
-      - uses: actions/setup-python@v5
+      - name: Checkout repository
+        uses: actions/checkout@v7
+      - name: Setup Python 3.13
+        uses: actions/setup-python@v7
         with:
           python-version: "3.13"
-      - run: pip install mypy types-requests homeassistant-stubs voluptuous
-      - run: mypy custom_components/mylight150
+      - name: Install dependencies
+        run: pip install mypy types-requests homeassistant-stubs voluptuous
+      - name: Run Mypy
+        run: mypy custom_components/mylight150
