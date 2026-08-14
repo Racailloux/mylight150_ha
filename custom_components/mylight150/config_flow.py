@@ -48,7 +48,9 @@ _PRICING_SELECTOR = NumberSelectorConfig(
 )
 
 
-async def _validate_credentials(hass, username: str, password: str) -> tuple[str | None, str]:
+async def _validate_credentials(
+    hass, username: str, password: str
+) -> tuple[str | None, str]:
     """Try to authenticate. Returns None on success, or an error key string on failure."""
     api = MyLight150ApiClient(hass, username, password)
     try:

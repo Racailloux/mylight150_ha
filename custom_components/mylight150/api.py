@@ -73,7 +73,7 @@ class MyLight150ApiClient:
         """Return a valid access token, or None if failed. Refreshing or re-logging if needed."""
         now = datetime.now(timezone.utc).timestamp()
         _LOGGER.debug(
-            f"Current tokens validities: (current time: {now}) "            
+            f"Current tokens validities: (current time: {now}) "
             f"Access token: {self._token_expires_at} / "
             f"Refresh token: {self._refresh_token_expires_at}"
         )
@@ -84,12 +84,14 @@ class MyLight150ApiClient:
                 f"Token is still valid for account: {self._username} (token: {self._access_token[:20]}...)"
             )
             return self._access_token
-        
+
         # Access token expired, check if refresh token is still valid
         if self._refresh_token and self._refresh_token_expires_at > now:
-            _LOGGER.debug("Access token expired but refresh token still available, refreshing...")
+            _LOGGER.debug(
+                "Access token expired but refresh token still available, refreshing..."
+            )
             return await self._async_refresh_access_token()
-        
+
         # Everything expired, do a full OAuth2 PKCE login
         _LOGGER.debug("No valid token, performing full login...")
         return await self._async_login()
@@ -129,7 +131,6 @@ class MyLight150ApiClient:
             )
             return {}
         return response.json()
-
 
     # Persistence methods
     def restore_tokens(
@@ -174,9 +175,7 @@ class MyLight150ApiClient:
         # PKCE
         code_verifier = secrets.token_urlsafe(64)
         code_challenge = (
-            base64.urlsafe_b64encode(
-                hashlib.sha256(code_verifier.encode()).digest()
-            )
+            base64.urlsafe_b64encode(hashlib.sha256(code_verifier.encode()).digest())
             .decode()
             .rstrip("=")
         )
@@ -269,16 +268,16 @@ class MyLight150ApiClient:
 
         response = self._session.post(token_url, data=data, allow_redirects=False)
         if response.status_code != 200:
-            _LOGGER.warning(
-                f"Step 4 failed! Response code: {response.status_code}"
-            )
+            _LOGGER.warning(f"Step 4 failed! Response code: {response.status_code}")
             _LOGGER.debug(f"Response text: {response.text[:200]}")
             raise MyLight150AuthError(f"Step 4 failed: {response.status_code}")
 
         token_data = response.json()
         access_token = token_data.get("access_token")
         if not access_token:
-            _LOGGER.warning(f"Step 4 failed! Missing access_token in response: {token_data[:100]}...")
+            _LOGGER.warning(
+                f"Step 4 failed! Missing access_token in response: {token_data[:100]}..."
+            )
             raise MyLight150AuthError("Step 4: Missing access_token in response")
 
         self._access_token = access_token
