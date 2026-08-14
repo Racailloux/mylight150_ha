@@ -1,4 +1,5 @@
 """Sensors for MyLight150 integration."""
+
 from __future__ import annotations
 
 import logging
@@ -48,12 +49,12 @@ _LOGGER = logging.getLogger(__name__)
 @dataclass(frozen=True, kw_only=True)
 class MyLight150SensorEntityDescription(SensorEntityDescription):
     """SensorEntityDescription extended with coordinator data_key."""
+
     data_key: str
 
 
 # List all sensors
 SENSORS: tuple[MyLight150SensorEntityDescription, ...] = (
-
     # Live powers sensors (kW)
     MyLight150SensorEntityDescription(
         key="solar_production",
@@ -85,7 +86,6 @@ SENSORS: tuple[MyLight150SensorEntityDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:home-lightning-bolt",
     ),
-
     # MySmartBattery (virtual battery) sensors
     MyLight150SensorEntityDescription(
         key="msb_state",
@@ -137,7 +137,6 @@ SENSORS: tuple[MyLight150SensorEntityDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:battery",
     ),
-
     # Money sensors
     MyLight150SensorEntityDescription(
         key="money_pot",
@@ -148,7 +147,6 @@ SENSORS: tuple[MyLight150SensorEntityDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:piggy-bank",
     ),
-
     # Equipments sensors
     MyLight150SensorEntityDescription(
         key="heatPump_mode",
@@ -164,7 +162,6 @@ SENSORS: tuple[MyLight150SensorEntityDescription, ...] = (
         translation_key="waterheater_mode",
         icon="mdi:water-boiler",
     ),
-
     # Total energy sensors (kWh)
     MyLight150SensorEntityDescription(
         key=CONF_ENERGY_PROD_FROM_SOLAR,
@@ -245,7 +242,6 @@ SENSORS: tuple[MyLight150SensorEntityDescription, ...] = (
     ),
 )
 
-
 async def async_setup_entry(
     hass: HomeAssistant,
     entry: ConfigEntry,
@@ -255,8 +251,7 @@ async def async_setup_entry(
 
     # Common sensors
     sensors: list = [
-        MyLight150SensorEntity(coordinator, entry, desc)
-        for desc in SENSORS
+        MyLight150SensorEntity(coordinator, entry, desc) for desc in SENSORS
     ]
 
     # Pricing special sensors
@@ -265,9 +260,8 @@ async def async_setup_entry(
 
     async_add_entities(sensors)
 
-
 class MyLight150SensorEntity(CoordinatorEntity[MyLight150Coordinator], SensorEntity):
-    """ Sensor entites for MyLight150. Auto pooling is handled by the coordinator."""
+    """Sensor entites for MyLight150. Auto pooling is handled by the coordinator."""
 
     entity_description: MyLight150SensorEntityDescription
 
@@ -295,13 +289,14 @@ class MyLight150SensorEntity(CoordinatorEntity[MyLight150Coordinator], SensorEnt
 
     @property
     def native_value(self) -> Any:
-        """ Sensor value coming from coordinator.data. Returns None if data is not available (coordinator not yet refreshed, or key missing)."""
+        """Sensor value coming from coordinator.data. Returns None if data is not available (coordinator not yet refreshed, or key missing)."""
         if self.coordinator.data is None:
             return None
         return self.coordinator.data.get(self.entity_description.data_key)
 
-
-class MyLight150PricingModeSensorEntity(CoordinatorEntity[MyLight150Coordinator], SensorEntity):
+class MyLight150PricingModeSensorEntity(
+    CoordinatorEntity[MyLight150Coordinator], SensorEntity
+):
 
     def __init__(
         self,
@@ -312,10 +307,10 @@ class MyLight150PricingModeSensorEntity(CoordinatorEntity[MyLight150Coordinator]
 
         # unique_id format : {domain}_{entry_id}_{sensor_key}
         self._attr_unique_id = f"{DOMAIN}_{entry.entry_id}_{CONF_PRICING_MODE}"
-        self._attr_key=CONF_PRICING_MODE
-        self._attr_has_entity_name=True
-        self._attr_translation_key=CONF_PRICING_MODE
-        self._attr_icon="mdi:clock-time-eight-outline"
+        self._attr_key = CONF_PRICING_MODE
+        self._attr_has_entity_name = True
+        self._attr_translation_key = CONF_PRICING_MODE
+        self._attr_icon = "mdi:clock-time-eight-outline"
         
         # Device association named by installation code
         installation_code = coordinator.installation_code or entry.entry_id
@@ -363,8 +358,9 @@ class MyLight150PricingModeSensorEntity(CoordinatorEntity[MyLight150Coordinator]
             "schedule": self.coordinator.hphc_schedule,
         }
 
-
-class MyLight150CurrentPricingSensorEntity(CoordinatorEntity[MyLight150Coordinator], SensorEntity):
+class MyLight150CurrentPricingSensorEntity(
+    CoordinatorEntity[MyLight150Coordinator], SensorEntity
+):
 
     def __init__(
         self,
@@ -373,7 +369,7 @@ class MyLight150CurrentPricingSensorEntity(CoordinatorEntity[MyLight150Coordinat
     ) -> None:
         super().__init__(coordinator)
         self._entry = entry
-        
+
         # unique_id format : {domain}_{entry_id}_{sensor_key}
         self._attr_unique_id = f"{DOMAIN}_{entry.entry_id}_{CONF_PRICING_CURRENT}"
         self._attr_key = CONF_PRICING_CURRENT
@@ -383,7 +379,7 @@ class MyLight150CurrentPricingSensorEntity(CoordinatorEntity[MyLight150Coordinat
         self._attr_native_unit_of_measurement = "€/kWh"
         self._attr_suggested_display_precision = 3
         self._attr_icon = "mdi:currency-eur"
-        
+
         # Device association named by installation code
         installation_code = coordinator.installation_code or entry.entry_id
         self._attr_device_info = DeviceInfo(
@@ -408,7 +404,7 @@ class MyLight150CurrentPricingSensorEntity(CoordinatorEntity[MyLight150Coordinat
 
     async def _async_update_time(self, _now=None) -> None:
         self.async_write_ha_state()
-    
+
     @property
     def native_value(self) -> float | None:
         """Return the current pricing in €/kWh"""
@@ -417,7 +413,7 @@ class MyLight150CurrentPricingSensorEntity(CoordinatorEntity[MyLight150Coordinat
         tarif_base = options.get(CONF_PRICING_BASE, DEFAULT_PRICING_BASE)
         tarif_offpeak = options.get(CONF_PRICING_OFFPEAK, DEFAULT_PRICING_OFFPEAK)
 
-        if pricing_type != "hphc": # Standard pricing
+        if pricing_type != "hphc":  # Standard pricing
             return tarif_base
 
         # Peak/OffPeak mode: Calculate the current pricing
@@ -450,9 +446,9 @@ def _compute_hphc_mode(schedule: list[dict]) -> str:
 
     for period in schedule:
         start = _parse_hhmm(period.get("start", "00h00"))
-        end   = _parse_hhmm(period.get("end",   "00h00"))
+        end = _parse_hhmm(period.get("end", "00h00"))
         ptype = period.get("type", "peak").lower()
-        
+
         # Manage midnight limit
         if end == 0:
             end = 24 * 60

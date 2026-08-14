@@ -54,7 +54,7 @@ DEFAULT_PRICING_TYPE: str = "base"
 
 # Platform list to be loaded (other sensors (binary,etc) can be added later.
 PLATFORMS: list[Platform] = [
-#    Platform.BINARY_SENSOR,
+    # Platform.BINARY_SENSOR,
     Platform.SENSOR,
 ]
 

@@ -27,42 +27,42 @@ TO_REDACT = {
 # List of endpoints to call for diagnostics. Each tuple contains a key and the endpoint path.
 DIAGNOSTIC_ENDPOINTS: list[tuple[str, str]] = [
     # General information about the API and installation
-    ("root",                            "/"),
-    ("v2",                              "/v2"),
-    ("v2_installation",                 "/v2/installations/{code}"),
-    ("v3_contract_energy-pricing",      "/v3/contract/energy-pricing"),
+    ("root", "/"),
+    ("v2", "/v2"),
+    ("v2_installation", "/v2/installations/{code}"),
+    ("v3_contract_energy-pricing", "/v3/contract/energy-pricing"),
      
     # Live data
-    ("v2_home",                         "/v2/installations/{code}/home?msb=msb01"),
+    ("v2_home", "/v2/installations/{code}/home?msb=msb01"),
     # Options from contracts (MSB, MSP, MSH, etc.)
-    ("v3_contract_options",             "/v3/contract/options"),
-    ("v3_contract_options_msb",         "/v3/contract/options/msb"),
-    ("v3_contract_options_mb",          "/v3/contract/options/mb"),
-    ("v3_contract_options_msp",         "/v3/contract/options/msp"),
-    ("v3_contract_options_msh",         "/v3/contract/options/msh"),
+    ("v3_contract_options", "/v3/contract/options"),
+    ("v3_contract_options_msb", "/v3/contract/options/msb"),
+    ("v3_contract_options_mb", "/v3/contract/options/mb"),
+    ("v3_contract_options_msp", "/v3/contract/options/msp"),
+    ("v3_contract_options_msh", "/v3/contract/options/msh"),
     ("v3_contract_options_myBatteryWithEms", "/v3/contract/options/myBatteryWithEms"),
     # Savings and money pot
-    ("v3_savings",                      "/v3/savings"),
-    ("v3_money_pot",                    "/v3/money-pot"),
+    ("v3_savings", "/v3/savings"),
+    ("v3_money_pot", "/v3/money-pot"),
     # Energy, production and consumption
-    ("v3_energies",                     "/v3/energies"),
-    ("v3_production",                   "/v3/production"),
-    ("v3_production_day",               "/v3/production?aggregation=Days"),
-    ("v3_consumption",                  "/v3/consumption"),
-    ("v3_consumption_day",              "/v3/consumption?aggregation=Days"),
+    ("v3_energies", "/v3/energies"),
+    ("v3_production", "/v3/production"),
+    ("v3_production_day", "/v3/production?aggregation=Days"),
+    ("v3_consumption", "/v3/consumption"),
+    ("v3_consumption_day", "/v3/consumption?aggregation=Days"),
     # Piloted Equipment (HVAC, water heater, etc.)
-    ("v2_equipments",                   "/v2/installations/{code}/equipments"),
-    ("v3_equipments",                   "/v3/equipments"),
-    ("v3_equipments_hvacAirToWater05",  "/v3/equipments/hvacAirToWater05/heatPump"),
-    ("v3_equipments_waterHeater03",     "/v3/equipments/waterHeater03/waterHeater"),
+    ("v2_equipments", "/v2/installations/{code}/equipments"),
+    ("v3_equipments", "/v3/equipments"),
+    ("v3_equipments_hvacAirToWater05", "/v3/equipments/hvacAirToWater05/heatPump"),
+    ("v3_equipments_waterHeater03", "/v3/equipments/waterHeater03/waterHeater"),
     ("v3_consumption_hvacAirToWater05", "/v3/consumption/hvacAirToWater05?aggregation=Week"),
-    ("v3_consumption_waterHeater03",    "/v3/consumption/waterHeater03?aggregation=Week"),
+    ("v3_consumption_waterHeater03", "/v3/consumption/waterHeater03?aggregation=Week"),
     # MB (MyBattery)
-    ("v3_mb",                           "/v3/mb"),
-    ("v3_mb_legacy",                    "/v3/mb/legacy"),
+    ("v3_mb", "/v3/mb"),
+    ("v3_mb_legacy", "/v3/mb/legacy"),
     # MSB (MySmartBattery)
-    ("v3_msb_legacy",                   "/v3/msb/legacy"),
-    ("v3_virtual_battery_state",        "/v3/virtual-battery/state"),
+    ("v3_msb_legacy", "/v3/msb/legacy"),
+    ("v3_virtual_battery_state", "/v3/virtual-battery/state"),
 ]
 
 
@@ -77,25 +77,31 @@ async def async_get_config_entry_diagnostics(
         # Configuration Infos
         "config_entry": async_redact_data(
             {
-                "entry_id":   entry.entry_id,
-                "version":    entry.version,
-                "domain":     entry.domain,
-                "title":      entry.title,
-                "source":     entry.source,
-                "data":       dict(entry.data),
-                "options":    dict(entry.options),
+                "entry_id": entry.entry_id,
+                "version": entry.version,
+                "domain": entry.domain,
+                "title": entry.title,
+                "source": entry.source,
+                "data": dict(entry.data),
+                "options": dict(entry.options),
             },
             TO_REDACT,
         ),
         # Coordinator status and last data
         "coordinator": {
-            "installation_code":    coordinator.installation_code,
-            "update_interval_sec":  coordinator.update_interval.total_seconds() if coordinator.update_interval else None,
-            "last_update_success":  coordinator.last_update_success,
-            "last_exception":       str(coordinator.last_exception) if coordinator.last_exception else None,
+            "installation_code": coordinator.installation_code,
+            "update_interval_sec": coordinator.update_interval.total_seconds()
+            if coordinator.update_interval
+            else None,
+            "last_update_success": coordinator.last_update_success,
+            "last_exception": str(coordinator.last_exception)
+            if coordinator.last_exception
+            else None,
         },
         # Last data parsed during the last coordinator update
-        "last_data": coordinator.data if coordinator.data else "No data available",
+        "last_data": coordinator.data
+        if coordinator.data
+        else "No data available",
         # Raw dump from the list of endpoints
         "api_dump": await _async_fetch_diagnostic_endpoints(coordinator),
     }
@@ -113,7 +119,7 @@ async def _async_fetch_diagnostic_endpoints(
         try:
             _LOGGER.debug("Diagnostics: API call of '%s'", endpoint)
             results[key] = await coordinator._api.async_call_api(endpoint)
-        except Exception as err: # noqa: BLE001
+        except Exception as err:  # noqa: BLE001
             # Catching all exceptions to prevent the diagnostic from being blocked
             results[key] = {"error": str(err)}
             _LOGGER.warning("Diagnostics: Error on requesting: %s", err)
