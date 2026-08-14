@@ -54,7 +54,7 @@ async def _validate_credentials(
     """Try to authenticate. Returns None on success, or an error key string on failure."""
     api = MyLight150ApiClient(hass, username, password)
     try:
-    	# Try to connect to MyLight using the given credentials
+        # Try to connect to MyLight using the given credentials
         await api.async_login_test()
         _LOGGER.info("Config flow: Connection test successful!")
 

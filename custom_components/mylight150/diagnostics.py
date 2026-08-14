@@ -100,7 +100,6 @@ async def async_get_config_entry_diagnostics(
         "api_dump": await _async_fetch_diagnostic_endpoints(coordinator),
     }
 
-
 async def _async_fetch_diagnostic_endpoints(
     coordinator: MyLight150Coordinator,
 ) -> dict[str, Any]:
