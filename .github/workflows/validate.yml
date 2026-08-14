@@ -43,7 +43,8 @@ jobs:
       - name: Setup UV (without cache)
         uses: astral-sh/setup-uv@20cfd1bf945f4377ade1205e4dbc17946fc9a30d  # v10.0.1
         with:
-          cache: false  # Désactivate cache (no dependancy file)
+          enable-cache: false  # Deactivate cache
+          cache-dependency-glob: ""  # Deactivate dependancy file search
       - name: Run Ruff check
         run: uvx ruff check .
       - name: Run Ruff format check
