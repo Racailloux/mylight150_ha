@@ -548,6 +548,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
 
         # Update pricing type at 1st refresh of the day
         if is_first_refresh_of_day:
+            _LOGGER.info("First refresh of the day detected. Updating pricing data.")
             try:
                 # Load pricing type from entry and API and update it, if necessary
                 pricing_type = pricing_data.get("current", DEFAULT_PRICING_TYPE)
