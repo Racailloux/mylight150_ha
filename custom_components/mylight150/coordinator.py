@@ -148,7 +148,8 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             RequestException,
             JSONDecodeError,
         ) as err:
-            _LOGGER.warning("Error while retrieving installation code: %s", err)
+            _LOGGER.warning("Error while retrieving installation code.")
+            _LOGGER.debug(f"Error while retrieving installation code: {err}")
 
         return ""
 
@@ -175,7 +176,8 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             RequestException,
             JSONDecodeError,
         ) as err:
-            _LOGGER.warning("Error while retrieving home data: %s", err)
+            _LOGGER.warning("Error while retrieving home data.")
+            _LOGGER.debug(f"Error while retrieving home data: {err}")
 
         return {}
 
@@ -205,7 +207,8 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             RequestException,
             JSONDecodeError,
         ) as err:
-            _LOGGER.warning("Error while retrieving virtual battery data: %s", err)
+            _LOGGER.warning("Error while retrieving virtual battery data.")
+            _LOGGER.debug(f"Error while retrieving virtual battery data: {err}")
 
         return {}
 
@@ -232,7 +235,8 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             RequestException,
             JSONDecodeError,
         ) as err:
-            _LOGGER.warning("Error while retrieving equipment: %s", err)
+            _LOGGER.warning("Error while retrieving equipments.")
+            _LOGGER.debug(f"Error while retrieving equipments: {err}")
             return {}
 
     async def _async_update_energy_data(self) -> dict[str, Any]:
@@ -361,7 +365,8 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             RequestException,
             JSONDecodeError,
         ) as err:
-            _LOGGER.warning("Error while retrieving energy production data : %s", err)
+            _LOGGER.warning("Error while retrieving energy production data.")
+            _LOGGER.debug(f"Error while retrieving energy production data: {err}")
             return {}
 
     async def _async_get_energy_consumption_days(
@@ -394,7 +399,8 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             RequestException,
             JSONDecodeError,
         ) as err:
-            _LOGGER.warning("Error while retrieving energy consumption data : %s", err)
+            _LOGGER.warning("Error while retrieving energy consumption data.")
+            _LOGGER.debug(f"Error while retrieving energy consumption data: {err}")
             return {}
 
     async def _async_get_energy_production_month(self, year: int, month: int) -> dict:
@@ -424,9 +430,8 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             RequestException,
             JSONDecodeError,
         ) as err:
-            _LOGGER.warning(
-                "MyLight150: Error while retrieving energy production data : %s", err
-            )
+            _LOGGER.warning("Error while retrieving energy production data.")
+            _LOGGER.debug(f"Error while retrieving energy production data: {err}")
             return {}
 
     async def _async_get_energy_consumption_month(self, year: int, month: int) -> dict:
@@ -457,7 +462,8 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             RequestException,
             JSONDecodeError,
         ) as err:
-            _LOGGER.warning("Error while retrieving energy consumption data : %s", err)
+            _LOGGER.warning("Error while retrieving energy consumption data.")
+            _LOGGER.debug(f"Error while retrieving energy consumption data: {err}")
             return {}
 
     async def _async_get_energy_production_year(self, year: int) -> dict:
@@ -487,7 +493,8 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             RequestException,
             JSONDecodeError,
         ) as err:
-            _LOGGER.debug("Error while retrieving energy production data : %s", err)
+            _LOGGER.warning("Error while retrieving energy production data.")
+            _LOGGER.debug(f"Error while retrieving energy production data: {err}")
             return {}
 
     async def _async_get_energy_consumption_year(self, year: int) -> dict:
@@ -518,7 +525,8 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             RequestException,
             JSONDecodeError,
         ) as err:
-            _LOGGER.debug("Error while retrieving energy consumption data : %s", err)
+            _LOGGER.warning("Error while retrieving energy consumption data.")
+            _LOGGER.debug(f"Error while retrieving energy consumption data: {err}")
             return {}
 
     async def _async_update_pricing_data(self) -> bool:
@@ -543,7 +551,8 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             RequestException,
             JSONDecodeError,
         ) as err:
-            _LOGGER.warning("Error while retrieving pricing data : %s", err)
+            _LOGGER.warning("Error while retrieving pricing data.")
+            _LOGGER.debug(f"Error while retrieving pricing data: {err}")
             return False
 
         # Update pricing type at 1st refresh of the day
@@ -568,7 +577,8 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
                     await self._hass.config_entries.async_reload(self._entry.entry_id)
 
             except (AttributeError, TypeError, HomeAssistantError) as err:
-                _LOGGER.warning("Error while updating pricing type : %s", err)
+                _LOGGER.warning("Error while updating pricing type.")
+                _LOGGER.debug(f"Error while updating pricing type: {err}")
                 return False
 
         # Update schedule table at 1st refresh of the day or if never retrieved since last reboot
@@ -578,7 +588,8 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
                 self.hphc_schedule = schedule.get("breakdown", [])
                 _LOGGER.debug("peak/offpeak schedule loaded: %s", self.hphc_schedule)
             except (AttributeError, TypeError) as err:
-                _LOGGER.warning("Error while retrieving pricing schedule : %s", err)
+                _LOGGER.warning("Error while retrieving pricing schedule.")
+                _LOGGER.debug(f"Error while retrieving pricing schedule: {err}")
 
         return True
 
@@ -599,6 +610,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             RequestException,
             JSONDecodeError,
         ) as err:
-            _LOGGER.warning("Error while retrieving money-pot data: %s", err)
+            _LOGGER.warning("Error while retrieving money-pot data.")
+            _LOGGER.debug(f"Error while retrieving money-pot data: {err}")
 
         return {}
