@@ -161,7 +161,9 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
 
             parsed: dict[str, Any] = {
                 # Live powers (kW)
-                "solar_production": _safe_get(data, "solarProduction", "value", default=0),
+                "solar_production": _safe_get(
+                    data, "solarProduction", "value", default=0
+                ),
                 "grid": _safe_get(data, "grid", "value", default=0)
                 - _safe_get(data, "injection", "value", default=0),
                 "load": _safe_get(data, "load", "value", default=0),
@@ -391,7 +393,9 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             breakdown = data.get("breakdown", {})
 
             return {
-                CONF_ENERGY_CONSUMPTION: _safe_get(breakdown, "total", "energy", default=0.0),
+                CONF_ENERGY_CONSUMPTION: _safe_get(
+                    breakdown, "total", "energy", default=0.0
+                ),
                 CONF_ENERGY_CONSO_FROM_SOLAR: _src(breakdown, "selfConsumption"),
                 CONF_ENERGY_CONSO_FROM_MSB: _src(breakdown, "virtualBattery"),
                 CONF_ENERGY_CONSO_FROM_GRID: _src(breakdown, "grid"),
@@ -454,7 +458,9 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             breakdown = data.get("breakdown", {})
 
             return {
-                CONF_ENERGY_CONSUMPTION: _safe_get(breakdown, "total", "energy", default=0.0),
+                CONF_ENERGY_CONSUMPTION: _safe_get(
+                    breakdown, "total", "energy", default=0.0
+                ),
                 CONF_ENERGY_CONSO_FROM_SOLAR: _src(breakdown, "selfConsumption"),
                 CONF_ENERGY_CONSO_FROM_MSB: _src(breakdown, "virtualBattery"),
                 CONF_ENERGY_CONSO_FROM_GRID: _src(breakdown, "grid"),
@@ -517,7 +523,9 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             breakdown = data.get("breakdown", {})
 
             return {
-                CONF_ENERGY_CONSUMPTION: _safe_get(breakdown, "total", "energy", default=0.0),
+                CONF_ENERGY_CONSUMPTION: _safe_get(
+                    breakdown, "total", "energy", default=0.0
+                ),
                 CONF_ENERGY_CONSO_FROM_SOLAR: _src(breakdown, "selfConsumption"),
                 CONF_ENERGY_CONSO_FROM_MSB: _src(breakdown, "virtualBattery"),
                 CONF_ENERGY_CONSO_FROM_GRID: _src(breakdown, "grid"),
@@ -603,7 +611,9 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             data = await self._api.async_call_api("/v3/money-pot")
 
             parsed: dict[str, Any] = {
-                "money_pot": _safe_get(data, "payload", "balance", "value", default=0.0),
+                "money_pot": _safe_get(
+                    data, "payload", "balance", "value", default=0.0
+                ),
             }
             _LOGGER.debug("Data parsed for money-pot: %s", parsed)
             return parsed
