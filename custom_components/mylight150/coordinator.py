@@ -161,10 +161,10 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
 
             parsed: dict[str, Any] = {
                 # Live powers (kW)
-                "solar_production": data.get("solarProduction", {}).get("value"),
-                "grid": data.get("grid", {}).get("value")
-                - data.get("injection", {}).get("value"),
-                "load": data.get("load", {}).get("value"),
+                "solar_production": _safe_get(data, "solarProduction", "value", 0),
+                "grid": _safe_get(data, "grid", "value", 0)
+                - _safe_get(data, "injection", "value", 0),
+                "load": _safe_get(data, "load", "value", 0),
             }
 
             _LOGGER.debug("Data parsed for live home: %s", parsed)
@@ -187,13 +187,16 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             data = await self._api.async_call_api("/v3/virtual-battery/state")
 
             parsed: dict[str, Any] = {
-                "msb_state": data.get("status", {}).get("state", "unknown"),
-                "msb_power": data.get("status", {}).get("socEvolutionInkW", 0),
-                "msb_autonomy": data.get("status", {}).get("socInkWh", 0),
-                "msb_capacity": data.get("status", {}).get("capacity", 0),
-                "msb_level": data.get("status", {}).get("socInkWh", 0)
-                / data.get("status", {}).get("capacity", 0)
-                * 100.0,
+                "msb_state": _safe_get(data, "status", "state", default="unknown"),
+                "msb_power": _safe_get(data, "status", "socEvolutionInkW", default=0),
+                "msb_autonomy": _safe_get(data, "status", "socInkWh", default=0),
+                "msb_capacity": _safe_get(data, "status", "capacity", default=0),
+                "msb_level": (
+                    _safe_get(data, "status", "socInkWh", default=0) /
+                    _safe_get(data, "status", "capacity", default=1) * 100.0
+                    if _safe_get(data, "status", "capacity")
+                    else 0.0
+                ),
             }
             if parsed.get("msb_state", "idle") == "charging":
                 parsed["msb_power"] = parsed.get("msb_power", 0.0) * -1
@@ -346,7 +349,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             """Extract energy value from production destination list."""
             for item in breakdown.get("destination", []):
                 if item.get("type") == type_name:
-                    return item.get("measure", {}).get("energy", 0.0)
+                    return _safe_get(item, "measure", "energy", 0.0)
             return 0.0
 
         try:
@@ -377,9 +380,9 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
 
         def _src(breakdown: dict, type_name: str) -> float:
             """Extract energy value from consumption sources list."""
-            for item in breakdown.get("sources", {}).get("energies", []):
+            for item in _safe_get(breakdown, "sources", "energies", []):
                 if item.get("type") == type_name:
-                    return item.get("measure", {}).get("energy", 0.0)
+                    return _safe_get(item, "measure", "energy", 0.0)
             return 0.0
 
         try:
@@ -387,7 +390,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             breakdown = data.get("breakdown", {})
 
             return {
-                CONF_ENERGY_CONSUMPTION: breakdown.get("total", {}).get("energy", 0.0),
+                CONF_ENERGY_CONSUMPTION: _safe_get(breakdown, "total", "energy", 0.0),
                 CONF_ENERGY_CONSO_FROM_SOLAR: _src(breakdown, "selfConsumption"),
                 CONF_ENERGY_CONSO_FROM_MSB: _src(breakdown, "virtualBattery"),
                 CONF_ENERGY_CONSO_FROM_GRID: _src(breakdown, "grid"),
@@ -409,9 +412,9 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
 
         def _dest(breakdown: dict, type_name: str) -> float:
             """Extract energy value from production destination list."""
-            for item in breakdown.get("destination", []):
+            for item in _safe_get(breakdown, "destination", []):
                 if item.get("type") == type_name:
-                    return item.get("measure", {}).get("energy", 0.0)
+                    return _safe_get(item, "measure", "energy", 0.0)
             return 0.0
 
         try:
@@ -419,7 +422,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             breakdown = data.get("breakdown", {})
 
             return {
-                CONF_ENERGY_PROD_FROM_SOLAR: breakdown.get("total", 0.0),
+                CONF_ENERGY_PROD_FROM_SOLAR: _safe_get(breakdown, "total", 0.0),
                 CONF_ENERGY_PROD_TO_MSB: _dest(breakdown, "virtualBattery"),
                 CONF_ENERGY_PROD_TO_GRID: _dest(breakdown, "injection"),
             }
@@ -440,9 +443,9 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
 
         def _src(breakdown: dict, type_name: str) -> float:
             """Extract energy value from consumption sources list."""
-            for item in breakdown.get("sources", {}).get("energies", []):
+            for item in _safe_get(breakdown, "sources", "energies", []):
                 if item.get("type") == type_name:
-                    return item.get("measure", {}).get("energy", 0.0)
+                    return _safe_get(item, "measure", "energy", 0.0)
             return 0.0
 
         try:
@@ -450,7 +453,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             breakdown = data.get("breakdown", {})
 
             return {
-                CONF_ENERGY_CONSUMPTION: breakdown.get("total", {}).get("energy", 0.0),
+                CONF_ENERGY_CONSUMPTION: _safe_get(breakdown, "total", "energy", 0.0),
                 CONF_ENERGY_CONSO_FROM_SOLAR: _src(breakdown, "selfConsumption"),
                 CONF_ENERGY_CONSO_FROM_MSB: _src(breakdown, "virtualBattery"),
                 CONF_ENERGY_CONSO_FROM_GRID: _src(breakdown, "grid"),
@@ -472,9 +475,9 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
 
         def _dest(breakdown: dict, type_name: str) -> float:
             """Extract energy value from production destination list."""
-            for item in breakdown.get("destination", []):
+            for item in _safe_get(breakdown, "destination", []):
                 if item.get("type") == type_name:
-                    return item.get("measure", {}).get("energy", 0.0)
+                    return _safe_get(item, "measure", "energy", 0.0)
             return 0.0
 
         try:
@@ -482,7 +485,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             breakdown = data.get("breakdown", {})
 
             return {
-                CONF_ENERGY_PROD_FROM_SOLAR: breakdown.get("total", 0.0),
+                CONF_ENERGY_PROD_FROM_SOLAR: _safe_get(breakdown, "total", 0.0),
                 CONF_ENERGY_PROD_TO_MSB: _dest(breakdown, "virtualBattery"),
                 CONF_ENERGY_PROD_TO_GRID: _dest(breakdown, "injection"),
             }
@@ -503,9 +506,9 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
 
         def _src(breakdown: dict, type_name: str) -> float:
             """Extract energy value from consumption sources list."""
-            for item in breakdown.get("sources", {}).get("energies", []):
+            for item in _safe_get(breakdown, "sources", "energies", []):
                 if item.get("type") == type_name:
-                    return item.get("measure", {}).get("energy", 0.0)
+                    return _safe_get(item, "measure", "energy", 0.0)
             return 0.0
 
         try:
@@ -513,7 +516,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             breakdown = data.get("breakdown", {})
 
             return {
-                CONF_ENERGY_CONSUMPTION: breakdown.get("total", {}).get("energy", 0.0),
+                CONF_ENERGY_CONSUMPTION: _safe_get(breakdown, "total", "energy", 0.0),
                 CONF_ENERGY_CONSO_FROM_SOLAR: _src(breakdown, "selfConsumption"),
                 CONF_ENERGY_CONSO_FROM_MSB: _src(breakdown, "virtualBattery"),
                 CONF_ENERGY_CONSO_FROM_GRID: _src(breakdown, "grid"),
@@ -599,7 +602,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             data = await self._api.async_call_api("/v3/money-pot")
 
             parsed: dict[str, Any] = {
-                "money_pot": data.get("payload", {}).get("balance", {}).get("value"),
+                "money_pot": _safe_get(data, "payload", "balance", "value", 0.0),
             }
             _LOGGER.debug("Data parsed for money-pot: %s", parsed)
             return parsed
@@ -614,3 +617,15 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             _LOGGER.debug(f"Error while retrieving money-pot data: {err}")
 
         return {}
+
+# Securized data retrieval from nested dicts
+def _safe_get(data: Any, *keys, default=None) -> Any:
+    """Navigate nested dicts safely — returns default if any level is None or missing."""
+    current = data
+    for key in keys:
+        if not isinstance(current, dict):
+            return default
+        current = current.get(key)
+        if current is None:
+            return default
+    return current
