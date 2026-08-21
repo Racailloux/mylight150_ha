@@ -192,8 +192,8 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
                 "msb_autonomy": _safe_get(data, "status", "socInkWh", default=0),
                 "msb_capacity": _safe_get(data, "status", "capacity", default=0),
                 "msb_level": (
-                    _safe_get(data, "status", "socInkWh", default=0) /
-                    _safe_get(data, "status", "capacity", default=1)
+                    _safe_get(data, "status", "socInkWh", default=0)
+                    / _safe_get(data, "status", "capacity", default=1)
                     * 100.0
                     if _safe_get(data, "status", "capacity")
                     else 0.0
