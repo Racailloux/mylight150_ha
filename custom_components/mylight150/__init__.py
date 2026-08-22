@@ -6,6 +6,7 @@ import logging
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from .services import async_setup_services, async_unload_services
 
 from .api import MyLight150ApiClient
 from .const import (
@@ -28,6 +29,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         password=entry.data[CONF_PASSWORD],
         hass=hass,
     )
+
+    # Service intialization
+    await async_setup_services(hass)
 
     # Coordinator instantiation (pooling time comes from option in config entry)
     update_interval = entry.options.get(CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL)
@@ -55,6 +59,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    # Service unloading
+    await async_unload_services(hass)
+
     # Called when the integration is reloaded or deleted. Unloads platforms and cancels scheduled tasks.
     unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
 

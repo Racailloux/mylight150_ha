@@ -1,0 +1,12 @@
+# Field/selector definitions only. Display text (service and field
+# name/description shown in Developer Tools > Services and in
+# automation editors) is NOT duplicated here: Home Assistant reads it
+# from strings.json (source/English) and translations/fr.json (French).
+
+import_statistics:
+  fields:
+    entry_id:
+      required: true
+      selector:
+        config_entry:
+          integration: mylight150
