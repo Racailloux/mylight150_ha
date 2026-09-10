@@ -81,7 +81,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
                 data.update(parsed_data)
 
             # Fetch realtime home data and parse it for sensors
-            parsed_data = await self._async_update_home_data()
+            parsed_data = await self._async_update_measures_data()
             if parsed_data:
                 data.update(parsed_data)
 
@@ -153,20 +153,18 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
 
         return ""
 
-    async def _async_update_home_data(self) -> dict[str, Any]:
-        """Fetch instant data from /v2/installations/{code}/home?msb=msb01 endpoint."""
-        endpoint = f"/v2/installations/{self.installation_code}/home?msb=msb01"
+    async def _async_update_measures_data(self) -> dict[str, Any]:
+        """Fetch instant powers (kW) data from /v3/measures endpoint."""
         try:
-            data = await self._api.async_call_api(endpoint)
+            data = await self._api.async_call_api("/v3/measures")
 
             parsed: dict[str, Any] = {
-                # Live powers (kW)
                 "solar_production": _safe_get(
-                    data, "solarProduction", "value", default=0
+                    data, "installation", "productionInKw", default=0.0
                 ),
-                "grid": _safe_get(data, "grid", "value", default=0)
-                - _safe_get(data, "injection", "value", default=0),
-                "load": _safe_get(data, "load", "value", default=0),
+                "grid": _safe_get(data, "installation", "gridInKw", default=0.0)
+                - _safe_get(data, "installation", "injectionInKw", default=0.0),
+                "load": _safe_get(data, "installation", "consumptionInKw", default=0.0),
             }
 
             _LOGGER.debug("Data parsed for live home: %s", parsed)
