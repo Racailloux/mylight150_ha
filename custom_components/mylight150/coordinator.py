@@ -85,18 +85,17 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             if parsed_data:
                 data.update(parsed_data)
 
-            # Fetch device data and parse it for sensors
-            parsed_data = await self._async_update_devices_data()
+            # Fetch equipment data and parse it for sensors
+            parsed_data = await self._async_update_equipment_data()
             if parsed_data:
                 data.update(parsed_data)
+                # Update money-pot informations if equipment managed by MyLight150
+                parsed_data = await self._async_update_moneypot_data()
+                if parsed_data:
+                    data.update(parsed_data)
 
             # Fetch energy data and parse it for sensors
             parsed_data = await self._async_update_energy_data()
-            if parsed_data:
-                data.update(parsed_data)
-
-            # Update money-pot informations if needed
-            parsed_data = await self._async_update_moneypot_data()
             if parsed_data:
                 data.update(parsed_data)
 
@@ -216,8 +215,8 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
 
         return {}
 
-    async def _async_update_devices_data(self) -> dict[str, Any]:
-        """Fetch device data from /v3/equipments endpoint."""
+    async def _async_update_equipment_data(self) -> dict[str, Any]:
+        """Fetch equipment data from /v3/equipments endpoint."""
         try:
             data = await self._api.async_call_api("/v3/equipments")
             equipments = data.get("equipments", [])
