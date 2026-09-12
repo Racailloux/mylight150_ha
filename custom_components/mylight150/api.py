@@ -71,7 +71,8 @@ class MyLight150ApiClient:
 
     async def async_get_token(self) -> str:
         """Return a valid access token, or None if failed. Refreshing or re-logging if needed."""
-        now = datetime.now(timezone.utc).timestamp()
+        # 30 seconds margin to avoid token expiration during API calls
+        now = datetime.now(timezone.utc).timestamp() - 30 
         _LOGGER.debug(
             f"Current tokens validities: (current time: {now}) "
             f"Access token: {self._token_expires_at} / "
