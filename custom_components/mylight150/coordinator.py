@@ -65,7 +65,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
         """Cyclic refresh every N minutes from config."""
         _LOGGER.info("Coordinator starts retrieving data")
         try:
-            # Fetch installation code if not already done
+            # Fetch installation code if not already done > Only needed for historical users
             if not self.installation_code:
                 self.installation_code = await self._async_update_installation_code()
                 _LOGGER.debug("Installation code: %s", self.installation_code)
@@ -275,29 +275,22 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
                 yesterday_data.update(data)
 
             # Save in long term persistancy
-            self._persistent[CONF_ENERGY_PROD_FROM_SOLAR] = self._persistent.get(
-                CONF_ENERGY_PROD_FROM_SOLAR, 0.0
-            ) + yesterday_data.get(CONF_ENERGY_PROD_FROM_SOLAR, 0.0)
-            self._persistent[CONF_ENERGY_PROD_TO_MSB] = self._persistent.get(
-                CONF_ENERGY_PROD_TO_MSB, 0.0
-            ) + yesterday_data.get(CONF_ENERGY_PROD_TO_MSB, 0.0)
-            self._persistent[CONF_ENERGY_PROD_TO_GRID] = self._persistent.get(
-                CONF_ENERGY_PROD_TO_GRID, 0.0
-            ) + yesterday_data.get(CONF_ENERGY_PROD_TO_GRID, 0.0)
-            self._persistent[CONF_ENERGY_CONSUMPTION] = self._persistent.get(
-                CONF_ENERGY_CONSUMPTION, 0.0
-            ) + yesterday_data.get(CONF_ENERGY_CONSUMPTION, 0.0)
-            self._persistent[CONF_ENERGY_CONSO_FROM_SOLAR] = self._persistent.get(
-                CONF_ENERGY_CONSO_FROM_SOLAR, 0.0
-            ) + yesterday_data.get(CONF_ENERGY_CONSO_FROM_SOLAR, 0.0)
-            self._persistent[CONF_ENERGY_CONSO_FROM_MSB] = self._persistent.get(
-                CONF_ENERGY_CONSO_FROM_MSB, 0.0
-            ) + yesterday_data.get(CONF_ENERGY_CONSO_FROM_MSB, 0.0)
-            self._persistent[CONF_ENERGY_CONSO_FROM_GRID] = self._persistent.get(
-                CONF_ENERGY_CONSO_FROM_GRID, 0.0
-            ) + yesterday_data.get(CONF_ENERGY_CONSO_FROM_GRID, 0.0)
+            for conf_key in [
+                CONF_ENERGY_PROD_FROM_SOLAR,
+                CONF_ENERGY_PROD_TO_MSB,
+                CONF_ENERGY_PROD_TO_GRID,
+                CONF_ENERGY_CONSUMPTION,
+                CONF_ENERGY_CONSO_FROM_SOLAR,
+                CONF_ENERGY_CONSO_FROM_MSB,
+                CONF_ENERGY_CONSO_FROM_GRID,
+            ]:
+                self._persistent[conf_key] = self._persistent.get(
+                    conf_key, 0.0
+                ) + yesterday_data.get(conf_key, 0.0)
+
             await self._async_save_persistent_data()
 
+        # Retrieving data from current day to cumulate with past persistent data
         _LOGGER.debug("Fetching energy data for date: %s", strf_today)
         daily: dict[str, Any] = {}
         data = await self._async_get_energy_production_days(strf_today)
@@ -308,32 +301,23 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             daily.update(data)
 
         # Generate sum of past and daily energies
-        total = {
-            CONF_ENERGY_PROD_FROM_SOLAR: self._persistent.get(
-                CONF_ENERGY_PROD_FROM_SOLAR, 0.0
-            )
-            + daily.get(CONF_ENERGY_PROD_FROM_SOLAR, 0.0),
-            CONF_ENERGY_PROD_TO_MSB: self._persistent.get(CONF_ENERGY_PROD_TO_MSB, 0.0)
-            + daily.get(CONF_ENERGY_PROD_TO_MSB, 0.0),
-            CONF_ENERGY_PROD_TO_GRID: self._persistent.get(
-                CONF_ENERGY_PROD_TO_GRID, 0.0
-            )
-            + daily.get(CONF_ENERGY_PROD_TO_GRID, 0.0),
-            CONF_ENERGY_CONSUMPTION: self._persistent.get(CONF_ENERGY_CONSUMPTION, 0.0)
-            + daily.get(CONF_ENERGY_CONSUMPTION, 0.0),
-            CONF_ENERGY_CONSO_FROM_SOLAR: self._persistent.get(
-                CONF_ENERGY_CONSO_FROM_SOLAR, 0.0
-            )
-            + daily.get(CONF_ENERGY_CONSO_FROM_SOLAR, 0.0),
-            CONF_ENERGY_CONSO_FROM_MSB: self._persistent.get(
-                CONF_ENERGY_CONSO_FROM_MSB, 0.0
-            )
-            + daily.get(CONF_ENERGY_CONSO_FROM_MSB, 0.0),
-            CONF_ENERGY_CONSO_FROM_GRID: self._persistent.get(
-                CONF_ENERGY_CONSO_FROM_GRID, 0.0
-            )
-            + daily.get(CONF_ENERGY_CONSO_FROM_GRID, 0.0),
-        }
+        total: dict[str, Any] = {}
+        for conf_key in [
+            CONF_ENERGY_PROD_FROM_SOLAR,
+            CONF_ENERGY_PROD_TO_MSB,
+            CONF_ENERGY_PROD_TO_GRID,
+            CONF_ENERGY_CONSUMPTION,
+            CONF_ENERGY_CONSO_FROM_SOLAR,
+            CONF_ENERGY_CONSO_FROM_MSB,
+            CONF_ENERGY_CONSO_FROM_GRID,
+        ]:
+            past = self._persistent.get(conf_key, 0.0)
+            today = daily.get(conf_key, 0.0)
+            new_value = past + today
+
+            # Get last known value to filter API decrease that shouldn't be allowed
+            last_known = (self.data or {}).get(conf_key, 0.0) or 0.0
+            total[conf_key] = max(new_value, last_known)
 
         _LOGGER.debug(f"Total energies data retrieved: {total}")
 
@@ -627,7 +611,6 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
         return {}
 
 
-# Securized data retrieval from nested dicts
 def _safe_get(data: Any, *keys, default=None) -> Any:
     """Navigate nested dicts safely — returns default if any level is None or missing."""
     current = data
