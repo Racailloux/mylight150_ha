@@ -105,4 +105,3 @@ async def _async_cleanup_orphan_devices(
             f"Removing orphan device {device.id} (identifiers={device.identifiers})"
         )
         device_registry.async_remove_device(device.id)
-
