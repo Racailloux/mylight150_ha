@@ -8,6 +8,7 @@ LOGGER: Logger = getLogger(__package__)
 
 DOMAIN = "mylight150"
 DEFAULT_NAME = "MyLight150"
+IDENTIFIER = "ML150"
 
 # --- API ---
 API_URL = "https://mltcore-prd-apim.azure-api.net/me"

@@ -6,6 +6,7 @@ import logging
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import device_registry as dr, entity_registry as er
 
 from .api import MyLight150ApiClient
 from .const import (
@@ -14,6 +15,7 @@ from .const import (
     CONF_USERNAME,
     DEFAULT_UPDATE_INTERVAL,
     DOMAIN,
+    IDENTIFIER,
     PLATFORMS,
 )
 from .coordinator import MyLight150Coordinator
@@ -97,5 +99,5 @@ async def _async_cleanup_orphan_devices(
             continue
 
         _LOGGER.debug(f"Removing orphan device {device.id} (identifiers={device.identifiers})")
-        #device_registry.async_remove_device(device.id)
+        device_registry.async_remove_device(device.id)
 
