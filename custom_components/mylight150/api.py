@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import base64
+import email.utils
 import hashlib
 import logging
 import secrets
@@ -42,6 +43,7 @@ class MyLight150ApiClient:
         self._hass = hass
         self._username = username
         self._password = password
+        self._time_offset = 0.0
         self._session: Session = Session()
         # Token & token expiration storage
         self._access_token: str | None = None
@@ -80,14 +82,16 @@ class MyLight150ApiClient:
         )
 
         # Check if access token is still valid
-        if self._access_token and self._token_expires_at > now:
+        if self._access_token and self._token_expires_at > (now + self._time_offset):
             _LOGGER.debug(
                 f"Token is still valid for account: {self._username} (token: {self._access_token[:20]}...)"
             )
             return self._access_token
 
         # Access token expired, check if refresh token is still valid
-        if self._refresh_token and self._refresh_token_expires_at > now:
+        if self._refresh_token and self._refresh_token_expires_at > (
+            now + self._time_offset
+        ):
             _LOGGER.debug(
                 "Access token expired but refresh token still available, refreshing..."
             )
@@ -100,7 +104,7 @@ class MyLight150ApiClient:
     async def async_call_api(self, endpoint: str) -> dict[str, Any]:
         """Call API endpoint through request in a executor thread."""
         _LOGGER.debug(
-            f"Starting executor thread to proceed to an access token refresh for account: {self._username}"
+            f"Starting async API call for endpoint {endpoint} (account {self._username})"
         )
         token = await self.async_get_token()
         return await self._hass.async_add_executor_job(
@@ -273,6 +277,9 @@ class MyLight150ApiClient:
             _LOGGER.debug(f"Response text: {response.text[:200]}")
             raise MyLight150AuthError(f"Step 4 failed: {response.status_code}")
 
+        # Use HTTP response to calculate the time offset between local and server time
+        self._update_time_offset(response)
+
         token_data = response.json()
         access_token = token_data.get("access_token")
         if not access_token:
@@ -336,3 +343,23 @@ class MyLight150ApiClient:
 
         _LOGGER.debug(f"Token refreshed successfully for account: '{self._username}'")
         return access_token
+
+    def _update_time_offset(self, response) -> None:
+        """Calcule le décalage entre l'heure locale et l'heure du serveur."""
+        date_header = response.headers.get("Date")
+        if not date_header:
+            self._time_offset = 0.0
+            return
+
+        server_time = email.utils.parsedate_to_datetime(date_header)
+        local_time = datetime.now(timezone.utc)
+        offset = (server_time - local_time).total_seconds()
+        _LOGGER.debug("Clock offset measured: %.1f seconds. ", offset)
+
+        if abs(offset) > 10:  # More than 10 seconds offset is considered significant
+            _LOGGER.warning(
+                "MyLight150: Clock offset detected: %.1f seconds. "
+                "Check your Home Assistant system time.",
+                offset,
+            )
+        self._time_offset = offset
