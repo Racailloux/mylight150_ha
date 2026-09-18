@@ -46,9 +46,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     await coordinator.async_config_entry_first_refresh()
 
     # Cleanup all historical devices (old identifier) associated with this config entry
-    await _async_cleanup_orphan_devices(
-        hass, entry, IDENTIFIER
-    )
+    await _async_cleanup_orphan_devices(hass, entry, IDENTIFIER)
 
     # Storing coordinator into hass.data to be acccessible from sensor.py
     hass.data.setdefault(DOMAIN, {})
@@ -89,16 +87,22 @@ async def _async_cleanup_orphan_devices(
     devices = dr.async_entries_for_config_entry(device_registry, entry.entry_id)
 
     expected = (DOMAIN, valid_identifiers)
-                
+
     for device in devices:
         if device.identifiers == expected:
             continue
 
         # Never delete a device that still has active entities
-        if er.async_entries_for_device(entity_registry, device.id, include_disabled_entities=True):
-            _LOGGER.info(f"Device '{device.name}' does not correspond to any expected identifier but still has entities, not deleting.")
+        if er.async_entries_for_device(
+            entity_registry, device.id, include_disabled_entities=True
+        ):
+            _LOGGER.info(
+                f"Device '{device.name}' does not correspond to any expected identifier but still has entities, not deleting."
+            )
             continue
 
-        _LOGGER.debug(f"Removing orphan device {device.id} (identifiers={device.identifiers})")
+        _LOGGER.debug(
+            f"Removing orphan device {device.id} (identifiers={device.identifiers})"
+        )
         device_registry.async_remove_device(device.id)
 
