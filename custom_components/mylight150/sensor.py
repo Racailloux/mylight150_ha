@@ -39,6 +39,7 @@ from .const import (
     DEFAULT_PRICING_OFFPEAK,
     DEFAULT_PRICING_TYPE,
     DOMAIN,
+    IDENTIFIER,
 )
 from .coordinator import MyLight150Coordinator
 
@@ -262,7 +263,9 @@ async def async_setup_entry(
     async_add_entities(sensors)
 
 
-class MyLight150SensorEntity(CoordinatorEntity[MyLight150Coordinator], SensorEntity):
+class MyLight150SensorEntity(  # type: ignore[reportIncompatibleVariableOverride]
+    CoordinatorEntity[MyLight150Coordinator], SensorEntity
+):
     """Sensor entites for MyLight150. Auto pooling is handled by the coordinator."""
 
     entity_description: MyLight150SensorEntityDescription
@@ -274,15 +277,14 @@ class MyLight150SensorEntity(CoordinatorEntity[MyLight150Coordinator], SensorEnt
         description: MyLight150SensorEntityDescription,
     ) -> None:
         super().__init__(coordinator)
-        self.entity_description = description
+        self.entity_description = description  # type: ignore[reportIncompatibleVariableOverride]
 
         # unique_id format : {domain}_{entry_id}_{sensor_key}
         self._attr_unique_id = f"{DOMAIN}_{entry.entry_id}_{description.key}"
 
-        # Device association named by installation code
-        installation_code = coordinator.installation_code or entry.entry_id
+        # Device association
         self._attr_device_info = DeviceInfo(
-            identifiers={(DOMAIN, installation_code)},
+            identifiers={(DOMAIN, IDENTIFIER)},
             name="MyLight150",
             manufacturer="MyLight Systems",
             model="MySmartBattery",
@@ -290,14 +292,14 @@ class MyLight150SensorEntity(CoordinatorEntity[MyLight150Coordinator], SensorEnt
         )
 
     @property
-    def native_value(self) -> Any:
+    def native_value(self) -> Any:  # type: ignore[reportIncompatibleVariableOverride]
         """Sensor value coming from coordinator.data. Returns None if data is not available (coordinator not yet refreshed, or key missing)."""
         if self.coordinator.data is None:
             return None
         return self.coordinator.data.get(self.entity_description.data_key)
 
 
-class MyLight150PricingModeSensorEntity(
+class MyLight150PricingModeSensorEntity(  # type: ignore[reportIncompatibleVariableOverride]
     CoordinatorEntity[MyLight150Coordinator], SensorEntity
 ):
     def __init__(
@@ -314,11 +316,10 @@ class MyLight150PricingModeSensorEntity(
         self._attr_translation_key = CONF_PRICING_MODE
         self._attr_icon = "mdi:clock-time-eight-outline"
 
-        # Device association named by installation code
-        installation_code = coordinator.installation_code or entry.entry_id
+        # Device association
         self._attr_device_info = DeviceInfo(
-            identifiers={(DOMAIN, installation_code)},
-            name=f"MyLight150 ({installation_code})",
+            identifiers={(DOMAIN, IDENTIFIER)},
+            name="MyLight150",
             manufacturer="MyLight Systems",
             model="MySmartBattery",
             configuration_url="https://client.mylight150.com",
@@ -340,7 +341,7 @@ class MyLight150PricingModeSensorEntity(
         self.async_write_ha_state()
 
     @property
-    def native_value(self) -> Any:
+    def native_value(self) -> Any:  # type: ignore[reportIncompatibleVariableOverride]
         """Return the current pricing mode "peak" or "offpeak" depending on current time."""
         if self.coordinator.data is None:
             return None
@@ -352,7 +353,7 @@ class MyLight150PricingModeSensorEntity(
         return _compute_hphc_mode(schedule)
 
     @property
-    def extra_state_attributes(self) -> dict[str, Any]:
+    def extra_state_attributes(self) -> dict[str, Any]:  # type: ignore[reportIncompatibleVariableOverride]
         """Expose schedule data in attribute for potential automations."""
         if self.coordinator.data is None:
             return {}
@@ -361,7 +362,7 @@ class MyLight150PricingModeSensorEntity(
         }
 
 
-class MyLight150CurrentPricingSensorEntity(
+class MyLight150CurrentPricingSensorEntity(  # type: ignore[reportIncompatibleVariableOverride]
     CoordinatorEntity[MyLight150Coordinator], SensorEntity
 ):
     def __init__(
@@ -382,11 +383,10 @@ class MyLight150CurrentPricingSensorEntity(
         self._attr_suggested_display_precision = 3
         self._attr_icon = "mdi:currency-eur"
 
-        # Device association named by installation code
-        installation_code = coordinator.installation_code or entry.entry_id
+        # Device association
         self._attr_device_info = DeviceInfo(
-            identifiers={(DOMAIN, installation_code)},
-            name=f"MyLight150 ({installation_code})",
+            identifiers={(DOMAIN, IDENTIFIER)},
+            name="MyLight150",
             manufacturer="MyLight Systems",
             model="MySmartBattery",
             configuration_url="https://client.mylight150.com",
@@ -408,7 +408,7 @@ class MyLight150CurrentPricingSensorEntity(
         self.async_write_ha_state()
 
     @property
-    def native_value(self) -> float | None:
+    def native_value(self) -> float | None:  # type: ignore[reportIncompatibleVariableOverride]
         """Return the current pricing in €/kWh"""
         options = self._entry.options
         pricing_type = self._entry.data.get(CONF_PRICING_TYPE, DEFAULT_PRICING_TYPE)
@@ -427,7 +427,7 @@ class MyLight150CurrentPricingSensorEntity(
         return tarif_offpeak if current_mode == "offpeak" else tarif_base
 
     @property
-    def extra_state_attributes(self) -> dict[str, Any]:
+    def extra_state_attributes(self) -> dict[str, Any]:  # type: ignore[reportIncompatibleVariableOverride]
         """Expose pricings configured for potential automations."""
         options = self._entry.options
         return {
