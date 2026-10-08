@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
 
@@ -78,6 +78,7 @@ async def _async_update_listener(hass: HomeAssistant, entry: ConfigEntry) -> Non
     await hass.config_entries.async_reload(entry.entry_id)
 
 
+@callback
 async def _async_cleanup_orphan_devices(
     hass: HomeAssistant, entry: ConfigEntry, valid_identifiers: str | None
 ) -> None:
@@ -85,6 +86,7 @@ async def _async_cleanup_orphan_devices(
     device_registry = dr.async_get(hass)
     entity_registry = er.async_get(hass)
     devices = dr.async_entries_for_config_entry(device_registry, entry.entry_id)
+    _LOGGER.debug("ORPHAN CLEANUP: Start orphan device cleanup...")
 
     expected = (DOMAIN, valid_identifiers)
 
