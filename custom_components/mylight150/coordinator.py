@@ -527,11 +527,11 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
         today = dt_util.now().date()
 
         is_first_refresh_of_day = (
-            self._last_refresh_date is not None and self._last_refresh_date < today
+            self._last_refresh_date is None or self._last_refresh_date < today
         )
 
         # Nothing to do, avoid API request
-        if is_first_refresh_of_day is not True and self.hphc_schedule:
+        if is_first_refresh_of_day is not True:
             return True
 
         """Fetch pricing data at first morning update."""
@@ -549,40 +549,36 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             return False
 
         # Update pricing type at 1st refresh of the day
-        if is_first_refresh_of_day:
-            _LOGGER.info("First refresh of the day detected. Updating pricing data.")
-            try:
-                # Load pricing type from entry and API and update it, if necessary
-                pricing_type = pricing_data.get("current", DEFAULT_PRICING_TYPE)
-                pricing_type_stored = self._entry.data.get(
-                    CONF_PRICING_TYPE, DEFAULT_PRICING_TYPE
+        _LOGGER.info("First refresh of the day detected. Updating pricing data.")
+        try:
+            # Load pricing type from entry and API and update it, if necessary
+            pricing_type = pricing_data.get("current", DEFAULT_PRICING_TYPE)
+            pricing_type_stored = self._entry.data.get(CONF_PRICING_TYPE, "")
+
+            if pricing_type != pricing_type_stored:
+                _LOGGER.info(
+                    f"Pricing type change detected! Configuration was '{pricing_type_stored}', new pricing is '{pricing_type}'."
                 )
+                entry_data = self._entry.data.copy()
+                entry_data[CONF_PRICING_TYPE] = pricing_type
+                self._hass.config_entries.async_update_entry(
+                    self._entry, data=entry_data
+                )
+                # await self._hass.config_entries.async_reload(self._entry.entry_id)
 
-                if pricing_type != pricing_type_stored:
-                    _LOGGER.info(
-                        f"Pricing type change detected! Configuration was '{pricing_type_stored}', new pricing is '{pricing_type}'."
-                    )
-                    entry_data = self._entry.data.copy()
-                    entry_data[CONF_PRICING_TYPE] = pricing_type
-                    self._hass.config_entries.async_update_entry(
-                        self._entry, data=entry_data
-                    )
-                    await self._hass.config_entries.async_reload(self._entry.entry_id)
+        except (AttributeError, TypeError, HomeAssistantError) as err:
+            _LOGGER.warning("Error while updating pricing type.")
+            _LOGGER.debug(f"Error while updating pricing type: {err}")
+            return False
 
-            except (AttributeError, TypeError, HomeAssistantError) as err:
-                _LOGGER.warning("Error while updating pricing type.")
-                _LOGGER.debug(f"Error while updating pricing type: {err}")
-                return False
-
-        # Update schedule table at 1st refresh of the day or if never retrieved since last reboot
-        if is_first_refresh_of_day or self.hphc_schedule == []:
-            try:
-                schedule = pricing_data.get("schedule", {})
-                self.hphc_schedule = schedule.get("breakdown", [])
-                _LOGGER.debug("peak/offpeak schedule loaded: %s", self.hphc_schedule)
-            except (AttributeError, TypeError) as err:
-                _LOGGER.warning("Error while retrieving pricing schedule.")
-                _LOGGER.debug(f"Error while retrieving pricing schedule: {err}")
+        # Update schedule table
+        try:
+            schedule = pricing_data.get("schedule", {})
+            self.hphc_schedule = schedule.get("breakdown", [])
+            _LOGGER.debug("peak/offpeak schedule loaded: %s", self.hphc_schedule)
+        except (AttributeError, TypeError) as err:
+            _LOGGER.warning("Error while retrieving pricing schedule.")
+            _LOGGER.debug(f"Error while retrieving pricing schedule: {err}")
 
         return True
 
