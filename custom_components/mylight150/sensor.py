@@ -308,6 +308,7 @@ class MyLight150PricingModeSensorEntity(  # type: ignore[reportIncompatibleVaria
         entry: ConfigEntry,
     ) -> None:
         super().__init__(coordinator)
+        self._entry = entry
 
         # unique_id format : {domain}_{entry_id}_{sensor_key}
         self._attr_unique_id = f"{DOMAIN}_{entry.entry_id}_{CONF_PRICING_MODE}"
@@ -346,10 +347,11 @@ class MyLight150PricingModeSensorEntity(  # type: ignore[reportIncompatibleVaria
         if self.coordinator.data is None:
             return None
 
-        schedule = self.coordinator.hphc_schedule
-        if not schedule:
-            return "base"
+        pricing_type = self._entry.data.get(CONF_PRICING_TYPE, DEFAULT_PRICING_TYPE)
+        if pricing_type == "base":  # Base pricing
+            return pricing_type
 
+        schedule = self.coordinator.hphc_schedule
         return _compute_hphc_mode(schedule)
 
     @property
@@ -415,7 +417,7 @@ class MyLight150CurrentPricingSensorEntity(  # type: ignore[reportIncompatibleVa
         tarif_base = options.get(CONF_PRICING_BASE, DEFAULT_PRICING_BASE)
         tarif_offpeak = options.get(CONF_PRICING_OFFPEAK, DEFAULT_PRICING_OFFPEAK)
 
-        if pricing_type != "hphc":  # Standard pricing
+        if pricing_type == "base":  # Base pricing
             return tarif_base
 
         # Peak/OffPeak mode: Calculate the current pricing
