@@ -7,7 +7,7 @@ import email.utils
 import hashlib
 import logging
 import secrets
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from typing import Any
 from urllib.parse import parse_qs
 from zoneinfo import ZoneInfo
@@ -74,7 +74,7 @@ class MyLight150ApiClient:
     async def async_get_token(self) -> str:
         """Return a valid access token, or None if failed. Refreshing or re-logging if needed."""
         # 30 seconds margin to avoid token expiration during API calls
-        now = datetime.now(timezone.utc).timestamp() + 30
+        now = datetime.now(UTC).timestamp() + 30
         _LOGGER.debug(
             f"Current tokens validities: (current time: {now}) "
             f"Access token: {self._token_expires_at} / "
@@ -352,7 +352,7 @@ class MyLight150ApiClient:
             return
 
         server_time = email.utils.parsedate_to_datetime(date_header)
-        local_time = datetime.now(timezone.utc)
+        local_time = datetime.now(UTC)
         offset = (server_time - local_time).total_seconds()
         _LOGGER.debug("Clock offset measured: %.1f seconds. ", offset)
 
