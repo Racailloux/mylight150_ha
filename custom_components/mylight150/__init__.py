@@ -55,14 +55,17 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # Platforms loading
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
     # Listeners loading for option reload
-    entry.async_on_unload(entry.add_update_listener(_async_update_listener))
-
+    entry.async_on_unload(entry.add_update_listener(async_reload_entry))
     return True
 
 
-async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+async def async_reload_entry(hass: HomeAssistant, entry: ConfigEntry) -> None:
+    """Reload entry when options change."""
+    await hass.config_entries.async_reload(entry.entry_id)
 
-    # Called when the integration is reloaded or deleted. Unloads platforms and cancels scheduled tasks.
+
+async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    """Called when the integration is reloaded or deleted.Unloads platforms and cancels scheduled tasks."""
     unload_ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
 
     if unload_ok:
@@ -73,7 +76,7 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
 
 async def _async_update_listener(hass: HomeAssistant, entry: ConfigEntry) -> None:
-    # Called when any option changed (refresh delay time, etc.)
+    """Called when any option changed (refresh delay time, etc.)"""
     _LOGGER.debug("Mofidied options, reloading integration.")
     await hass.config_entries.async_reload(entry.entry_id)
 
