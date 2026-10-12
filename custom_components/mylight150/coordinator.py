@@ -70,10 +70,17 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
                 self.installation_code = await self._async_update_installation_code()
                 _LOGGER.debug("Installation code: %s", self.installation_code)
 
+            # Determines if this is the first refresh of the day to update pricing data and persistency
+            is_first_refresh_of_day = (
+                self._last_refresh_date is None or self._last_refresh_date != dt_util.now().date()
+            )
+
             data: dict[str, Any] = {}
 
-            # Update pricing informations if needed
-            await self._async_update_pricing_data()
+            # Updates to be done only at first refresh of the day
+            if is_first_refresh_of_day:
+                # Update pricing type and schedule in persistent data and config entry
+                await self._async_update_pricing_data()
 
             # Fetch virtual battery data and parse it for sensors
             parsed_data = await self._async_update_vbattery_data()
@@ -89,7 +96,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             parsed_data = await self._async_update_equipment_data()
             if parsed_data:
                 data.update(parsed_data)
-                # Update money-pot informations if equipment managed by MyLight150
+                # Update money-pot informations only if equipment managed by MyLight150
                 parsed_data = await self._async_update_moneypot_data()
                 if parsed_data:
                     data.update(parsed_data)
@@ -525,14 +532,6 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
     async def _async_update_pricing_data(self) -> bool:
         """Fetch pricing data at first morning update."""
         today = dt_util.now().date()
-
-        is_first_refresh_of_day = (
-            self._last_refresh_date is None or self._last_refresh_date < today
-        )
-
-        # Nothing to do, avoid API request
-        if is_first_refresh_of_day is not True:
-            return True
 
         """Fetch pricing data at first morning update."""
         endpoint = "/v3/contract/energy-pricing"
