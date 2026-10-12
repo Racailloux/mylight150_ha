@@ -72,7 +72,8 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
 
             # Determines if this is the first refresh of the day to update pricing data and persistency
             is_first_refresh_of_day = (
-                self._last_refresh_date is None or self._last_refresh_date != dt_util.now().date()
+                self._last_refresh_date is None
+                or self._last_refresh_date != dt_util.now().date()
             )
 
             data: dict[str, Any] = {}
@@ -530,10 +531,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             return {}
 
     async def _async_update_pricing_data(self) -> bool:
-        """Fetch pricing data at first morning update."""
-        today = dt_util.now().date()
-
-        """Fetch pricing data at first morning update."""
+        """Fetch pricing type and schedule to update persistent data."""
         endpoint = "/v3/contract/energy-pricing"
         try:
             pricing_data = await self._api.async_call_api(endpoint)
