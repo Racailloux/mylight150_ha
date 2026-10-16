@@ -120,7 +120,7 @@
       },
       "evcharger_charging_consumption": { "name": "EV charger charging consumption" },
       "evcharger_charging_cost": { "name": "EV charger charging cost" },
-      "evcharger_charging_moneyPot": { "name": "EV charger charging money pot" },
+      "evcharger_charging_moneypot": { "name": "EV charger charging money pot" },
       "energy_prod_from_solar": { "name": "Solar energy production" },
       "energy_prod_to_msb": { "name": "Virtual battery energy in" },
       "energy_prod_to_grid": { "name": "Grid energy injection" },

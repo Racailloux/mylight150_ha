@@ -42,7 +42,7 @@ CONF_ENERGY_CONSO_FROM_MSB = "energy_conso_from_msb"
 CONF_ENERGY_CONSO_FROM_GRID = "energy_conso_from_grid"
 EVCHARGER_CHARGING_CONSUMPTION = "evcharger_charging_consumption"
 EVCHARGER_CHARGING_COST = "evcharger_charging_cost"
-EVCHARGER_CHARGING_MONEYPOT = "evcharger_charging_moneyPot"
+EVCHARGER_CHARGING_MONEYPOT = "evcharger_charging_moneypot"
 EVCHARGER_CHARGING_TYPE = "evcharger_charging_type"
 EVCHARGER_STATE = "evcharger_state"
 
