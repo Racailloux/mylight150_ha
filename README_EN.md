@@ -81,11 +81,11 @@ This will be the base of all entity ID structure : mylight150_entity_name
 | | | | |
 | `sensor.mylight150_heatPump_mode`                  | Current heat pump mode                                                   |  -   | `text`             |
 | `sensor.mylight150_waterHeater_mode`               | Current water heater mode                                                |  -   | `text`             |
-| `sensor.mylight150_evcharger_state`                | EV charger state                                                         |   -   | `text`             |
-| `sensor.mylight150_evcharger_charging_type`        | EV charger charging type                                                 |   -   | `text`             |
-| `sensor.mylight150_evcharger_charging_consumption` | EV charger charging consumption                                          | kWh   | `text`             |
-| `sensor.mylight150_evcharger_charging_cost`        | EV charger charging cost                                                 | EUR   | `text`             |
-| `sensor.mylight150_evcharger_charging_moneypot`    | EV charger charging money pot                                            | EUR   | `text`             |
+| `sensor.mylight150_evcharger_state`                | EV charger state                                                         |   -  | `text`             |
+| `sensor.mylight150_evcharger_charging_type`        | EV charger charging type                                                 |   -  | `text`             |
+| `sensor.mylight150_evcharger_charging_consumption` | EV charger charging consumption                                          | kWh  | `total`            |
+| `sensor.mylight150_evcharger_charging_cost`        | EV charger charging cost                                                 | EUR  | `total`            |
+| `sensor.mylight150_evcharger_charging_moneypot`    | EV charger charging money pot                                            | EUR  | `total`            |
 | | | | |
 | `sensor.mylight150_energy_prod_from_solar `        | Solar energy production since integration installation                   | kWh  | `total_increasing` |
 | `sensor.mylight150_energy_prod_to_msb`             | Virtual battery energy in since integration installation                 | kWh  | `total_increasing` |

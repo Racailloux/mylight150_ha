@@ -87,9 +87,9 @@ Cela servira de base pour la structure des identifiants des entités : mylight15
 | `sensor.mylight150_waterHeater_mode`               | Mode actuel du chauffe-eau                                                         |   -   | `text`             |
 | `sensor.mylight150_evcharger_state`                | État de la borne de recharge                                                       |   -   | `text`             |
 | `sensor.mylight150_evcharger_charging_type`        | Mode de charge de la borne de recharge                                             |   -   | `text`             |
-| `sensor.mylight150_evcharger_charging_consumption` | Consommation de la borne de recharge                                               | kWh   | `text`             |
-| `sensor.mylight150_evcharger_charging_cost`        | Coût de la borne de recharge                                                       | EUR   | `text`             |
-| `sensor.mylight150_evcharger_charging_moneypot`    | Cagnotte de la borne de recharge                                                   | EUR   | `text`             |
+| `sensor.mylight150_evcharger_charging_consumption` | Consommation de la borne de recharge                                               | kWh   | `total`            |
+| `sensor.mylight150_evcharger_charging_cost`        | Coût de la borne de recharge                                                       | EUR   | `total`            |
+| `sensor.mylight150_evcharger_charging_moneypot`    | Cagnotte de la borne de recharge                                                   | EUR   | `total`            |
 | | | | |
 | `sensor.mylight150_energy_prod_from_solar `        | Production d'énergie solaire depuis l'installation de l'intégration                | kWh   | `total_increasing` |
 | `sensor.mylight150_energy_prod_to_msb`             | Énergie stockée dans la batterie virtuelle depuis l'installation de l'intégration  | kWh   | `total_increasing` |
