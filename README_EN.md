@@ -63,35 +63,35 @@ Find configuration options under **Settings ➤ Devices & Services ➤ Integrati
 ## Provided Entities
 
 The device will take the name of 'MyLight150 <installation_code>' where the installation code is a unique ID that MyLight150 generate for your own installation.
-This will be the base of all entity ID structure : mylight150_<installation_code>_entity_name
+This will be the base of all entity ID structure : mylight150_entity_name
 
 ### Sensors
 
 | Entity ID                                                       | Description                                                              | Unit | State Class        |
 | --------------------------------------------------------------- | ------------------------------------------------------------------------ | ---- | ------------------ |
-| `sensor.mylight150_<installation_code>_solar_production`        | Current solar production                                                 | kW   | `measurement`      |
-| `sensor.mylight150_<installation_code>_grid`                    | Current grid power                                                       | kW   | `measurement`      |
-| `sensor.mylight150_<installation_code>_injection`               | Current power injected on the grid                                       | kW   | `measurement`      |
-| `sensor.mylight150_<installation_code>_load`                    | Current power consumption                                                | kW   | `measurement`      |
-| `sensor.mylight150_<installation_code>_msb_state`               | Virtual battery status                                                   |  -   | `text`             |
-| `sensor.mylight150_<installation_code>_msb_power`               | Virtual battery power                                                    | kW   | `measurement`      |
-| `sensor.mylight150_<installation_code>_msb_autonomy`            | Virtual battery autonomy                                                 | kWh  | `measurement`      |
-| `sensor.mylight150_<installation_code>_msb_capacity`            | Virtual battery capacity                                                 | kWh  | `measurement`      |
-| `sensor.mylight150_<installation_code>_money_pot`               | Current value of your money pot                                          | EUR  | `measurement`      |
+| `sensor.mylight150_solar_production`        | Current solar production                                                 | kW   | `measurement`      |
+| `sensor.mylight150_grid`                    | Current grid power                                                       | kW   | `measurement`      |
+| `sensor.mylight150_injection`               | Current power injected on the grid                                       | kW   | `measurement`      |
+| `sensor.mylight150_load`                    | Current power consumption                                                | kW   | `measurement`      |
+| `sensor.mylight150_msb_state`               | Virtual battery status                                                   |  -   | `text`             |
+| `sensor.mylight150_msb_power`               | Virtual battery power                                                    | kW   | `measurement`      |
+| `sensor.mylight150_msb_autonomy`            | Virtual battery autonomy                                                 | kWh  | `measurement`      |
+| `sensor.mylight150_msb_capacity`            | Virtual battery capacity                                                 | kWh  | `measurement`      |
+| `sensor.mylight150_money_pot`               | Current value of your money pot                                          | EUR  | `measurement`      |
 | | | | |
-| `sensor.mylight150_<installation_code>_heatPump_mode`           | Current heat pump mode                                                   |  -   | `text`             |
-| `sensor.mylight150_<installation_code>_waterHeater_mode`        | Current water heater mode                                                |  -   | `text`             |
+| `sensor.mylight150_heatPump_mode`           | Current heat pump mode                                                   |  -   | `text`             |
+| `sensor.mylight150_waterHeater_mode`        | Current water heater mode                                                |  -   | `text`             |
 | | | | |
-| `sensor.mylight150_<installation_code>_energy_prod_from_solar ` | Solar energy production since integration installation                   | kWh  | `total_increasing` |
-| `sensor.mylight150_<installation_code>_energy_prod_to_msb`      | Virtual battery energy in since integration installation                 | kWh  | `total_increasing` |
-| `sensor.mylight150_<installation_code>_energy_prod_to_grid`     | Grid energy injection since integration installation                     | kWh  | `total_increasing` |
-| `sensor.mylight150_<installation_code>_energy_consumption`      | Total energy consumption since integration installation                  | kWh  | `total_increasing` |
-| `sensor.mylight150_<installation_code>_energy_conso_from_solar` | Solar energy self-consumption since integration installation             | kWh  | `total_increasing` |
-| `sensor.mylight150_<installation_code>_energy_conso_from_msb`   | Virtual battery energy out since integration installation                | kWh  | `total_increasing` |
-| `sensor.mylight150_<installation_code>_energy_conso_from_grid`  | Grid energy consumption since integration installation                   | kWh  | `total_increasing` |
+| `sensor.mylight150_energy_prod_from_solar ` | Solar energy production since integration installation                   | kWh  | `total_increasing` |
+| `sensor.mylight150_energy_prod_to_msb`      | Virtual battery energy in since integration installation                 | kWh  | `total_increasing` |
+| `sensor.mylight150_energy_prod_to_grid`     | Grid energy injection since integration installation                     | kWh  | `total_increasing` |
+| `sensor.mylight150_energy_consumption`      | Total energy consumption since integration installation                  | kWh  | `total_increasing` |
+| `sensor.mylight150_energy_conso_from_solar` | Solar energy self-consumption since integration installation             | kWh  | `total_increasing` |
+| `sensor.mylight150_energy_conso_from_msb`   | Virtual battery energy out since integration installation                | kWh  | `total_increasing` |
+| `sensor.mylight150_energy_conso_from_grid`  | Grid energy consumption since integration installation                   | kWh  | `total_increasing` |
 | | | | |
-| `sensor.mylight150_<installation_code>_pricing_mode`            | Current pricing mode, depending on the contract.                         |  -   | `text`             |
-| `sensor.mylight150_<installation_code>_current_pricing`         | Current pricing value. Pricing needs to be configured.                   | €/kWh| `measurement`      |
+| `sensor.mylight150_pricing_mode`            | Current pricing mode, depending on the contract.                         |  -   | `text`             |
+| `sensor.mylight150_current_pricing`         | Current pricing value. Pricing needs to be configured.                   | €/kWh| `measurement`      |
 
 
 ## Informations wanted
