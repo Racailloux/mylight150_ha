@@ -33,6 +33,7 @@ DIAGNOSTIC_ENDPOINTS: list[tuple[str, str]] = [
     ("v3_contract_energy-pricing", "/v3/contract/energy-pricing"),
     # Live data
     ("v3_measures", "/v3/measures"),
+    ("v3_measures_series", "/v3/measures/series"),
     # Options from contracts (MSB, MSP, MSH, etc.)
     ("v3_contract_options", "/v3/contract/options"),
     ("v3_contract_options_msb", "/v3/contract/options/msb"),
@@ -70,7 +71,7 @@ DIAGNOSTIC_ENDPOINTS: list[tuple[str, str]] = [
         "/v3/equipments/electricalVehicle10/evCharger",
     ),
     (
-        "v3_consumption_electricalVehicle10",
+        "v3_consumption_electricalVehicle10_week",
         "/v3/consumption/electricalVehicle10?aggregation=Week",
     ),
     (
