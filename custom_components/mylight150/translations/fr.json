@@ -103,6 +103,26 @@
           "comfort": "Marche forcée"
         }
       },
+      "evCharger_state": {
+        "name": "Etat de la borne de recharge",
+        "state": {
+          "ready": "Prêt",
+          "plugged": "Branché",
+          "paused": "En pause",
+          "charging": "En charge"
+        }
+      },
+      "evCharger_charging_type": {
+        "name": "Mode de charge de la borne de recharge",
+        "state": {
+          "fast": "Rapide",
+          "solar": "Solaire",
+          "offPeak": "Heures creuses"
+        }
+      },
+      "evCharger_charging_consumption": { "name": "Consommation de la borne de recharge" },
+      "evCharger_charging_cost": { "name": "Coût de la borne de recharge" },
+      "evCharger_charging_moneyPot": { "name": "Cagnotte de la borne de recharge" },
       "energy_prod_from_solar": { "name": "Energie solaire produite" },
       "energy_prod_to_msb": { "name": "Energie batterie virtuelle injectée" },
       "energy_prod_to_grid": { "name": "Energie réseau injectée" },

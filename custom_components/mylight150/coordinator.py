@@ -225,17 +225,75 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
 
     async def _async_update_equipment_data(self) -> dict[str, Any]:
         """Fetch equipment data from /v3/equipments endpoint."""
+        _LOGGER.debug("Fetching equipment data from API endpoint...")
         try:
             data = await self._api.async_call_api("/v3/equipments")
             equipments = data.get("equipments", [])
 
-            parsed: dict[str, Any] = {}
+            # Initialize equipment data for all known types (evCharger, waterHeater, heatPump)
+            parsed: dict[str, Any] = {
+                "EVCHARGER_STATE": None,
+                "EVCHARGER_CHARGING_TYPE": None,
+                "EVCHARGER_CHARGING_CONSUMPTION": None,
+                "EVCHARGER_CHARGING_COST": None,
+                "EVCHARGER_CHARGING_MONEYPOT": None,
+                "waterHeater_mode": None,
+                "heatPump_mode": None,
+            }
 
             for equipment in equipments:
                 equipment_type = equipment.get("equipmentType")
-                current_mode = equipment.get("currentMode")
-                if equipment_type and current_mode:
-                    parsed.update({f"{equipment_type}_mode": current_mode})
+
+                # Vehicle charger specific data
+                if equipment_type and equipment_type == "evCharger":
+                    _LOGGER.debug("Processing evCharger equipment...")
+                    parsed.update(
+                        {
+                            "EVCHARGER_CHARGING_TYPE": _safe_get(
+                                data, "state", default=None
+                            )
+                        }
+                    )
+                    parsed.update(
+                        {
+                            "EVCHARGER_CHARGING_TYPE": _safe_get(
+                                data, "currentCharge", "type", default=None
+                            )
+                        }
+                    )
+                    parsed.update(
+                        {
+                            "EVCHARGER_CHARGING_CONSUMPTION": _safe_get(
+                                data,
+                                "currentCharge",
+                                "consumption",
+                                "value",
+                                default=None,
+                            )
+                        }
+                    )
+                    parsed.update(
+                        {
+                            "EVCHARGER_CHARGING_COST": _safe_get(
+                                data, "currentCharge", "cost", default=None
+                            )
+                        }
+                    )
+                    parsed.update(
+                        {
+                            "EVCHARGER_CHARGING_MONEYPOT": _safe_get(
+                                data, "currentCharge", "moneyPot", default=None
+                            )
+                        }
+                    )
+
+                if equipment_type and (
+                    equipment_type == "waterHeater" or equipment_type == "heatPump"
+                ):
+                    _LOGGER.debug(f"Processing {equipment_type} equipment...")
+                    current_mode = equipment.get("currentMode")
+                    if current_mode:
+                        parsed.update({f"{equipment_type}_mode": current_mode})
 
             _LOGGER.debug("Data parsed for equipments: %s", parsed)
             return parsed
