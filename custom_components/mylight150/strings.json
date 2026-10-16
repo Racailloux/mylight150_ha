@@ -115,7 +115,7 @@
         "state": {
           "fast": "fast",
           "solar": "solar",
-          "offPeak": "off-peak hours"
+          "offpeak": "off-peak hours"
         }
       },
       "evcharger_charging_consumption": { "name": "EV charger charging consumption" },

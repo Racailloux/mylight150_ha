@@ -117,7 +117,7 @@
         "state": {
           "fast": "Rapide",
           "solar": "Solaire",
-          "offPeak": "Heures creuses"
+          "offpeak": "Heures creuses"
         }
       },
       "evcharger_charging_consumption": { "name": "Consommation de la borne de recharge" },
