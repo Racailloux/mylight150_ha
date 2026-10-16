@@ -101,7 +101,7 @@
           "comfort": "Comfort"
         }
       },
-      "evCharger_state": {
+      "evcharger_state": {
         "name": "EV charger state",
         "state": {
           "ready": "Ready",
@@ -110,7 +110,7 @@
           "charging": "Charging"
         }
       },
-      "evCharger_charging_type": {
+      "evcharger_charging_type": {
         "name": "EV charger charging type",
         "state": {
           "fast": "fast",
@@ -118,9 +118,9 @@
           "offPeak": "off-peak hours"
         }
       },
-      "evCharger_charging_consumption": { "name": "EV charger charging consumption" },
-      "evCharger_charging_cost": { "name": "EV charger charging cost" },
-      "evCharger_charging_moneyPot": { "name": "EV charger charging money pot" },
+      "evcharger_charging_consumption": { "name": "EV charger charging consumption" },
+      "evcharger_charging_cost": { "name": "EV charger charging cost" },
+      "evcharger_charging_moneyPot": { "name": "EV charger charging money pot" },
       "energy_prod_from_solar": { "name": "Solar energy production" },
       "energy_prod_to_msb": { "name": "Virtual battery energy in" },
       "energy_prod_to_grid": { "name": "Grid energy injection" },
