@@ -66,36 +66,36 @@ Vous trouverez les options de configuration sous **Paramètres ➤ Appareils et 
 ## Entités fournies
 
 L'appareil portera le nom "MyLight150 <installation_code>", où installation_code est un identifiant unique généré par MyLight150 pour votre installation.
-Cela servira de base pour la structure des identifiants des entités : mylight150_<installation_code>_entity_name.
+Cela servira de base pour la structure des identifiants des entités : mylight150_entity_name.
 
 
 ### Capteurs
 
-| ID de l'entité                                                  | Description                                                                        | Unité | State Class        |
-| --------------------------------------------------------------- | ---------------------------------------------------------------------------------- | ----- | ------------------ |
-| `sensor.mylight150_<installation_code>_solar_production`        | Production solaire actuelle                                                        | kW    | `measurement`      |
-| `sensor.mylight150_<installation_code>_grid`                    | Puissance actuelle du réseau                                                       | kW    | `measurement`      |
-| `sensor.mylight150_<installation_code>_injection`               | Puissance actuelle injectée sur le réseau                                          | kW    | `measurement`      |
-| `sensor.mylight150_<installation_code>_load`                    | Consommation électrique actuelle                                                   | kW    | `measurement`      |
-| `sensor.mylight150_<installation_code>_msb_state`               | État de la batterie virtuelle                                                      |   -   | `text`             |
-| `sensor.mylight150_<installation_code>_msb_power`               | Puissance de la batterie virtuelle                                                 | kW    | `measurement`      |
-| `sensor.mylight150_<installation_code>_msb_autonomy`            | Autonomie de la batterie virtuelle                                                 | kWh   | `measurement`      |
-| `sensor.mylight150_<installation_code>_msb_capacity`            | Capacité de la batterie virtuelle                                                  | kWh   | `measurement`      |
-| `sensor.mylight150_<installation_code>_money_pot`               | Valeur actuelle de votre cagnotte                                                  | EUR   | `measurement`      |
+| ID de l'entité                              | Description                                                                        | Unité | State Class        |
+| ------------------------------------------- | ---------------------------------------------------------------------------------- | ----- | ------------------ |
+| `sensor.mylight150_solar_production`        | Production solaire actuelle                                                        | kW    | `measurement`      |
+| `sensor.mylight150_grid`                    | Puissance actuelle du réseau                                                       | kW    | `measurement`      |
+| `sensor.mylight150_injection`               | Puissance actuelle injectée sur le réseau                                          | kW    | `measurement`      |
+| `sensor.mylight150_load`                    | Consommation électrique actuelle                                                   | kW    | `measurement`      |
+| `sensor.mylight150_msb_state`               | État de la batterie virtuelle                                                      |   -   | `text`             |
+| `sensor.mylight150_msb_power`               | Puissance de la batterie virtuelle                                                 | kW    | `measurement`      |
+| `sensor.mylight150_msb_autonomy`            | Autonomie de la batterie virtuelle                                                 | kWh   | `measurement`      |
+| `sensor.mylight150_msb_capacity`            | Capacité de la batterie virtuelle                                                  | kWh   | `measurement`      |
+| `sensor.mylight150_money_pot`               | Valeur actuelle de votre cagnotte                                                  | EUR   | `measurement`      |
 | | | | |
-| `sensor.mylight150_<installation_code>_heatPump_mode`           | Mode actuel de la pompe à chaleur                                                  |   -   | `text`             |
-| `sensor.mylight150_<installation_code>_waterHeater_mode`        | Mode actuel du chauffe-eau                                                         |   -   | `text`             |
+| `sensor.mylight150_heatPump_mode`           | Mode actuel de la pompe à chaleur                                                  |   -   | `text`             |
+| `sensor.mylight150_waterHeater_mode`        | Mode actuel du chauffe-eau                                                         |   -   | `text`             |
 | | | | |
-| `sensor.mylight150_<installation_code>_energy_prod_from_solar ` | Production d'énergie solaire depuis l'installation de l'intégration                | kWh   | `total_increasing` |
-| `sensor.mylight150_<installation_code>_energy_prod_to_msb`      | Énergie stockée dans la batterie virtuelle depuis l'installation de l'intégration  | kWh   | `total_increasing` |
-| `sensor.mylight150_<installation_code>_energy_prod_to_grid`     | Injection d'énergie dans le réseau depuis l'installation de l'intégration          | kWh   | `total_increasing` |
-| `sensor.mylight150_<installation_code>_energy_consumption`      | Consommation totale d'énergie depuis l'installation de l'intégration               | kWh   | `total_increasing` |
-| `sensor.mylight150_<installation_code>_energy_conso_from_solar` | Autoconsommation d'énergie solaire depuis l'installation de l'intégration          | kWh   | `total_increasing` |
-| `sensor.mylight150_<installation_code>_energy_conso_from_msb`   | Énergie restituée par la batterie virtuelle depuis l'installation de l'intégration | kWh   | `total_increasing` |
-| `sensor.mylight150_<installation_code>_energy_conso_from_grid`  | Consommation d'énergie du réseau depuis l'installation de l'intégration            | kWh   | `total_increasing` |
+| `sensor.mylight150_energy_prod_from_solar ` | Production d'énergie solaire depuis l'installation de l'intégration                | kWh   | `total_increasing` |
+| `sensor.mylight150_energy_prod_to_msb`      | Énergie stockée dans la batterie virtuelle depuis l'installation de l'intégration  | kWh   | `total_increasing` |
+| `sensor.mylight150_energy_prod_to_grid`     | Injection d'énergie dans le réseau depuis l'installation de l'intégration          | kWh   | `total_increasing` |
+| `sensor.mylight150_energy_consumption`      | Consommation totale d'énergie depuis l'installation de l'intégration               | kWh   | `total_increasing` |
+| `sensor.mylight150_energy_conso_from_solar` | Autoconsommation d'énergie solaire depuis l'installation de l'intégration          | kWh   | `total_increasing` |
+| `sensor.mylight150_energy_conso_from_msb`   | Énergie restituée par la batterie virtuelle depuis l'installation de l'intégration | kWh   | `total_increasing` |
+| `sensor.mylight150_energy_conso_from_grid`  | Consommation d'énergie du réseau depuis l'installation de l'intégration            | kWh   | `total_increasing` |
 | | | | |
-| `sensor.mylight150_<installation_code>_pricing_mode`            | Mode tarifaire actuel, selon le contrat.                                           |  -    | `text`             |
-| `sensor.mylight150_<installation_code>_current_pricing`         | Valeur tarifaire actuelle. Les tarifs doivent être configurés.                     | €/kWh | `measurement`      |
+| `sensor.mylight150_pricing_mode`            | Mode tarifaire actuel, selon le contrat.                                           |  -    | `text`             |
+| `sensor.mylight150_current_pricing`         | Valeur tarifaire actuelle. Les tarifs doivent être configurés.                     | €/kWh | `measurement`      |
 
 
 ## Informations recherchées
