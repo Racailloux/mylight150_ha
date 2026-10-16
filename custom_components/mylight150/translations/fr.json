@@ -104,7 +104,7 @@
         }
       },
       "evcharger_state": {
-        "name": "Etat de la borne de recharge",
+        "name": "État de la borne de recharge",
         "state": {
           "ready": "Prêt",
           "plugged": "Branché",
