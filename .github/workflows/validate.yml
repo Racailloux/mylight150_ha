@@ -9,6 +9,13 @@ on:
   pull_request:
     branches: ["main"]
 
+permissions:
+  contents: read
+
+concurrency:
+  group: validate-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   hassfest:
     name: "Hassfest Validation"
@@ -16,8 +23,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
       - name: Run hassfest validation
         uses: "home-assistant/actions/hassfest@master"
 
@@ -27,8 +32,6 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
-        with:
-          fetch-depth: 0
       - name: Run HACS validation
         uses: "hacs/action@main"
         with:
@@ -56,11 +59,11 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v7
-      - name: Setup Python 3.13
+      - name: Setup Python 3.14
         uses: actions/setup-python@v7
         with:
-          python-version: "3.13"
+          python-version: "3.14"
       - name: Install dependencies
-        run: pip install mypy types-requests homeassistant-stubs voluptuous
+        run: pip install mypy types-requests homeassistant
       - name: Run Mypy
         run: mypy custom_components/mylight150
