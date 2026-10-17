@@ -1,9 +1,10 @@
 # Home Assistant MyLight150 Integration
 
+[![ML150xHA](ML150xHA_EN.jpg)][releases]
+
 [![GitHub Release][releases-shield]][releases] 
 [![hacs][hacsbadge]][hacs] 
 [![License][license-shield]](LICENSE)
-
 [![GitHub Activity][commits-shield]][commits] 
 ![Project Maintenance][maintenance-shield]
 
