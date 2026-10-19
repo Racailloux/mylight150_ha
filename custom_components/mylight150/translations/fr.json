@@ -77,6 +77,7 @@
       "msb_state": {
         "name": "État de la batterie virtuelle",
         "state": {
+          "empty": "Vide",
           "charging": "Charge",
           "discharging": "Décharge",
           "idle": "Inactif",
