@@ -14,6 +14,7 @@ from zoneinfo import ZoneInfo
 
 from homeassistant.core import HomeAssistant
 from requests import Session
+from requests.exceptions import JSONDecodeError, RequestException
 
 from .const import (
     API_SUBSCRIPTION_KEY,
@@ -128,14 +129,29 @@ class Mylight150ApiClient:
             ),
         }
 
-        response = self._session.get(url, headers=headers, timeout=10)
-        if response.status_code != 200:
-            _LOGGER.warning(f"API request failed ({response.status_code})")
-            _LOGGER.debug(
-                f"API request failed while trying to get endpoint: '{endpoint}'.Response text: {response.text[:200]}"
-            )
-            return {}
-        return response.json()
+        for attempt in range(2):  # 1 try & 1 retry
+            try:
+                response = self._session.get(url, headers=headers, timeout=15)
+                if response.status_code == 200:
+                    return response.json()
+                _LOGGER.warning(
+                    f"API request failed ({response.status_code}) on {endpoint}"
+                )
+                return {}
+            except (
+                Mylight150AuthError,
+                Mylight150ApiError,
+                RequestException,
+                JSONDecodeError,
+            ) as err:
+                if attempt == 0:
+                    _LOGGER.debug(
+                        f"Attempt 1 failed on {endpoint}: {err} — retrying..."
+                    )
+                else:
+                    _LOGGER.warning(f"Attempt 2 failed on {endpoint}: {err}")
+                    return {}
+        return {}
 
     # Persistence methods
     def restore_tokens(
