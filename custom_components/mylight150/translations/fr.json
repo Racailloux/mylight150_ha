@@ -121,14 +121,14 @@
         }
       },
       "evcharger_charging_consumption": { "name": "Consommation de la borne de recharge" },
-      "evcharger_charging_cost": { "name": "Coût de la borne de recharge" },
+      "evcharger_charging_cost": { "name": "Coût de la recharge" },
       "evcharger_charging_moneypot": { "name": "Cagnotte de la borne de recharge" },
       "energy_prod_from_solar": { "name": "Energie solaire produite" },
-      "energy_prod_to_msb": { "name": "Energie batterie virtuelle injectée" },
+      "energy_prod_to_msb": { "name": "Energie chargée dans la batterie virtuelle" },
       "energy_prod_to_grid": { "name": "Energie réseau injectée" },
       "energy_consumption": { "name": "Energie totale consommée" },
       "energy_conso_from_solar": { "name": "Energie solaire auto-consommée" },
-      "energy_conso_from_msb": { "name": "Energie batterie virtuelle consommée" },
+      "energy_conso_from_msb": { "name": "Energie déchargée de la batterie virtuelle" },
       "energy_conso_from_grid": { "name": "Energie réseau consommée" },
       "pricing_mode": {
         "name": "Mode de tarif",

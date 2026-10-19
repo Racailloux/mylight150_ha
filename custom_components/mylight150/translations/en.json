@@ -122,11 +122,11 @@
       "evcharger_charging_cost": { "name": "EV charger charging cost" },
       "evcharger_charging_moneypot": { "name": "EV charger charging money pot" },
       "energy_prod_from_solar": { "name": "Solar energy production" },
-      "energy_prod_to_msb": { "name": "Virtual battery energy in" },
+      "energy_prod_to_msb": { "name": "Energy stored in the Virtual battery" },
       "energy_prod_to_grid": { "name": "Grid energy injection" },
       "energy_consumption": { "name": "Total energy consumption" },
       "energy_conso_from_solar": { "name": "Solar energy self-consumption" },
-      "energy_conso_from_msb": { "name": "Virtual battery energy out" },
+      "energy_conso_from_msb": { "name": "Energy discharged from the Virtual battery" },
       "energy_conso_from_grid": { "name": "Grid energy consumption" },
       "pricing_mode": {
         "name": "Pricing mode",
