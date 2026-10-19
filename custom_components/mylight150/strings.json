@@ -10,20 +10,20 @@
     "error": {
       "invalid_credentials": "Invalid credentials",
       "invalid_username": "Invalid username",
-      "unexpected": "Unexpected error communicating with MyLight150 server",
+      "unexpected": "Unexpected error communicating with mylight150 server",
       "user_already_configured": "Account has already been configured"
     },
     "step": {
       "user": {
-        "title": "MyLight150 - Account",
-        "description": "Enter your MyLight150 account credentials.",
+        "title": "mylight150 - Account",
+        "description": "Enter your mylight150 account credentials.",
         "data": {
           "username": "Username (email)",
           "password": "Password"
         }
       },
       "options": {
-        "title": "MyLight150 - Settings",
+        "title": "mylight150 - Settings",
         "description": "Detected pricing type: **{pricing_type}**.\n\nEnter pricing informations to allow energy dashboard costs calculations.",
         "data": {
           "update_interval": "Update interval",
@@ -39,7 +39,7 @@
         }
       },
       "reconfigure": {
-        "title": "MyLight150 - Update configuration",
+        "title": "mylight150 - Update configuration",
         "description": "Update settings for account **{username}**.",
         "data": {
           "password": "Password"
@@ -50,7 +50,7 @@
   "options": {
     "step": {
       "init": {
-        "title": "MyLight150 Options",
+        "title": "mylight150 Options",
         "description": "Detected pricing type: **{pricing_type}**.\n\nEnter pricing informations to allow energy dashboard costs calculations.",
         "data": {
           "update_interval": "Update interval",

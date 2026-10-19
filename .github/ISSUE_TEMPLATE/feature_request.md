@@ -19,7 +19,7 @@ A clear and concise description of any alternative solutions or features you've 
 Add any other context or screenshots about the feature request here.
 
 **Logfile**
-How to enable MyLight150 debugging?
+How to enable mylight150 debugging?
 (To be added when diagnotics will be available)
 
 **Your installation details**

@@ -1,4 +1,4 @@
-# Home Assistant MyLight150 Integration
+# Home Assistant mylight150 Integration
 
 [![ML150xHA](ML150xHA_EN.jpg)][releases]
 
@@ -12,7 +12,7 @@
 
 ## Description
 
-The `MyLight150` component provides an integration with the MyLight150 cloud service. It adds sensors such as power, battery status, ... that you can find on the mobile applications.
+The `mylight150` component provides an integration with the mylight150 cloud service. It adds sensors such as power, battery status, ... that you can find on the mobile applications.
 
 **Note:** This integration will not manage actions on the system, but retrieve data to integrate them into your Home Assistant environment.
 Energy board can be feed by all informations from sensors.
@@ -37,12 +37,12 @@ Alternatively, installation can be done manually by copying the files in this re
 ## Configuration
 
 Configuration is done through the Home Assistant UI.
-To add the integration, go to **Settings ➤ Devices & Services ➤ Integrations**, click **➕ Add Integration**, and search for "MyLight150".
+To add the integration, go to **Settings ➤ Devices & Services ➤ Integrations**, click **➕ Add Integration**, and search for "mylight150".
 
 | Name                    | Type     | Default | Description                                                                                                                                       |
 | ----------------------- | -------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `Username`              | `string` | –       | The username associated with your MyLight150 account.                                                                                             |
-| `Password`              | `string` | –       | The password for your MyLight150 account.                                                                                                         |
+| `Username`              | `string` | –       | The username associated with your mylight150 account.                                                                                             |
+| `Password`              | `string` | –       | The password for your mylight150 account.                                                                                                         |
 | `Update Interval`       | `int`    | `10`    | Frequency (in minutes) to fetch status data from MyLight.<br>Minimum allowed is 10 minutes.<br>\* _Can be updated later via the CONFIGURE menu._  |
 | `Scan at startup`       | `bool`   | `True`  | Allow to do a full data update at every restart of Home Assistant._                                                                               |
 | `Peak hours pricing`    | `float`   | `0.23` | Base pricing, or peak hours pricing, if Peak/OffPeak pricing is detected._                                                                        |
@@ -51,7 +51,7 @@ To add the integration, go to **Settings ➤ Devices & Services ➤ Integrations
 
 ## Options
 
-Find configuration options under **Settings ➤ Devices & Services ➤ Integrations ➤ MyLight150 ➤ Configure**:
+Find configuration options under **Settings ➤ Devices & Services ➤ Integrations ➤ mylight150 ➤ Configure**:
 
 | Name                    | Type      | Default | Description                                                                                                                                       |
 | ----------------------- | --------- | ------- | ------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -63,7 +63,7 @@ Find configuration options under **Settings ➤ Devices & Services ➤ Integrati
 
 ## Provided Entities
 
-The device will take the name of 'MyLight150 <installation_code>' where the installation code is a unique ID that MyLight150 generate for your own installation.
+The device will take the name of 'mylight150 <installation_code>' where the installation code is a unique ID that mylight150 generate for your own installation.
 This will be the base of all entity ID structure : mylight150_entity_name
 
 ### Sensors
@@ -102,7 +102,7 @@ This will be the base of all entity ID structure : mylight150_entity_name
 
 ## Informations wanted
 **⚠️ Some features needs users data to be implemented**
-As the maintainers don't get all MyLight150 options, if you own some that are not implemented, you are welvcome to contact us. Diagnotics data will be needed
+As the maintainers don't get all mylight150 options, if you own some that are not implemented, you are welvcome to contact us. Diagnotics data will be needed
 * MyBattery<br/>
   Integration of the MyBattery option
 * evCharger<br/>
@@ -112,13 +112,13 @@ As the maintainers don't get all MyLight150 options, if you own some that are no
 ## Credits
 * [Home Assistant](https://github.com/home-assistant) : Home Assistant open-source powerful domotic plateform.
 * [HACS](https://hacs.xyz/) : Home Assistant Community Store gives you a powerful UI to handle downloads of all your custom needs.
-* [MyLight150] : Electricity provider with virtual battery support.
+* [mylight150] : Electricity provider with virtual battery support.
 * [hassio MyLight integration](https://github.com/acesyde/hassio_mylight_integration) : MyLight system integration for previous API from MtLight System (MYHome)
 
 
 ---
 
-[MyLight150]: https://www.mylight-systems.com/
+[mylight150]: https://www.mylight-systems.com/
 [commits-shield]: https://img.shields.io/github/commit-activity/y/Racailloux/mylight150_ha.svg?style=for-the-badge
 [commits]: https://github.com/Racailloux/mylight150_ha/commits/main
 [hacs]: https://github.com/hacs/integration

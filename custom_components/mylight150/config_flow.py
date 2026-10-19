@@ -14,7 +14,7 @@ from homeassistant.helpers.selector import (
     NumberSelectorMode,
 )
 
-from .api import MyLight150ApiClient, MyLight150ApiError, MyLight150AuthError
+from .api import Mylight150ApiClient, Mylight150ApiError, Mylight150AuthError
 from .const import (
     CONF_PASSWORD,
     CONF_PRICING_BASE,
@@ -52,9 +52,9 @@ async def _validate_credentials(
     hass, username: str, password: str
 ) -> tuple[str | None, str]:
     """Try to authenticate. Returns None on success, or an error key string on failure."""
-    api = MyLight150ApiClient(hass, username, password)
+    api = Mylight150ApiClient(hass, username, password)
     try:
-        # Try to connect to MyLight using the given credentials
+        # Try to connect to mylight using the given credentials
         await api.async_login_test()
         _LOGGER.info("Config flow: Connection test successful!")
 
@@ -65,10 +65,10 @@ async def _validate_credentials(
 
         return None, pricing_type
 
-    except MyLight150AuthError:
+    except Mylight150AuthError:
         _LOGGER.debug("Config flow: invalid_credentials.")
         return "invalid_credentials", DEFAULT_PRICING_TYPE
-    except MyLight150ApiError:
+    except Mylight150ApiError:
         _LOGGER.debug("Config flow: API connection failed.")
         return "cannot_connect", DEFAULT_PRICING_TYPE
     except Exception:
@@ -76,7 +76,7 @@ async def _validate_credentials(
         return "unexpected", DEFAULT_PRICING_TYPE
 
 
-class MyLight150ConfigFlow(ConfigFlow, domain=DOMAIN):
+class Mylight150ConfigFlow(ConfigFlow, domain=DOMAIN):
     VERSION = 1
     MINOR_VERSION = 1
 
@@ -242,12 +242,12 @@ class MyLight150ConfigFlow(ConfigFlow, domain=DOMAIN):
     @staticmethod
     def async_get_options_flow(
         config_entry: ConfigEntry,
-    ) -> MyLight150OptionsFlowHandler:
-        return MyLight150OptionsFlowHandler()
+    ) -> Mylight150OptionsFlowHandler:
+        return Mylight150OptionsFlowHandler()
 
 
 # Options modifications
-class MyLight150OptionsFlowHandler(OptionsFlow):
+class Mylight150OptionsFlowHandler(OptionsFlow):
     async def async_step_init(self, user_input: dict[str, Any] | None = None):
         # pricing_type stored in the options at 1st config_flow
         pricing_type = self.config_entry.data.get(
@@ -310,4 +310,4 @@ class MyLight150OptionsFlowHandler(OptionsFlow):
         )
 
 
-__all__ = ["MyLight150ConfigFlow", "MyLight150OptionsFlowHandler"]
+__all__ = ["Mylight150ConfigFlow", "Mylight150OptionsFlowHandler"]

@@ -1,6 +1,6 @@
 {
   "domain": "mylight150",
-  "name": "MyLight150",
+  "name": "mylight150",
   "codeowners": ["@Racailloux"],
   "config_flow": true,
   "dependencies": [],

@@ -1,4 +1,4 @@
-# Home Assistant MyLight150 Integration
+# Home Assistant mylight150 Integration
   
 [![ML150xHA](ML150xHA_FR.jpg)][releases]
 
@@ -13,7 +13,7 @@
 
 ## Description
 
-Le composant `MyLight150` permet une intégration avec le service cloud MyLight150. Il ajoute des capteurs tels que la puissance, l'état de la batterie, etc., que vous pouvez retrouver dans les applications mobiles.
+Le composant `mylight150` permet une intégration avec le service cloud mylight150. Il ajoute des capteurs tels que la puissance, l'état de la batterie, etc., que vous pouvez retrouver dans les applications mobiles.
 
 **Remarque :** Cette intégration ne permet pas de gérer des actions sur votre système, mais uniquement de récupérer des données pour les intégrer dans votre environnement **Home Assistant**.
 Le tableau de bord énergie peut être alimenté par les capteurs fournis par l'intégration.
@@ -40,12 +40,12 @@ Sinon, vous pouvez installer manuellement l'intégration en copiant les fichiers
 ## Configuration
 
 La configuration se fait via l'interface utilisateur de **Home Assistant**.
-Pour ajouter l'intégration, allez dans **Paramètres ➤ Appareils et services ➤ Intégrations**, cliquez sur **➕ Ajouter une intégration**, puis recherchez **"MyLight150"**.
+Pour ajouter l'intégration, allez dans **Paramètres ➤ Appareils et services ➤ Intégrations**, cliquez sur **➕ Ajouter une intégration**, puis recherchez **"mylight150"**.
 
 | Nom                     | Type     | Défaut  | Description                                                                                                                                               |
 | ----------------------- | -------- | ------- | --------------------------------------------------------------------------------------------------------------------------------------------------------  |
-| `Username`              | `string` | –       | Nom d'utilisateur associé à votre compte MyLight150.                                                                                                      |
-| `Password`              | `string` | –       | Mot de passe de votre compte MyLight150.                                                                                                                  |
+| `Username`              | `string` | –       | Nom d'utilisateur associé à votre compte mylight150.                                                                                                      |
+| `Password`              | `string` | –       | Mot de passe de votre compte mylight150.                                                                                                                  |
 | `Update Interval`       | `int`    | `10`    | Fréquence (min) de récupération des données depuis MyLight.<br>Min. autorisé : 10 mins.<br>\* _Peut être modifié ultérieurement via le menu CONFIGURER._  |
 | `Scan at startup`       | `bool`   | `True`  | Permet d'effectuer une mise à jour complète des données à chaque redémarrage de Home Assistant.                                                           |
 | `Peak hours pricing`    | `float`   | `0.23` | Tarif de base ou tarif des heures pleines, si un tarif heures pleines/heures creuses est détecté.                                                         |
@@ -54,7 +54,7 @@ Pour ajouter l'intégration, allez dans **Paramètres ➤ Appareils et services 
 
 ## Options
 
-Vous trouverez les options de configuration sous **Paramètres ➤ Appareils et services ➤ Intégrations ➤ MyLight150 ➤ Configurer** :
+Vous trouverez les options de configuration sous **Paramètres ➤ Appareils et services ➤ Intégrations ➤ mylight150 ➤ Configurer** :
 
 | Nom                     | Type      | Défaut  | Description                                                                                                                                                 |
 | ----------------------- | --------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -66,7 +66,7 @@ Vous trouverez les options de configuration sous **Paramètres ➤ Appareils et 
 
 ## Entités fournies
 
-L'appareil portera le nom "MyLight150 <installation_code>", où installation_code est un identifiant unique généré par MyLight150 pour votre installation.
+L'appareil portera le nom "mylight150 <installation_code>", où installation_code est un identifiant unique généré par mylight150 pour votre installation.
 Cela servira de base pour la structure des identifiants des entités : mylight150_entity_name.
 
 
@@ -106,7 +106,7 @@ Cela servira de base pour la structure des identifiants des entités : mylight15
 
 ## Informations recherchées
 ⚠️ **Certaines fonctionnalités nécessitent des données utilisateurs pour être implémentées.**
-Les développeurs n'ont pas accès à toutes les options de MyLight150. Si vous possédez des fonctionnalités non implémentées, n'hésitez pas à nous contacter. Des données de diagnostic seront nécessaires.
+Les développeurs n'ont pas accès à toutes les options de mylight150. Si vous possédez des fonctionnalités non implémentées, n'hésitez pas à nous contacter. Des données de diagnostic seront nécessaires.
 * MyBattery :<br> Intégration de l'option MyBattery.
 * evCharger :br Intégration de l'équipement de charge pour voiture électrique.
 
@@ -114,13 +114,13 @@ Les développeurs n'ont pas accès à toutes les options de MyLight150. Si vous 
 ## Remerciements
 * [Home Assistant](https://github.com/home-assistant) : Plateforme domotique open-source puissante.
 * [HACS](https://hacs.xyz/) : Home Assistant Community Store offre une interface puissante pour gérer les téléchargements de tous vos besoins personnalisés.
-* [MyLight150] : Fournisseur d'électricité avec support de batterie virtuelle.
+* [mylight150] : Fournisseur d'électricité avec support de batterie virtuelle.
 * [hassio MyLight integration](https://github.com/acesyde/hassio_mylight_integration) : Intégration de MyLight System pour l'ancienne API de MyLight System (MyHome).
 
 
 ---
 
-[MyLight150]: https://www.mylight-systems.com/
+[mylight150]: https://www.mylight-systems.com/
 [commits-shield]: https://img.shields.io/github/commit-activity/y/Racailloux/mylight150_ha.svg?style=for-the-badge
 [commits]: https://github.com/Racailloux/mylight150_ha/commits/main
 [hacs]: https://github.com/hacs/integration

@@ -1,4 +1,4 @@
-"""Sensors for MyLight150 integration."""
+"""Sensors for mylight150 integration."""
 
 from __future__ import annotations
 
@@ -46,23 +46,23 @@ from .const import (
     EVCHARGER_STATE,
     IDENTIFIER,
 )
-from .coordinator import MyLight150Coordinator
+from .coordinator import Mylight150Coordinator
 
 _LOGGER = logging.getLogger(__name__)
 
 
 # Sensors descriptions
 @dataclass(frozen=True, kw_only=True)
-class MyLight150SensorEntityDescription(SensorEntityDescription):
+class Mylight150SensorEntityDescription(SensorEntityDescription):
     """SensorEntityDescription extended with coordinator data_key."""
 
     data_key: str
 
 
 # List all sensors
-SENSORS: tuple[MyLight150SensorEntityDescription, ...] = (
+SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
     # Live powers sensors (kW)
-    MyLight150SensorEntityDescription(
+    Mylight150SensorEntityDescription(
         key="solar_production",
         data_key="solar_production",
         has_entity_name=True,
@@ -72,7 +72,7 @@ SENSORS: tuple[MyLight150SensorEntityDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:solar-power",
     ),
-    MyLight150SensorEntityDescription(
+    Mylight150SensorEntityDescription(
         key="grid",
         data_key="grid",
         has_entity_name=True,
@@ -82,7 +82,7 @@ SENSORS: tuple[MyLight150SensorEntityDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:transmission-tower",
     ),
-    MyLight150SensorEntityDescription(
+    Mylight150SensorEntityDescription(
         key="load",
         data_key="load",
         has_entity_name=True,
@@ -93,14 +93,14 @@ SENSORS: tuple[MyLight150SensorEntityDescription, ...] = (
         icon="mdi:home-lightning-bolt",
     ),
     # MySmartBattery (virtual battery) sensors
-    MyLight150SensorEntityDescription(
+    Mylight150SensorEntityDescription(
         key="msb_state",
         data_key="msb_state",
         has_entity_name=True,
         translation_key="msb_state",
         icon="mdi:battery-sync",
     ),
-    MyLight150SensorEntityDescription(
+    Mylight150SensorEntityDescription(
         key="msb_power",
         data_key="msb_power",
         has_entity_name=True,
@@ -110,7 +110,7 @@ SENSORS: tuple[MyLight150SensorEntityDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:battery-charging",
     ),
-    MyLight150SensorEntityDescription(
+    Mylight150SensorEntityDescription(
         key="msb_autonomy",
         data_key="msb_autonomy",
         has_entity_name=True,
@@ -121,7 +121,7 @@ SENSORS: tuple[MyLight150SensorEntityDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:battery",
     ),
-    MyLight150SensorEntityDescription(
+    Mylight150SensorEntityDescription(
         key="msb_capacity",
         data_key="msb_capacity",
         has_entity_name=True,
@@ -132,7 +132,7 @@ SENSORS: tuple[MyLight150SensorEntityDescription, ...] = (
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:home-battery",
     ),
-    MyLight150SensorEntityDescription(
+    Mylight150SensorEntityDescription(
         key="msb_level",
         data_key="msb_level",
         has_entity_name=True,
@@ -144,7 +144,7 @@ SENSORS: tuple[MyLight150SensorEntityDescription, ...] = (
         icon="mdi:battery",
     ),
     # Money sensors
-    MyLight150SensorEntityDescription(
+    Mylight150SensorEntityDescription(
         key="money_pot",
         data_key="money_pot",
         has_entity_name=True,
@@ -154,35 +154,35 @@ SENSORS: tuple[MyLight150SensorEntityDescription, ...] = (
         icon="mdi:piggy-bank",
     ),
     # Equipments sensors
-    MyLight150SensorEntityDescription(
+    Mylight150SensorEntityDescription(
         key="heatPump_mode",
         data_key="heatPump_mode",
         has_entity_name=True,
         translation_key="heatpump_mode",
         icon="mdi:heating-coil",
     ),
-    MyLight150SensorEntityDescription(
+    Mylight150SensorEntityDescription(
         key="waterHeater_mode",
         data_key="waterHeater_mode",
         has_entity_name=True,
         translation_key="waterheater_mode",
         icon="mdi:water-boiler",
     ),
-    MyLight150SensorEntityDescription(
+    Mylight150SensorEntityDescription(
         key=EVCHARGER_STATE,
         data_key=EVCHARGER_STATE,
         has_entity_name=True,
         translation_key=EVCHARGER_STATE,
         icon="mdi:car-electric",
     ),
-    MyLight150SensorEntityDescription(
+    Mylight150SensorEntityDescription(
         key=EVCHARGER_CHARGING_TYPE,
         data_key=EVCHARGER_CHARGING_TYPE,
         has_entity_name=True,
         translation_key=EVCHARGER_CHARGING_TYPE,
         icon="mdi:ev-plug-type1",
     ),
-    MyLight150SensorEntityDescription(
+    Mylight150SensorEntityDescription(
         key=EVCHARGER_CHARGING_CONSUMPTION,
         data_key=EVCHARGER_CHARGING_CONSUMPTION,
         has_entity_name=True,
@@ -193,7 +193,7 @@ SENSORS: tuple[MyLight150SensorEntityDescription, ...] = (
         state_class=SensorStateClass.TOTAL,
         icon="mdi:ev-station",
     ),
-    MyLight150SensorEntityDescription(
+    Mylight150SensorEntityDescription(
         key=EVCHARGER_CHARGING_COST,
         data_key=EVCHARGER_CHARGING_COST,
         has_entity_name=True,
@@ -204,7 +204,7 @@ SENSORS: tuple[MyLight150SensorEntityDescription, ...] = (
         state_class=SensorStateClass.TOTAL,
         icon="mdi:cash",
     ),
-    MyLight150SensorEntityDescription(
+    Mylight150SensorEntityDescription(
         key=EVCHARGER_CHARGING_MONEYPOT,
         data_key=EVCHARGER_CHARGING_MONEYPOT,
         has_entity_name=True,
@@ -216,7 +216,7 @@ SENSORS: tuple[MyLight150SensorEntityDescription, ...] = (
         icon="mdi:piggy-bank",
     ),
     # Total energy sensors (kWh)
-    MyLight150SensorEntityDescription(
+    Mylight150SensorEntityDescription(
         key=CONF_ENERGY_PROD_FROM_SOLAR,
         data_key=CONF_ENERGY_PROD_FROM_SOLAR,
         has_entity_name=True,
@@ -227,7 +227,7 @@ SENSORS: tuple[MyLight150SensorEntityDescription, ...] = (
         state_class=SensorStateClass.TOTAL_INCREASING,
         icon="mdi:solar-power",
     ),
-    MyLight150SensorEntityDescription(
+    Mylight150SensorEntityDescription(
         key=CONF_ENERGY_PROD_TO_MSB,
         data_key=CONF_ENERGY_PROD_TO_MSB,
         has_entity_name=True,
@@ -238,7 +238,7 @@ SENSORS: tuple[MyLight150SensorEntityDescription, ...] = (
         state_class=SensorStateClass.TOTAL_INCREASING,
         icon="mdi:battery-arrow-up",
     ),
-    MyLight150SensorEntityDescription(
+    Mylight150SensorEntityDescription(
         key=CONF_ENERGY_PROD_TO_GRID,
         data_key=CONF_ENERGY_PROD_TO_GRID,
         has_entity_name=True,
@@ -249,7 +249,7 @@ SENSORS: tuple[MyLight150SensorEntityDescription, ...] = (
         state_class=SensorStateClass.TOTAL_INCREASING,
         icon="mdi:transmission-tower-import",
     ),
-    MyLight150SensorEntityDescription(
+    Mylight150SensorEntityDescription(
         key=CONF_ENERGY_CONSUMPTION,
         data_key=CONF_ENERGY_CONSUMPTION,
         has_entity_name=True,
@@ -260,7 +260,7 @@ SENSORS: tuple[MyLight150SensorEntityDescription, ...] = (
         state_class=SensorStateClass.TOTAL_INCREASING,
         icon="mdi:home-lightning-bolt",
     ),
-    MyLight150SensorEntityDescription(
+    Mylight150SensorEntityDescription(
         key=CONF_ENERGY_CONSO_FROM_SOLAR,
         data_key=CONF_ENERGY_CONSO_FROM_SOLAR,
         has_entity_name=True,
@@ -271,7 +271,7 @@ SENSORS: tuple[MyLight150SensorEntityDescription, ...] = (
         state_class=SensorStateClass.TOTAL_INCREASING,
         icon="mdi:solar-power-variant",
     ),
-    MyLight150SensorEntityDescription(
+    Mylight150SensorEntityDescription(
         key=CONF_ENERGY_CONSO_FROM_MSB,
         data_key=CONF_ENERGY_CONSO_FROM_MSB,
         has_entity_name=True,
@@ -282,7 +282,7 @@ SENSORS: tuple[MyLight150SensorEntityDescription, ...] = (
         state_class=SensorStateClass.TOTAL_INCREASING,
         icon="mdi:battery-arrow-down",
     ),
-    MyLight150SensorEntityDescription(
+    Mylight150SensorEntityDescription(
         key=CONF_ENERGY_CONSO_FROM_GRID,
         data_key=CONF_ENERGY_CONSO_FROM_GRID,
         has_entity_name=True,
@@ -301,32 +301,32 @@ async def async_setup_entry(
     entry: ConfigEntry,
     async_add_entities: AddEntitiesCallback,
 ) -> None:
-    coordinator: MyLight150Coordinator = hass.data[DOMAIN][entry.entry_id]
+    coordinator: Mylight150Coordinator = hass.data[DOMAIN][entry.entry_id]
 
     # Common sensors
     sensors: list = [
-        MyLight150SensorEntity(coordinator, entry, desc) for desc in SENSORS
+        Mylight150SensorEntity(coordinator, entry, desc) for desc in SENSORS
     ]
 
     # Pricing special sensors
-    sensors.append(MyLight150PricingModeSensorEntity(coordinator, entry))
-    sensors.append(MyLight150CurrentPricingSensorEntity(coordinator, entry))
+    sensors.append(Mylight150PricingModeSensorEntity(coordinator, entry))
+    sensors.append(Mylight150CurrentPricingSensorEntity(coordinator, entry))
 
     async_add_entities(sensors)
 
 
-class MyLight150SensorEntity(  # type: ignore[reportIncompatibleVariableOverride]
-    CoordinatorEntity[MyLight150Coordinator], SensorEntity
+class Mylight150SensorEntity(  # type: ignore[reportIncompatibleVariableOverride]
+    CoordinatorEntity[Mylight150Coordinator], SensorEntity
 ):
-    """Sensor entites for MyLight150. Auto pooling is handled by the coordinator."""
+    """Sensor entites for mylight150. Auto pooling is handled by the coordinator."""
 
-    entity_description: MyLight150SensorEntityDescription
+    entity_description: Mylight150SensorEntityDescription
 
     def __init__(
         self,
-        coordinator: MyLight150Coordinator,
+        coordinator: Mylight150Coordinator,
         entry: ConfigEntry,
-        description: MyLight150SensorEntityDescription,
+        description: Mylight150SensorEntityDescription,
     ) -> None:
         super().__init__(coordinator)
         self.entity_description = description  # type: ignore[reportIncompatibleVariableOverride]
@@ -337,8 +337,8 @@ class MyLight150SensorEntity(  # type: ignore[reportIncompatibleVariableOverride
         # Device association
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, IDENTIFIER)},
-            name="MyLight150",
-            manufacturer="MyLight Systems",
+            name="mylight150",
+            manufacturer="mylight150 Systems",
             model="MySmartBattery",
             configuration_url="https://client.mylight150.com",
         )
@@ -351,12 +351,12 @@ class MyLight150SensorEntity(  # type: ignore[reportIncompatibleVariableOverride
         return self.coordinator.data.get(self.entity_description.data_key)
 
 
-class MyLight150PricingModeSensorEntity(  # type: ignore[reportIncompatibleVariableOverride]
-    CoordinatorEntity[MyLight150Coordinator], SensorEntity
+class Mylight150PricingModeSensorEntity(  # type: ignore[reportIncompatibleVariableOverride]
+    CoordinatorEntity[Mylight150Coordinator], SensorEntity
 ):
     def __init__(
         self,
-        coordinator: MyLight150Coordinator,
+        coordinator: Mylight150Coordinator,
         entry: ConfigEntry,
     ) -> None:
         super().__init__(coordinator)
@@ -372,8 +372,8 @@ class MyLight150PricingModeSensorEntity(  # type: ignore[reportIncompatibleVaria
         # Device association
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, IDENTIFIER)},
-            name="MyLight150",
-            manufacturer="MyLight Systems",
+            name="mylight150",
+            manufacturer="mylight150 Systems",
             model="MySmartBattery",
             configuration_url="https://client.mylight150.com",
         )
@@ -416,12 +416,12 @@ class MyLight150PricingModeSensorEntity(  # type: ignore[reportIncompatibleVaria
         }
 
 
-class MyLight150CurrentPricingSensorEntity(  # type: ignore[reportIncompatibleVariableOverride]
-    CoordinatorEntity[MyLight150Coordinator], SensorEntity
+class Mylight150CurrentPricingSensorEntity(  # type: ignore[reportIncompatibleVariableOverride]
+    CoordinatorEntity[Mylight150Coordinator], SensorEntity
 ):
     def __init__(
         self,
-        coordinator: MyLight150Coordinator,
+        coordinator: Mylight150Coordinator,
         entry: ConfigEntry,
     ) -> None:
         super().__init__(coordinator)
@@ -440,8 +440,8 @@ class MyLight150CurrentPricingSensorEntity(  # type: ignore[reportIncompatibleVa
         # Device association
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, IDENTIFIER)},
-            name="MyLight150",
-            manufacturer="MyLight Systems",
+            name="mylight150",
+            manufacturer="mylight150 Systems",
             model="MySmartBattery",
             configuration_url="https://client.mylight150.com",
         )

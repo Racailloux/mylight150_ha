@@ -24,7 +24,7 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots to help explain your problem.
 
 **Logfile**
-How to enable MyLight150 debugging?
+How to enable mylight150 debugging?
 (To be added when diagnotics will be available)
 
 **Your installation details**

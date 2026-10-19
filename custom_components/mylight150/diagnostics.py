@@ -1,4 +1,4 @@
-"""MyLight150 diagnostics — collect debug and API informations."""
+"""mylight150 diagnostics — collect debug and API informations."""
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 
 from .const import CONF_PASSWORD, CONF_USERNAME, DOMAIN
-from .coordinator import MyLight150Coordinator
+from .coordinator import Mylight150Coordinator
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -93,7 +93,7 @@ async def async_get_config_entry_diagnostics(
     entry: ConfigEntry,
 ) -> dict[str, Any]:
     """Entry point for diagnostics. Called by HA when user requests a diagnostic report."""
-    coordinator: MyLight150Coordinator = hass.data[DOMAIN][entry.entry_id]
+    coordinator: Mylight150Coordinator = hass.data[DOMAIN][entry.entry_id]
 
     return {
         # Configuration Infos
@@ -128,7 +128,7 @@ async def async_get_config_entry_diagnostics(
 
 
 async def _async_fetch_diagnostic_endpoints(
-    coordinator: MyLight150Coordinator,
+    coordinator: Mylight150Coordinator,
 ) -> dict[str, Any]:
     """Call each endpoint in DIAGNOSTIC_ENDPOINTS and return the results."""
     code = coordinator.installation_code or "unknown"

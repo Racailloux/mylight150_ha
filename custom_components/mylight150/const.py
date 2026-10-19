@@ -7,7 +7,7 @@ from homeassistant.const import CONF_PASSWORD, CONF_USERNAME, Platform
 LOGGER: Logger = getLogger(__package__)
 
 DOMAIN = "mylight150"
-DEFAULT_NAME = "MyLight150"
+DEFAULT_NAME = "mylight150"
 IDENTIFIER = "ML150"
 
 # --- API ---

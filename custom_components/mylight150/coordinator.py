@@ -1,4 +1,4 @@
-"""MyLight150 DataUpdateCoordinator."""
+"""mylight150 DataUpdateCoordinator."""
 
 from __future__ import annotations
 
@@ -14,7 +14,7 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from homeassistant.util import dt as dt_util
 from requests.exceptions import JSONDecodeError, RequestException
 
-from .api import MyLight150ApiClient, MyLight150ApiError, MyLight150AuthError
+from .api import Mylight150ApiClient, Mylight150ApiError, Mylight150AuthError
 from .const import (
     CONF_ENERGY_CONSO_FROM_GRID,
     CONF_ENERGY_CONSO_FROM_MSB,
@@ -39,14 +39,14 @@ STORAGE_VERSION = 1
 _LOGGER = logging.getLogger(__name__)
 
 
-class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
-    """Coordinator MyLight150 — coordinate cyclic API calls."""
+class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
+    """Coordinator mylight150 — coordinate cyclic API calls."""
 
     def __init__(
         self,
         hass: HomeAssistant,
         entry: ConfigEntry,
-        api: MyLight150ApiClient,
+        api: Mylight150ApiClient,
         update_interval_minutes: int,
     ) -> None:
         self._hass = hass
@@ -102,7 +102,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             parsed_data = await self._async_update_equipment_data()
             if parsed_data:
                 data.update(parsed_data)
-                # Update money-pot informations only if equipment managed by MyLight150
+                # Update money-pot informations only if equipment managed by mylight150
                 parsed_data = await self._async_update_moneypot_data()
                 if parsed_data:
                     data.update(parsed_data)
@@ -119,9 +119,9 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
 
             return data
 
-        except MyLight150AuthError as err:
+        except Mylight150AuthError as err:
             _LOGGER.warning(f"Authentification error: {err}", err)
-        except MyLight150ApiError as err:
+        except Mylight150ApiError as err:
             _LOGGER.warning(f"API error: {err}", err)
         return {}
 
@@ -141,7 +141,7 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
         await self._store.async_save(self._persistent)
         _LOGGER.debug("Persistent data saved: %s", self._persistent)
 
-    # API Calls to MyLight150 endpoints
+    # API Calls to mylight150 endpoints
     async def _async_update_installation_code(self) -> str:
         """Fetch installation code from /v2 endpoint."""
         try:
@@ -155,8 +155,8 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
                         _LOGGER.debug(f"Installation code '{code}' found.")
                         return code
         except (
-            MyLight150AuthError,
-            MyLight150ApiError,
+            Mylight150AuthError,
+            Mylight150ApiError,
             RequestException,
             JSONDecodeError,
         ) as err:
@@ -183,8 +183,8 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             return parsed
 
         except (
-            MyLight150AuthError,
-            MyLight150ApiError,
+            Mylight150AuthError,
+            Mylight150ApiError,
             RequestException,
             JSONDecodeError,
         ) as err:
@@ -218,8 +218,8 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             return parsed
 
         except (
-            MyLight150AuthError,
-            MyLight150ApiError,
+            Mylight150AuthError,
+            Mylight150ApiError,
             RequestException,
             JSONDecodeError,
         ) as err:
@@ -302,8 +302,8 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             return parsed
 
         except (
-            MyLight150AuthError,
-            MyLight150ApiError,
+            Mylight150AuthError,
+            Mylight150ApiError,
             RequestException,
             JSONDecodeError,
         ) as err:
@@ -416,8 +416,8 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             }
 
         except (
-            MyLight150AuthError,
-            MyLight150ApiError,
+            Mylight150AuthError,
+            Mylight150ApiError,
             RequestException,
             JSONDecodeError,
         ) as err:
@@ -452,8 +452,8 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             }
 
         except (
-            MyLight150AuthError,
-            MyLight150ApiError,
+            Mylight150AuthError,
+            Mylight150ApiError,
             RequestException,
             JSONDecodeError,
         ) as err:
@@ -483,8 +483,8 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             }
 
         except (
-            MyLight150AuthError,
-            MyLight150ApiError,
+            Mylight150AuthError,
+            Mylight150ApiError,
             RequestException,
             JSONDecodeError,
         ) as err:
@@ -517,8 +517,8 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             }
 
         except (
-            MyLight150AuthError,
-            MyLight150ApiError,
+            Mylight150AuthError,
+            Mylight150ApiError,
             RequestException,
             JSONDecodeError,
         ) as err:
@@ -548,8 +548,8 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             }
 
         except (
-            MyLight150AuthError,
-            MyLight150ApiError,
+            Mylight150AuthError,
+            Mylight150ApiError,
             RequestException,
             JSONDecodeError,
         ) as err:
@@ -582,8 +582,8 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             }
 
         except (
-            MyLight150AuthError,
-            MyLight150ApiError,
+            Mylight150AuthError,
+            Mylight150ApiError,
             RequestException,
             JSONDecodeError,
         ) as err:
@@ -597,8 +597,8 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
         try:
             pricing_data = await self._api.async_call_api(endpoint)
         except (
-            MyLight150AuthError,
-            MyLight150ApiError,
+            Mylight150AuthError,
+            Mylight150ApiError,
             RequestException,
             JSONDecodeError,
         ) as err:
@@ -654,8 +654,8 @@ class MyLight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             return parsed
 
         except (
-            MyLight150AuthError,
-            MyLight150ApiError,
+            Mylight150AuthError,
+            Mylight150ApiError,
             RequestException,
             JSONDecodeError,
         ) as err:

@@ -1,4 +1,4 @@
-"""API client for MyLight150 integration with Home Assistant."""
+"""API client for mylight150 integration with Home Assistant."""
 
 from __future__ import annotations
 
@@ -28,16 +28,16 @@ from .const import (
 _LOGGER = logging.getLogger(__name__)
 
 
-class MyLight150AuthError(Exception):
+class Mylight150AuthError(Exception):
     """Raised when authentication fails (bad credentials, expired tokens...)."""
 
 
-class MyLight150ApiError(Exception):
+class Mylight150ApiError(Exception):
     """Raised when an API call fails."""
 
 
-class MyLight150ApiClient:
-    """Async client for the MyLight150 API."""
+class Mylight150ApiClient:
+    """Async client for the mylight150 API."""
 
     def __init__(self, hass: HomeAssistant, username: str, password: str) -> None:
         self._hass = hass
@@ -66,10 +66,10 @@ class MyLight150ApiClient:
                 f"{datetime.fromtimestamp(self._refresh_token_expires_at, ZoneInfo('Europe/Paris')).strftime('%Y-%m-%d %H:%M:%S')} (Paris))"
             )
             return self._access_token is not None
-        except MyLight150AuthError:
+        except Mylight150AuthError:
             raise
         except Exception as err:
-            raise MyLight150AuthError(f"Login failed: {err}") from err
+            raise Mylight150AuthError(f"Login failed: {err}") from err
 
     async def async_get_token(self) -> str:
         """Return a valid access token, or None if failed. Refreshing or re-logging if needed."""
@@ -199,13 +199,13 @@ class MyLight150ApiClient:
         if response.status_code != 200:
             _LOGGER.warning(f"Step 1 Response code: {response.status_code}")
             _LOGGER.debug(f"Response text: {response.text[:200]}")
-            raise MyLight150AuthError(f"Step 1 failed: {response.status_code}")
+            raise Mylight150AuthError(f"Step 1 failed: {response.status_code}")
 
         csrf_token = self._session.cookies.get("x-ms-cpim-csrf")
         trans_token = self._session.cookies.get("x-ms-cpim-trans")
         if not csrf_token or not trans_token:
             _LOGGER.warning("Step 1 failed! Missing token")
-            raise MyLight150AuthError("Step 1: Missing token")
+            raise Mylight150AuthError("Step 1: Missing token")
 
         # Step 2
         self_asserted_url = (
@@ -228,7 +228,7 @@ class MyLight150ApiClient:
         if response.status_code != 200:
             _LOGGER.warning(f"Step 2 failed! Response code: {response.status_code}")
             _LOGGER.debug(f"Response text: {response.text[:200]}")
-            raise MyLight150AuthError(f"Step 2 failed: {response.status_code}")
+            raise Mylight150AuthError(f"Step 2 failed: {response.status_code}")
 
         # Step 3
         confirmation_url = (
@@ -248,7 +248,7 @@ class MyLight150ApiClient:
         if response.status_code != 302:
             _LOGGER.warning(f"Step 3 failed! Response code: {response.status_code}")
             _LOGGER.debug(f"Response text: {response.text[:200]}")
-            raise MyLight150AuthError(f"Step 3 failed: got {response.status_code}")
+            raise Mylight150AuthError(f"Step 3 failed: got {response.status_code}")
 
         redirect_url = response.headers.get("Location", "")
         fragment = redirect_url.split("#")[1]
@@ -258,7 +258,7 @@ class MyLight150ApiClient:
             _LOGGER.warning(
                 f"Step 3 failed! Missing auth_code in redirect URL: {redirect_url[:100]}..."
             )
-            raise MyLight150AuthError("Step 3: Missing auth_code in redirect URL")
+            raise Mylight150AuthError("Step 3: Missing auth_code in redirect URL")
 
         # Step 4
         token_url = f"{OAUTH_URL}/oauth2/v2.0/token"
@@ -275,7 +275,7 @@ class MyLight150ApiClient:
         if response.status_code != 200:
             _LOGGER.warning(f"Step 4 failed! Response code: {response.status_code}")
             _LOGGER.debug(f"Response text: {response.text[:200]}")
-            raise MyLight150AuthError(f"Step 4 failed: {response.status_code}")
+            raise Mylight150AuthError(f"Step 4 failed: {response.status_code}")
 
         # Use HTTP response to calculate the time offset between local and server time
         self._update_time_offset(response)
@@ -286,7 +286,7 @@ class MyLight150ApiClient:
             _LOGGER.warning(
                 f"Step 4 failed! Missing access_token in response: {token_data[:100]}..."
             )
-            raise MyLight150AuthError("Step 4: Missing access_token in response")
+            raise Mylight150AuthError("Step 4: Missing access_token in response")
 
         self._access_token = access_token
         self._refresh_token = token_data.get("refresh_token")
@@ -358,7 +358,7 @@ class MyLight150ApiClient:
 
         if abs(offset) > 10:  # More than 10 seconds offset is considered significant
             _LOGGER.warning(
-                "MyLight150: Clock offset detected: %.1f seconds. "
+                "mylight150: Clock offset detected: %.1f seconds. "
                 "Check your Home Assistant system time.",
                 offset,
             )

@@ -1,4 +1,4 @@
-"""Integration MyLight150 for Home Assistant."""
+"""Integration mylight150 for Home Assistant."""
 
 from __future__ import annotations
 
@@ -9,7 +9,7 @@ from homeassistant.core import HomeAssistant, callback
 from homeassistant.helpers import device_registry as dr
 from homeassistant.helpers import entity_registry as er
 
-from .api import MyLight150ApiClient
+from .api import Mylight150ApiClient
 from .const import (
     CONF_PASSWORD,
     CONF_UPDATE_INTERVAL,
@@ -19,14 +19,14 @@ from .const import (
     IDENTIFIER,
     PLATFORMS,
 )
-from .coordinator import MyLight150Coordinator
+from .coordinator import Mylight150Coordinator
 
 _LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     # API instanciation
-    api = MyLight150ApiClient(
+    api = Mylight150ApiClient(
         hass=hass,
         username=entry.data[CONF_USERNAME],
         password=entry.data[CONF_PASSWORD],
@@ -34,7 +34,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
 
     # Coordinator instantiation (pooling time comes from option in config entry)
     update_interval = entry.options.get(CONF_UPDATE_INTERVAL, DEFAULT_UPDATE_INTERVAL)
-    coordinator = MyLight150Coordinator(
+    coordinator = Mylight150Coordinator(
         hass=hass,
         entry=entry,
         api=api,
