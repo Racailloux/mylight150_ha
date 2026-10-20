@@ -122,9 +122,9 @@
           "offpeak": "Heures creuses"
         }
       },
-      "evcharger_charging_consumption": { "name": "Consommation de la borne de recharge" },
+      "evcharger_charging_consumption": { "name": "Consommation de la recharge" },
       "evcharger_charging_cost": { "name": "Coût de la recharge" },
-      "evcharger_charging_moneypot": { "name": "Cagnotte de la borne de recharge" },
+      "evcharger_charging_moneypot": { "name": "Cagnottage de la recharge" },
       "energy_prod_from_solar": { "name": "Energie solaire produite" },
       "energy_prod_to_msb": { "name": "Energie chargée dans la batterie virtuelle" },
       "energy_prod_to_grid": { "name": "Energie réseau injectée" },
