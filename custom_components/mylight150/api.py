@@ -14,7 +14,7 @@ from zoneinfo import ZoneInfo
 
 from homeassistant.core import HomeAssistant
 from requests import Session
-from requests.exceptions import JSONDecodeError, RequestException
+from requests.exceptions import RequestException
 
 from .const import (
     API_SUBSCRIPTION_KEY,
@@ -142,7 +142,6 @@ class Mylight150ApiClient:
                 Mylight150AuthError,
                 Mylight150ApiError,
                 RequestException,
-                JSONDecodeError,
             ) as err:
                 if attempt == 0:
                     _LOGGER.debug(
