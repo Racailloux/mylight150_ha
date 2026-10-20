@@ -1,3 +1,4 @@
 /.vscode
 custom_components/mylight150/test_data/equipments_ready.json
 custom_components/mylight150/test_data/equipments_paused.json
+test_data
