@@ -237,13 +237,13 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
 
             # Initialize equipment data for all known types (evCharger, waterHeater, heatPump)
             parsed: dict[str, Any] = {
-                EVCHARGER_STATE: None,
-                EVCHARGER_CHARGING_TYPE: None,
-                EVCHARGER_CHARGING_CONSUMPTION: None,
-                EVCHARGER_CHARGING_COST: None,
-                EVCHARGER_CHARGING_MONEYPOT: None,
-                "waterHeater_mode": None,
-                "heatPump_mode": None,
+                EVCHARGER_STATE: "unavailable",
+                EVCHARGER_CHARGING_TYPE: "unavailable",
+                EVCHARGER_CHARGING_CONSUMPTION: "unavailable",
+                EVCHARGER_CHARGING_COST: "unavailable",
+                EVCHARGER_CHARGING_MONEYPOT: "unavailable",
+                "waterHeater_mode": "unavailable",
+                "heatPump_mode": "unavailable",
             }
 
             for equipment in equipments:
@@ -253,41 +253,49 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
                 if equipment_type and equipment_type == "evCharger":
                     _LOGGER.debug("Processing evCharger equipment...")
 
-                    ev_data = _safe_get(equipment, "state", default=None)
+                    ev_data = _safe_get(equipment, "state", default="unavailable")
                     parsed.update({EVCHARGER_STATE: ev_data})
 
-                    ev_data = _safe_get(
-                        equipment,
-                        "currentCharge",
-                        "type",
-                        default=None,
-                    )
-                    parsed.update({EVCHARGER_CHARGING_TYPE: ev_data})
+                    # EV charger is unplugged, no other charging data available
+                    if ev_data == "ready":
+                        parsed.update({EVCHARGER_CHARGING_TYPE: "unplugged"})
+                        parsed.update({EVCHARGER_CHARGING_CONSUMPTION: 0.0})
+                        parsed.update({EVCHARGER_CHARGING_COST: 0.0})
+                        parsed.update({EVCHARGER_CHARGING_MONEYPOT: 0.0})
+                    # EV charger is plugged, retrieve other charging data
+                    else:
+                        ev_data = _safe_get(
+                            equipment,
+                            "currentCharge",
+                            "type",
+                            default=None,
+                        )
+                        parsed.update({EVCHARGER_CHARGING_TYPE: ev_data})
 
-                    ev_data = _safe_get(
-                        equipment,
-                        "currentCharge",
-                        "consumption",
-                        "value",
-                        default=None,
-                    )
-                    parsed.update({EVCHARGER_CHARGING_CONSUMPTION: ev_data})
+                        ev_data = _safe_get(
+                            equipment,
+                            "currentCharge",
+                            "consumption",
+                            "value",
+                            default=None,
+                        )
+                        parsed.update({EVCHARGER_CHARGING_CONSUMPTION: ev_data})
 
-                    ev_data = _safe_get(
-                        equipment,
-                        "currentCharge",
-                        "cost",
-                        default=None,
-                    )
-                    parsed.update({EVCHARGER_CHARGING_COST: ev_data})
+                        ev_data = _safe_get(
+                            equipment,
+                            "currentCharge",
+                            "cost",
+                            default=None,
+                        )
+                        parsed.update({EVCHARGER_CHARGING_COST: ev_data})
 
-                    ev_data = _safe_get(
-                        equipment,
-                        "currentCharge",
-                        "moneyPot",
-                        default=None,
-                    )
-                    parsed.update({EVCHARGER_CHARGING_MONEYPOT: ev_data})
+                        ev_data = _safe_get(
+                            equipment,
+                            "currentCharge",
+                            "moneyPot",
+                            default=None,
+                        )
+                        parsed.update({EVCHARGER_CHARGING_MONEYPOT: ev_data})
 
                 # Water heater and heat pump specific data
                 if equipment_type and (

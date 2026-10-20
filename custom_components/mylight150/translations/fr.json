@@ -116,6 +116,7 @@
       "evcharger_charging_type": {
         "name": "Mode de charge de la borne de recharge",
         "state": {
+          "unplugged": "Débranché",
           "fast": "Rapide",
           "solar": "Solaire",
           "offpeak": "Heures creuses"

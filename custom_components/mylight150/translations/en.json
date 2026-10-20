@@ -114,9 +114,10 @@
       "evcharger_charging_type": {
         "name": "EV charger charging type",
         "state": {
-          "fast": "fast",
-          "solar": "solar",
-          "offpeak": "off-peak hours"
+          "unplugged": "Unplugged",
+          "fast": "Fast",
+          "solar": "Solar",
+          "offpeak": "Off-Peak hours"
         }
       },
       "evcharger_charging_consumption": { "name": "EV charger charging consumption" },
