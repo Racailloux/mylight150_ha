@@ -239,9 +239,9 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             parsed: dict[str, Any] = {
                 EVCHARGER_STATE: "unavailable",
                 EVCHARGER_CHARGING_TYPE: "unavailable",
-                EVCHARGER_CHARGING_CONSUMPTION: "unavailable",
-                EVCHARGER_CHARGING_COST: "unavailable",
-                EVCHARGER_CHARGING_MONEYPOT: "unavailable",
+                EVCHARGER_CHARGING_CONSUMPTION: None,
+                EVCHARGER_CHARGING_COST: None,
+                EVCHARGER_CHARGING_MONEYPOT: None,
                 "waterHeater_mode": "unavailable",
                 "heatPump_mode": "unavailable",
             }
