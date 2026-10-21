@@ -34,8 +34,8 @@
         "data_description": {
           "update_interval": "Minutes between cloud polling updates.",
           "update_initial": "Perform an update immediately upon startup.",
-          "pricing_base": "Your standard or peak hours electricity rate.",
-          "pricing_offpeak": "Your off-peak hours electricity rate (HC/HP contract only)."
+          "pricing_base": "Your standard or peak hours electricity rate, expressed in cents of Euros.",
+          "pricing_offpeak": "Your off-peak hours electricity rate, expressed in cents of Euros (HC/HP contract only)."
         }
       },
       "reconfigure": {

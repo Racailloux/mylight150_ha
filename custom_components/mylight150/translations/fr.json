@@ -30,14 +30,14 @@
         "data": {
           "update_interval": "Intervalle de mise à jour",
           "update_initial": "Mise à jour au démarrage",
-          "pricing_base": "Tarif heures pleines (€/kWh)",
-          "pricing_offpeak": "Tarif heures creuses (€/kWh)"
+          "pricing_base": "Tarif heures pleines (c€/kWh)",
+          "pricing_offpeak": "Tarif heures creuses (c€/kWh)"
         },
         "data_description": {
           "update_interval": "Minutes etre les mises à jour depuis le cloud.",
           "update_initial": "Faire une mise à jour à démarrage de Home Assistant.",
-          "pricing_base": "Votre tarif standard ou heures pleines.",
-          "pricing_offpeak": "Votre tarif heures creuses."
+          "pricing_base": "Votre tarif standard ou heures pleines, exprimé en centimes d'Euros.",
+          "pricing_offpeak": "Votre tarif heures creuses, exprimé en centimes d'Euros (uniquement pour les contrats HP/HC)."
         }
       },
       "reconfigure": {

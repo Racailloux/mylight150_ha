@@ -434,7 +434,7 @@ class Mylight150CurrentPricingSensorEntity(  # type: ignore[reportIncompatibleVa
         self._attr_translation_key = CONF_PRICING_CURRENT
         self._attr_state_class = SensorStateClass.MEASUREMENT
         self._attr_native_unit_of_measurement = "€/kWh"
-        self._attr_suggested_display_precision = 3
+        self._attr_suggested_display_precision = 4
         self._attr_icon = "mdi:currency-eur"
 
         # Device association
