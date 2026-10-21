@@ -147,12 +147,13 @@ class Mylight150ConfigFlow(ConfigFlow, domain=DOMAIN):
                     CONF_UPDATE_INITIAL: user_input.get(
                         CONF_UPDATE_INITIAL, DEFAULT_UPDATE_INITIAL
                     ),
-                    CONF_PRICING_BASE: (user_input.get(
-                        CONF_PRICING_BASE, DEFAULT_PRICING_BASE
-                    ) * 100),
-                    CONF_PRICING_OFFPEAK: (user_input.get(
-                        CONF_PRICING_OFFPEAK, DEFAULT_PRICING_OFFPEAK
-                    ) * 100)
+                    CONF_PRICING_BASE: (
+                        user_input.get(CONF_PRICING_BASE, DEFAULT_PRICING_BASE) * 100
+                    ),
+                    CONF_PRICING_OFFPEAK: (
+                        user_input.get(CONF_PRICING_OFFPEAK, DEFAULT_PRICING_OFFPEAK)
+                        * 100
+                    ),
                 },
             )
         # Base schema common for every pricing type
@@ -175,7 +176,7 @@ class Mylight150ConfigFlow(ConfigFlow, domain=DOMAIN):
             ): bool,
             vol.Optional(
                 CONF_PRICING_BASE,
-                default=(DEFAULT_PRICING_BASE*100),  # type: ignore # voluptuous stubs incorrects
+                default=(DEFAULT_PRICING_BASE * 100),  # type: ignore # voluptuous stubs incorrects
             ): NumberSelector(_PRICING_SELECTOR),
         }
         # Only for offpeak pricing type
@@ -183,7 +184,7 @@ class Mylight150ConfigFlow(ConfigFlow, domain=DOMAIN):
             schema[
                 vol.Optional(
                     CONF_PRICING_OFFPEAK,
-                    default=(DEFAULT_PRICING_OFFPEAK*100),  # type: ignore # voluptuous stubs incorrects
+                    default=(DEFAULT_PRICING_OFFPEAK * 100),  # type: ignore # voluptuous stubs incorrects
                 )
             ] = NumberSelector(_PRICING_SELECTOR)
 
@@ -261,10 +262,12 @@ class Mylight150OptionsFlowHandler(OptionsFlow):
             user_input[CONF_UPDATE_INITIAL] = user_input.get(
                 CONF_UPDATE_INITIAL, DEFAULT_UPDATE_INITIAL
             )
-            user_input[CONF_PRICING_BASE] = user_input.get(
-                CONF_PRICING_BASE, DEFAULT_PRICING_BASE) / 100
-            user_input[CONF_PRICING_OFFPEAK] = user_input.get(
-                CONF_PRICING_OFFPEAK, DEFAULT_PRICING_OFFPEAK) / 100
+            user_input[CONF_PRICING_BASE] = (
+                user_input.get(CONF_PRICING_BASE, DEFAULT_PRICING_BASE) / 100
+            )
+            user_input[CONF_PRICING_OFFPEAK] = (
+                user_input.get(CONF_PRICING_OFFPEAK, DEFAULT_PRICING_OFFPEAK) / 100
+            )
             return self.async_create_entry(title="", data=user_input)
 
         # Base Schema
@@ -293,7 +296,8 @@ class Mylight150OptionsFlowHandler(OptionsFlow):
                 CONF_PRICING_BASE,
                 default=self.config_entry.options.get(
                     CONF_PRICING_BASE, DEFAULT_PRICING_BASE
-                ) * 100,
+                )
+                * 100,
             ): NumberSelector(_PRICING_SELECTOR),
         }
 
@@ -304,7 +308,8 @@ class Mylight150OptionsFlowHandler(OptionsFlow):
                     CONF_PRICING_OFFPEAK,
                     default=self.config_entry.options.get(
                         CONF_PRICING_OFFPEAK, DEFAULT_PRICING_OFFPEAK
-                    ) * 100,
+                    )
+                    * 100,
                 )
             ] = NumberSelector(_PRICING_SELECTOR)
 
