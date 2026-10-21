@@ -53,9 +53,9 @@ MIN_UPDATE_INTERVAL: int = 10
 MAX_UPDATE_INTERVAL: int = 30
 DEFAULT_UPDATE_INTERVAL: int = 10
 DEFAULT_UPDATE_INITIAL: bool = True
-DEFAULT_PRICING_BASE: float = 0.23
-DEFAULT_PRICING_OFFPEAK: float = 0.14
-DEFAULT_PRICING_TYPE: str = "base"
+DEFAULT_PRICING_BASE: float = 0.2142
+DEFAULT_PRICING_OFFPEAK: float = 0.1589
+DEFAULT_PRICING_TYPE: str = "hphc"
 
 
 # Platform list to be loaded (other sensors (binary,etc) can be added later.
