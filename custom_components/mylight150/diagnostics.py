@@ -29,7 +29,10 @@ DIAGNOSTIC_ENDPOINTS: list[tuple[str, str]] = [
     # General information about the API and installation
     ("root", "/"),
     ("v2", "/v2"),
+    ("v3", "/v3"),
     ("v2_installation", "/v2/installations/{code}"),
+    ("v2_installation_detail", "/v2/installations/{code}/Detail"),
+    ("v2_installation_home", "/v2/installations/{code}/home"),
     ("v3_contract_energy-pricing", "/v3/contract/energy-pricing"),
     # Live data
     ("v3_measures", "/v3/measures"),
