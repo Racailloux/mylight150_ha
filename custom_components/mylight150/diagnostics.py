@@ -16,12 +16,13 @@ _LOGGER = logging.getLogger(__name__)
 
 # Keys to hide in the report — never expose credentials
 TO_REDACT = {
-    "entry_id",
-    "title",
     "access_token",
+    "address",
     CONF_PASSWORD,
     CONF_USERNAME,
+    "entry_id",
     "refresh_token",
+    "title",
 }
 
 # List of endpoints to call for diagnostics. Each tuple contains a key and the endpoint path.
@@ -33,7 +34,9 @@ DIAGNOSTIC_ENDPOINTS: list[tuple[str, str]] = [
     ("v2_installation", "/v2/installations/{code}"),
     ("v2_installation_detail", "/v2/installations/{code}/Detail"),
     ("v2_installation_home", "/v2/installations/{code}/home"),
+    ("v3_contract", "/v3/contract"),
     ("v3_contract_energy-pricing", "/v3/contract/energy-pricing"),
+    ("v3_contract_activation_tracking", "/v3/contract-activation-tracking"),
     # Live data
     ("v3_measures", "/v3/measures"),
     ("v3_measures_series", "/v3/measures/series"),
@@ -148,4 +151,5 @@ async def _async_fetch_diagnostic_endpoints(
             results[key] = {"error": str(err)}
             _LOGGER.warning("Diagnostics: Error on requesting: %s", err)
 
+    results = async_redact_data(results, TO_REDACT)
     return results
