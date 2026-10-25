@@ -728,7 +728,9 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
                 _LOGGER.warning("Error while retrieving contract options data.")
                 _LOGGER.debug(f"Error while retrieving contract options data: {err}")
 
-        _LOGGER.debug(f"Current options detected: MB={self._has_mb}, MSB={self._has_msb}, MSP={self._has_msp}, EV Charger={self._has_evcharger}, HVAC={self._has_hvac}, Water Heater={self._has_waterheater}")
+        _LOGGER.debug(
+            f"Current options detected: MB={self._has_mb}, MSB={self._has_msb}, MSP={self._has_msp}, EV Charger={self._has_evcharger}, HVAC={self._has_hvac}, Water Heater={self._has_waterheater}"
+        )
         return {
             CONF_OPTION_MB: self._has_mb,
             CONF_OPTION_MSB: self._has_msb,
