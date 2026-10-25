@@ -32,6 +32,12 @@ CONF_ENERGY_CONSUMPTION = "energy_consumption"
 CONF_ENERGY_PROD_FROM_SOLAR = "energy_prod_from_solar"
 CONF_ENERGY_PROD_TO_GRID = "energy_prod_to_grid"
 CONF_ENERGY_PROD_TO_MSB = "energy_prod_to_msb"
+CONF_OPTION_EVCHARGER = "option_evcharger"
+CONF_OPTION_HVAC = "option_hvac"
+CONF_OPTION_MB = "option_mb"
+CONF_OPTION_MSB = "option_msb"
+CONF_OPTION_MSP = "option_msp"
+CONF_OPTION_WATERHEATER = "option_waterheater"
 CONF_PRICING_BASE = "pricing_base"
 CONF_PRICING_CURRENT = "current_pricing"
 CONF_PRICING_OFFPEAK = "pricing_offpeak"
@@ -60,7 +66,7 @@ DEFAULT_PRICING_TYPE: str = "hphc"
 
 # Platform list to be loaded (other sensors (binary,etc) can be added later.
 PLATFORMS: list[Platform] = [
-    # Platform.BINARY_SENSOR,
+    Platform.BINARY_SENSOR,
     Platform.SENSOR,
 ]
 

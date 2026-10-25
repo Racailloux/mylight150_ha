@@ -16,7 +16,6 @@ from homeassistant.components.sensor import (
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import PERCENTAGE, UnitOfEnergy, UnitOfPower
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
@@ -44,9 +43,9 @@ from .const import (
     EVCHARGER_CHARGING_MONEYPOT,
     EVCHARGER_CHARGING_TYPE,
     EVCHARGER_STATE,
-    IDENTIFIER,
 )
 from .coordinator import Mylight150Coordinator
+from .entity import build_device_info
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -335,13 +334,7 @@ class Mylight150SensorEntity(  # type: ignore[reportIncompatibleVariableOverride
         self._attr_unique_id = f"{DOMAIN}_{entry.entry_id}_{description.key}"
 
         # Device association
-        self._attr_device_info = DeviceInfo(
-            identifiers={(DOMAIN, IDENTIFIER)},
-            name="mylight150",
-            manufacturer="mylight150 Systems",
-            model="MySmartBattery",
-            configuration_url="https://client.mylight150.com",
-        )
+        self._attr_device_info = build_device_info()
 
     @property
     def native_value(self) -> Any:  # type: ignore[reportIncompatibleVariableOverride]
@@ -370,13 +363,7 @@ class Mylight150PricingModeSensorEntity(  # type: ignore[reportIncompatibleVaria
         self._attr_icon = "mdi:clock-time-eight-outline"
 
         # Device association
-        self._attr_device_info = DeviceInfo(
-            identifiers={(DOMAIN, IDENTIFIER)},
-            name="mylight150",
-            manufacturer="mylight150 Systems",
-            model="MySmartBattery",
-            configuration_url="https://client.mylight150.com",
-        )
+        self._attr_device_info = build_device_info()
 
     async def async_added_to_hass(self) -> None:
         await super().async_added_to_hass()
@@ -438,13 +425,7 @@ class Mylight150CurrentPricingSensorEntity(  # type: ignore[reportIncompatibleVa
         self._attr_icon = "mdi:currency-eur"
 
         # Device association
-        self._attr_device_info = DeviceInfo(
-            identifiers={(DOMAIN, IDENTIFIER)},
-            name="mylight150",
-            manufacturer="mylight150 Systems",
-            model="MySmartBattery",
-            configuration_url="https://client.mylight150.com",
-        )
+        self._attr_device_info = build_device_info()
 
     async def async_added_to_hass(self) -> None:
         await super().async_added_to_hass()

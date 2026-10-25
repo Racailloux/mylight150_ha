@@ -23,6 +23,12 @@ from .const import (
     CONF_ENERGY_PROD_FROM_SOLAR,
     CONF_ENERGY_PROD_TO_GRID,
     CONF_ENERGY_PROD_TO_MSB,
+    CONF_OPTION_EVCHARGER,
+    CONF_OPTION_HVAC,
+    CONF_OPTION_MB,
+    CONF_OPTION_MSB,
+    CONF_OPTION_MSP,
+    CONF_OPTION_WATERHEATER,
     CONF_PRICING_TYPE,
     DEFAULT_PRICING_TYPE,
     DOMAIN,
@@ -58,6 +64,14 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
         self._store: Store[dict[str, Any]] = Store(hass, STORAGE_VERSION, STORAGE_KEY)
         self._persistent: dict[str, Any] = {}
         self.hphc_schedule: list[dict] = []
+        self._has_mb: bool = False  # MyBattery
+        self._has_msb: bool = False  # MySmartBattery
+        self._has_msc: bool = False  # MySmartCommunity
+        self._has_msh: bool = False  # MySmartHeater
+        self._has_msp: bool = False  # MySmartPilot
+        self._has_evcharger: bool = False  # EV Charger
+        self._has_hvac: bool = False  # HVAC
+        self._has_waterheater: bool = False  # Water Heater
 
         super().__init__(
             hass,
@@ -85,8 +99,16 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
 
             # Updates to be done only at first refresh of the day
             if is_first_refresh_of_day:
+                _LOGGER.info(
+                    "First refresh of the day detected. Updating non frequent data."
+                )
                 # Update pricing type and schedule in persistent data and config entry
                 await self._async_update_pricing_data()
+                # Update options
+                parsed_data = await self._async_update_options_data()
+                _LOGGER.debug("Options data retrieved: %s", parsed_data)
+                if parsed_data:
+                    data.update(parsed_data)
 
             # Fetch virtual battery data and parse it for sensors
             parsed_data = await self._async_update_vbattery_data()
@@ -599,8 +621,10 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             _LOGGER.debug(f"Error while retrieving energy consumption data: {err}")
             return {}
 
+    # Update pricing type and schedule in persistent data and config entry
     async def _async_update_pricing_data(self) -> bool:
         """Fetch pricing type and schedule to update persistent data."""
+        _LOGGER.debug("Updating pricing data...")
         endpoint = "/v3/contract/energy-pricing"
         try:
             pricing_data = await self._api.async_call_api(endpoint)
@@ -614,8 +638,7 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             _LOGGER.debug(f"Error while retrieving pricing data: {err}")
             return False
 
-        # Update pricing type at 1st refresh of the day
-        _LOGGER.info("First refresh of the day detected. Updating pricing data.")
+        # Update pricing type
         try:
             # Load pricing type from entry and API and update it, if necessary
             pricing_type = pricing_data.get("current", DEFAULT_PRICING_TYPE)
@@ -648,6 +671,74 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
 
         return True
 
+    # Update options data in coordinator and send usefull ones to binary sensors
+    async def _async_update_options_data(self) -> dict[str, Any]:
+        """Fetch options data."""
+        _LOGGER.debug("Updating options data...")
+
+        try:
+            data = await self._api.async_call_api("/v3/contract/options")
+
+            _LOGGER.debug("Options data retrieved: %s", data)
+            # MyBattery
+            self._has_mb: bool = data.get("mb", None) != None
+            # MySmartBattery
+            self._has_msb: bool = data.get("msb", None) != None
+            # MySmartCommunity
+            self._has_msc: bool = data.get("msc", None) != None
+            # MySmartHeater
+            self._has_msh: bool = data.get("msh", None) != None
+            # MySmartPilot
+            self._has_msp: bool = data.get("msp", None) != None
+        except (
+            Mylight150AuthError,
+            Mylight150ApiError,
+            RequestException,
+            JSONDecodeError,
+        ) as err:
+            _LOGGER.warning("Error while retrieving contract options data.")
+            _LOGGER.debug(f"Error while retrieving contract options data: {err}")
+
+        # Update equipment data if MySmartPilot is available
+        self._has_evcharger = False
+        self._has_hvac = False
+        self._has_waterheater = False
+
+        if self._has_msp:
+            _LOGGER.debug("MySmartPilot is available for this installation.")
+            try:
+                data = await self._api.async_call_api("/v3/equipments")
+                equipments = data.get("equipments", [])
+
+                for equipment in equipments:
+                    equipment_type = equipment.get("equipmentType")
+
+                    if equipment_type and equipment_type == "evCharger":
+                        self._has_evcharger = True
+                    elif equipment_type and equipment_type == "heatPump":
+                        self._has_hvac = True
+                    elif equipment_type and equipment_type == "waterHeater":
+                        self._has_waterheater = True
+            except (
+                Mylight150AuthError,
+                Mylight150ApiError,
+                RequestException,
+                JSONDecodeError,
+            ) as err:
+                _LOGGER.warning("Error while retrieving contract options data.")
+                _LOGGER.debug(f"Error while retrieving contract options data: {err}")
+
+        _LOGGER.debug(f"Current options detected: MB={self._has_mb}, MSB={self._has_msb}, MSP={self._has_msp}, EV Charger={self._has_evcharger}, HVAC={self._has_hvac}, Water Heater={self._has_waterheater}")
+        return {
+            CONF_OPTION_MB: self._has_mb,
+            CONF_OPTION_MSB: self._has_msb,
+            CONF_OPTION_MSP: self._has_msp,
+            CONF_OPTION_EVCHARGER: self._has_evcharger,
+            CONF_OPTION_HVAC: self._has_hvac,
+            CONF_OPTION_WATERHEATER: self._has_waterheater,
+        }
+
+    # Update money-pot data
     async def _async_update_moneypot_data(self) -> dict[str, Any]:
         """Fetch instant data from /v3/money-pot endpoint."""
         try:

@@ -140,6 +140,14 @@
       },
       "current_pricing": { "name": "Current pricing" },
       "money_pot": { "name": "Moneypot balance" }
+    },
+    "binary_sensor": {
+      "option_evcharger": { "name": "EV charger" },
+      "option_hvac": { "name": "Heat pump" },
+      "option_mb": { "name": "MyBattery" },
+      "option_msb": { "name": "MySmartBattery" },
+      "option_msp": { "name": "MySmartPilot" },
+      "option_waterheater": { "name": "Water heater" }
     }
   }
 }

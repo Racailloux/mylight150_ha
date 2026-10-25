@@ -142,6 +142,14 @@
       },
       "current_pricing": { "name": "Tarif actuel" },
       "money_pot": { "name": "Solde de la cagnotte" }
+    },
+    "binary_sensor": {
+      "option_evcharger": { "name": "Borne de recharge" },
+      "option_hvac": { "name": "Chaudière" },
+      "option_mb": { "name": "MyBattery" },
+      "option_msb": { "name": "MySmartBattery" },
+      "option_msp": { "name": "MySmartPilot" },
+      "option_waterheater": { "name": "Ballon d'eau chaude" }
     }
   }
 }
