@@ -681,15 +681,15 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
 
             _LOGGER.debug("Options data retrieved: %s", data)
             # MyBattery
-            self._has_mb: bool = data.get("mb", None) != None
+            self._has_mb = data.get("mb", None) != None
             # MySmartBattery
-            self._has_msb: bool = data.get("msb", None) != None
+            self._has_msb = data.get("msb", None) != None
             # MySmartCommunity
-            self._has_msc: bool = data.get("msc", None) != None
+            self._has_msc = data.get("msc", None) != None
             # MySmartHeater
-            self._has_msh: bool = data.get("msh", None) != None
+            self._has_msh = data.get("msh", None) != None
             # MySmartPilot
-            self._has_msp: bool = data.get("msp", None) != None
+            self._has_msp = data.get("msp", None) != None
         except (
             Mylight150AuthError,
             Mylight150ApiError,
