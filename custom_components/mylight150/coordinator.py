@@ -258,8 +258,12 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             RequestException,
             JSONDecodeError,
         ) as err:
-            _LOGGER.warning("Error while retrieving MySmartBattery virtual battery data.")
-            _LOGGER.debug(f"Error while retrieving MySmartBattery virtual battery data: {err}")
+            _LOGGER.warning(
+                "Error while retrieving MySmartBattery virtual battery data."
+            )
+            _LOGGER.debug(
+                f"Error while retrieving MySmartBattery virtual battery data: {err}"
+            )
 
         return {}
 
@@ -273,7 +277,7 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
                 CONF_MB_LAST_UPDATE: datetime.strptime(lastUpdate, "%Y-%m-%d").date(),
                 CONF_MB_AUTONOMY: _safe_get(data, "stateOfCharge", default=0),
             }
-            
+
             _LOGGER.debug("Data parsed for MyBattery virtual battery: %s", parsed)
             return parsed
 
@@ -284,7 +288,9 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             JSONDecodeError,
         ) as err:
             _LOGGER.warning("Error while retrieving MyBattery virtual battery data.")
-            _LOGGER.debug(f"Error while retrieving MyBattery virtual battery data: {err}")
+            _LOGGER.debug(
+                f"Error while retrieving MyBattery virtual battery data: {err}"
+            )
 
         return {}
 
