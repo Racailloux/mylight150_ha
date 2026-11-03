@@ -62,7 +62,6 @@ _LOGGER = logging.getLogger(__name__)
 class Mylight150SensorEntityDescription(SensorEntityDescription):
     """SensorEntityDescription extended with coordinator data_key."""
 
-    data_key: str
     required_option: str | None = None
 
 
@@ -71,7 +70,6 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
     # Live powers sensors (kW)
     Mylight150SensorEntityDescription(
         key="solar_production",
-        data_key="solar_production",
         has_entity_name=True,
         translation_key="solar_production",
         native_unit_of_measurement=UnitOfPower.KILO_WATT,
@@ -82,7 +80,6 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
     ),
     Mylight150SensorEntityDescription(
         key="grid",
-        data_key="grid",
         has_entity_name=True,
         translation_key="grid",
         native_unit_of_measurement=UnitOfPower.KILO_WATT,
@@ -93,7 +90,6 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
     ),
     Mylight150SensorEntityDescription(
         key="load",
-        data_key="load",
         has_entity_name=True,
         translation_key="load",
         native_unit_of_measurement=UnitOfPower.KILO_WATT,
@@ -105,7 +101,6 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
     # MySmartBattery (virtual battery) sensors
     Mylight150SensorEntityDescription(
         key="msb_state",
-        data_key="msb_state",
         has_entity_name=True,
         translation_key="msb_state",
         icon="mdi:battery-sync",
@@ -113,7 +108,6 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
     ),
     Mylight150SensorEntityDescription(
         key="msb_power",
-        data_key="msb_power",
         has_entity_name=True,
         translation_key="msb_power",
         native_unit_of_measurement=UnitOfPower.KILO_WATT,
@@ -124,7 +118,6 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
     ),
     Mylight150SensorEntityDescription(
         key="msb_autonomy",
-        data_key="msb_autonomy",
         has_entity_name=True,
         translation_key="msb_autonomy",
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
@@ -136,7 +129,6 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
     ),
     Mylight150SensorEntityDescription(
         key="msb_capacity",
-        data_key="msb_capacity",
         has_entity_name=True,
         translation_key="msb_capacity",
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
@@ -148,7 +140,6 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
     ),
     Mylight150SensorEntityDescription(
         key="msb_level",
-        data_key="msb_level",
         has_entity_name=True,
         translation_key="msb_level",
         native_unit_of_measurement=PERCENTAGE,
@@ -161,7 +152,6 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
     # Total energy sensors (kWh)
     Mylight150SensorEntityDescription(
         key=CONF_ENERGY_PROD_FROM_SOLAR,
-        data_key=CONF_ENERGY_PROD_FROM_SOLAR,
         has_entity_name=True,
         translation_key=CONF_ENERGY_PROD_FROM_SOLAR,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
@@ -173,7 +163,6 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
     ),
     Mylight150SensorEntityDescription(
         key=CONF_ENERGY_PROD_TO_MSB,
-        data_key=CONF_ENERGY_PROD_TO_MSB,
         has_entity_name=True,
         translation_key=CONF_ENERGY_PROD_TO_MSB,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
@@ -185,7 +174,6 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
     ),
     Mylight150SensorEntityDescription(
         key=CONF_ENERGY_PROD_TO_GRID,
-        data_key=CONF_ENERGY_PROD_TO_GRID,
         has_entity_name=True,
         translation_key=CONF_ENERGY_PROD_TO_GRID,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
@@ -197,7 +185,6 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
     ),
     Mylight150SensorEntityDescription(
         key=CONF_ENERGY_CONSUMPTION,
-        data_key=CONF_ENERGY_CONSUMPTION,
         has_entity_name=True,
         translation_key=CONF_ENERGY_CONSUMPTION,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
@@ -209,7 +196,6 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
     ),
     Mylight150SensorEntityDescription(
         key=CONF_ENERGY_CONSO_FROM_SOLAR,
-        data_key=CONF_ENERGY_CONSO_FROM_SOLAR,
         has_entity_name=True,
         translation_key=CONF_ENERGY_CONSO_FROM_SOLAR,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
@@ -221,7 +207,6 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
     ),
     Mylight150SensorEntityDescription(
         key=CONF_ENERGY_CONSO_FROM_MSB,
-        data_key=CONF_ENERGY_CONSO_FROM_MSB,
         has_entity_name=True,
         translation_key=CONF_ENERGY_CONSO_FROM_MSB,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
@@ -233,7 +218,6 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
     ),
     Mylight150SensorEntityDescription(
         key=CONF_ENERGY_CONSO_FROM_GRID,
-        data_key=CONF_ENERGY_CONSO_FROM_GRID,
         has_entity_name=True,
         translation_key=CONF_ENERGY_CONSO_FROM_GRID,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
@@ -246,7 +230,6 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
     # MySmartPilot equipments sensors
     Mylight150SensorEntityDescription(
         key="heatPump_mode",
-        data_key="heatPump_mode",
         has_entity_name=True,
         translation_key="heatpump_mode",
         icon="mdi:heating-coil",
@@ -254,7 +237,6 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
     ),
     Mylight150SensorEntityDescription(
         key="waterHeater_mode",
-        data_key="waterHeater_mode",
         has_entity_name=True,
         translation_key="waterheater_mode",
         icon="mdi:water-boiler",
@@ -262,7 +244,6 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
     ),
     Mylight150SensorEntityDescription(
         key=EVCHARGER_STATE,
-        data_key=EVCHARGER_STATE,
         has_entity_name=True,
         translation_key=EVCHARGER_STATE,
         icon="mdi:car-electric",
@@ -270,7 +251,6 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
     ),
     Mylight150SensorEntityDescription(
         key=EVCHARGER_CHARGING_TYPE,
-        data_key=EVCHARGER_CHARGING_TYPE,
         has_entity_name=True,
         translation_key=EVCHARGER_CHARGING_TYPE,
         icon="mdi:ev-plug-type1",
@@ -278,7 +258,6 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
     ),
     Mylight150SensorEntityDescription(
         key=EVCHARGER_CHARGING_CONSUMPTION,
-        data_key=EVCHARGER_CHARGING_CONSUMPTION,
         has_entity_name=True,
         translation_key=EVCHARGER_CHARGING_CONSUMPTION,
         native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
@@ -290,7 +269,6 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
     ),
     Mylight150SensorEntityDescription(
         key=EVCHARGER_CHARGING_COST,
-        data_key=EVCHARGER_CHARGING_COST,
         has_entity_name=True,
         translation_key=EVCHARGER_CHARGING_COST,
         native_unit_of_measurement="€",
@@ -302,7 +280,6 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
     ),
     Mylight150SensorEntityDescription(
         key=EVCHARGER_CHARGING_MONEYPOT,
-        data_key=EVCHARGER_CHARGING_MONEYPOT,
         has_entity_name=True,
         translation_key=EVCHARGER_CHARGING_MONEYPOT,
         native_unit_of_measurement="€",
@@ -315,7 +292,6 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
     # Money sensors
     Mylight150SensorEntityDescription(
         key="money_pot",
-        data_key="money_pot",
         has_entity_name=True,
         translation_key="money_pot",
         native_unit_of_measurement="€",
@@ -398,7 +374,7 @@ class Mylight150SensorEntity(  # type: ignore[reportIncompatibleVariableOverride
         """Sensor value coming from coordinator.data. Returns None if data is not available (coordinator not yet refreshed, or key missing)."""
         if self.coordinator.data is None:
             return None
-        return self.coordinator.data.get(self.entity_description.data_key)
+        return self.coordinator.data.get(self.entity_description.key)
 
 
 class Mylight150PricingModeSensorEntity(  # type: ignore[reportIncompatibleVariableOverride]

@@ -27,48 +27,35 @@ from .coordinator import Mylight150Coordinator
 from .entity import build_device_info
 
 
-@dataclass(frozen=True, kw_only=True)
-class Mylight150BinarySensorEntityDescription(BinarySensorEntityDescription):
-    """BinarySensorEntityDescription extended with coordinator data_key."""
-
-    data_key: str
-
-
 # List all binary sensors
-BINARY_SENSORS: tuple[Mylight150BinarySensorEntityDescription, ...] = (
-    Mylight150BinarySensorEntityDescription(
+BINARY_SENSORS: tuple[BinarySensorEntityDescription, ...] = (
+    BinarySensorEntityDescription(
         key=CONF_OPTION_MB,
-        data_key=CONF_OPTION_MB,
         translation_key=CONF_OPTION_MB,
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
-    Mylight150BinarySensorEntityDescription(
+    BinarySensorEntityDescription(
         key=CONF_OPTION_MSB,
-        data_key=CONF_OPTION_MSB,
         translation_key=CONF_OPTION_MSB,
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
-    Mylight150BinarySensorEntityDescription(
+    BinarySensorEntityDescription(
         key=CONF_OPTION_MSP,
-        data_key=CONF_OPTION_MSP,
         translation_key=CONF_OPTION_MSP,
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
-    Mylight150BinarySensorEntityDescription(
+    BinarySensorEntityDescription(
         key=CONF_OPTION_EVCHARGER,
-        data_key=CONF_OPTION_EVCHARGER,
         translation_key=CONF_OPTION_EVCHARGER,
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
-    Mylight150BinarySensorEntityDescription(
+    BinarySensorEntityDescription(
         key=CONF_OPTION_HVAC,
-        data_key=CONF_OPTION_HVAC,
         translation_key=CONF_OPTION_HVAC,
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
-    Mylight150BinarySensorEntityDescription(
+    BinarySensorEntityDescription(
         key=CONF_OPTION_WATERHEATER,
-        data_key=CONF_OPTION_WATERHEATER,
         translation_key=CONF_OPTION_WATERHEATER,
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
@@ -97,13 +84,13 @@ class Mylight150OptionBinarySensor(  # type: ignore[reportIncompatibleVariableOv
     """On when the option is active on the MyLight150 account."""
 
     _attr_has_entity_name = True
-    entity_description: Mylight150BinarySensorEntityDescription
+    entity_description: BinarySensorEntityDescription
 
     def __init__(
         self,
         coordinator: Mylight150Coordinator,
         entry: ConfigEntry,
-        description: Mylight150BinarySensorEntityDescription,
+        description: BinarySensorEntityDescription,
     ) -> None:
         super().__init__(coordinator)
         self.entity_description = description  # type: ignore[reportIncompatibleVariableOverride]
