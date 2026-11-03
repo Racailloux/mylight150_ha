@@ -16,6 +16,7 @@ from homeassistant.components.sensor import (
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import PERCENTAGE, UnitOfEnergy, UnitOfPower
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers import entity_registry as er
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
@@ -29,6 +30,12 @@ from .const import (
     CONF_ENERGY_PROD_FROM_SOLAR,
     CONF_ENERGY_PROD_TO_GRID,
     CONF_ENERGY_PROD_TO_MSB,
+    CONF_OPTION_EVCHARGER,
+    CONF_OPTION_HVAC,
+    # CONF_OPTION_MB,
+    CONF_OPTION_MSB,
+    CONF_OPTION_MSP,
+    CONF_OPTION_WATERHEATER,
     CONF_PRICING_BASE,
     CONF_PRICING_CURRENT,
     CONF_PRICING_MODE,
@@ -56,6 +63,7 @@ class Mylight150SensorEntityDescription(SensorEntityDescription):
     """SensorEntityDescription extended with coordinator data_key."""
 
     data_key: str
+    required_option: str | None = None
 
 
 # List all sensors
@@ -70,6 +78,7 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.POWER,
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:solar-power",
+        required_option=CONF_OPTION_MSB,
     ),
     Mylight150SensorEntityDescription(
         key="grid",
@@ -80,6 +89,7 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.POWER,
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:transmission-tower",
+        required_option=CONF_OPTION_MSB,
     ),
     Mylight150SensorEntityDescription(
         key="load",
@@ -90,6 +100,7 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.POWER,
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:home-lightning-bolt",
+        required_option=CONF_OPTION_MSB,
     ),
     # MySmartBattery (virtual battery) sensors
     Mylight150SensorEntityDescription(
@@ -98,6 +109,7 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
         has_entity_name=True,
         translation_key="msb_state",
         icon="mdi:battery-sync",
+        required_option=CONF_OPTION_MSB,
     ),
     Mylight150SensorEntityDescription(
         key="msb_power",
@@ -108,6 +120,7 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.POWER,
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:battery-charging",
+        required_option=CONF_OPTION_MSB,
     ),
     Mylight150SensorEntityDescription(
         key="msb_autonomy",
@@ -119,6 +132,7 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.ENERGY_STORAGE,
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:battery",
+        required_option=CONF_OPTION_MSB,
     ),
     Mylight150SensorEntityDescription(
         key="msb_capacity",
@@ -130,6 +144,7 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.ENERGY_STORAGE,
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:home-battery",
+        required_option=CONF_OPTION_MSB,
     ),
     Mylight150SensorEntityDescription(
         key="msb_level",
@@ -141,78 +156,7 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.BATTERY,
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:battery",
-    ),
-    # Money sensors
-    Mylight150SensorEntityDescription(
-        key="money_pot",
-        data_key="money_pot",
-        has_entity_name=True,
-        translation_key="money_pot",
-        native_unit_of_measurement="€",
-        state_class=SensorStateClass.MEASUREMENT,
-        icon="mdi:piggy-bank",
-    ),
-    # Equipments sensors
-    Mylight150SensorEntityDescription(
-        key="heatPump_mode",
-        data_key="heatPump_mode",
-        has_entity_name=True,
-        translation_key="heatpump_mode",
-        icon="mdi:heating-coil",
-    ),
-    Mylight150SensorEntityDescription(
-        key="waterHeater_mode",
-        data_key="waterHeater_mode",
-        has_entity_name=True,
-        translation_key="waterheater_mode",
-        icon="mdi:water-boiler",
-    ),
-    Mylight150SensorEntityDescription(
-        key=EVCHARGER_STATE,
-        data_key=EVCHARGER_STATE,
-        has_entity_name=True,
-        translation_key=EVCHARGER_STATE,
-        icon="mdi:car-electric",
-    ),
-    Mylight150SensorEntityDescription(
-        key=EVCHARGER_CHARGING_TYPE,
-        data_key=EVCHARGER_CHARGING_TYPE,
-        has_entity_name=True,
-        translation_key=EVCHARGER_CHARGING_TYPE,
-        icon="mdi:ev-plug-type1",
-    ),
-    Mylight150SensorEntityDescription(
-        key=EVCHARGER_CHARGING_CONSUMPTION,
-        data_key=EVCHARGER_CHARGING_CONSUMPTION,
-        has_entity_name=True,
-        translation_key=EVCHARGER_CHARGING_CONSUMPTION,
-        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
-        suggested_display_precision=2,
-        device_class=SensorDeviceClass.ENERGY,
-        state_class=SensorStateClass.TOTAL,
-        icon="mdi:ev-station",
-    ),
-    Mylight150SensorEntityDescription(
-        key=EVCHARGER_CHARGING_COST,
-        data_key=EVCHARGER_CHARGING_COST,
-        has_entity_name=True,
-        translation_key=EVCHARGER_CHARGING_COST,
-        native_unit_of_measurement="€",
-        suggested_display_precision=2,
-        device_class=SensorDeviceClass.MONETARY,
-        state_class=SensorStateClass.TOTAL,
-        icon="mdi:cash",
-    ),
-    Mylight150SensorEntityDescription(
-        key=EVCHARGER_CHARGING_MONEYPOT,
-        data_key=EVCHARGER_CHARGING_MONEYPOT,
-        has_entity_name=True,
-        translation_key=EVCHARGER_CHARGING_MONEYPOT,
-        native_unit_of_measurement="€",
-        suggested_display_precision=2,
-        device_class=SensorDeviceClass.MONETARY,
-        state_class=SensorStateClass.TOTAL,
-        icon="mdi:piggy-bank",
+        required_option=CONF_OPTION_MSB,
     ),
     # Total energy sensors (kWh)
     Mylight150SensorEntityDescription(
@@ -225,6 +169,7 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.TOTAL_INCREASING,
         icon="mdi:solar-power",
+        required_option=CONF_OPTION_MSB,
     ),
     Mylight150SensorEntityDescription(
         key=CONF_ENERGY_PROD_TO_MSB,
@@ -236,6 +181,7 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.TOTAL_INCREASING,
         icon="mdi:battery-arrow-up",
+        required_option=CONF_OPTION_MSB,
     ),
     Mylight150SensorEntityDescription(
         key=CONF_ENERGY_PROD_TO_GRID,
@@ -247,6 +193,7 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.TOTAL_INCREASING,
         icon="mdi:transmission-tower-import",
+        required_option=CONF_OPTION_MSB,
     ),
     Mylight150SensorEntityDescription(
         key=CONF_ENERGY_CONSUMPTION,
@@ -258,6 +205,7 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.TOTAL_INCREASING,
         icon="mdi:home-lightning-bolt",
+        required_option=CONF_OPTION_MSB,
     ),
     Mylight150SensorEntityDescription(
         key=CONF_ENERGY_CONSO_FROM_SOLAR,
@@ -269,6 +217,7 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.TOTAL_INCREASING,
         icon="mdi:solar-power-variant",
+        required_option=CONF_OPTION_MSB,
     ),
     Mylight150SensorEntityDescription(
         key=CONF_ENERGY_CONSO_FROM_MSB,
@@ -280,6 +229,7 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.TOTAL_INCREASING,
         icon="mdi:battery-arrow-down",
+        required_option=CONF_OPTION_MSB,
     ),
     Mylight150SensorEntityDescription(
         key=CONF_ENERGY_CONSO_FROM_GRID,
@@ -291,8 +241,96 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.TOTAL_INCREASING,
         icon="mdi:transmission-tower-export",
+        required_option=CONF_OPTION_MSB,
+    ),
+    # MySmartPilot equipments sensors
+    Mylight150SensorEntityDescription(
+        key="heatPump_mode",
+        data_key="heatPump_mode",
+        has_entity_name=True,
+        translation_key="heatpump_mode",
+        icon="mdi:heating-coil",
+        required_option=CONF_OPTION_HVAC,
+    ),
+    Mylight150SensorEntityDescription(
+        key="waterHeater_mode",
+        data_key="waterHeater_mode",
+        has_entity_name=True,
+        translation_key="waterheater_mode",
+        icon="mdi:water-boiler",
+        required_option=CONF_OPTION_WATERHEATER,
+    ),
+    Mylight150SensorEntityDescription(
+        key=EVCHARGER_STATE,
+        data_key=EVCHARGER_STATE,
+        has_entity_name=True,
+        translation_key=EVCHARGER_STATE,
+        icon="mdi:car-electric",
+        required_option=CONF_OPTION_EVCHARGER,
+    ),
+    Mylight150SensorEntityDescription(
+        key=EVCHARGER_CHARGING_TYPE,
+        data_key=EVCHARGER_CHARGING_TYPE,
+        has_entity_name=True,
+        translation_key=EVCHARGER_CHARGING_TYPE,
+        icon="mdi:ev-plug-type1",
+        required_option=CONF_OPTION_EVCHARGER,
+    ),
+    Mylight150SensorEntityDescription(
+        key=EVCHARGER_CHARGING_CONSUMPTION,
+        data_key=EVCHARGER_CHARGING_CONSUMPTION,
+        has_entity_name=True,
+        translation_key=EVCHARGER_CHARGING_CONSUMPTION,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        suggested_display_precision=2,
+        device_class=SensorDeviceClass.ENERGY,
+        state_class=SensorStateClass.TOTAL,
+        icon="mdi:ev-station",
+        required_option=CONF_OPTION_EVCHARGER,
+    ),
+    Mylight150SensorEntityDescription(
+        key=EVCHARGER_CHARGING_COST,
+        data_key=EVCHARGER_CHARGING_COST,
+        has_entity_name=True,
+        translation_key=EVCHARGER_CHARGING_COST,
+        native_unit_of_measurement="€",
+        suggested_display_precision=2,
+        device_class=SensorDeviceClass.MONETARY,
+        state_class=SensorStateClass.TOTAL,
+        icon="mdi:cash",
+        required_option=CONF_OPTION_EVCHARGER,
+    ),
+    Mylight150SensorEntityDescription(
+        key=EVCHARGER_CHARGING_MONEYPOT,
+        data_key=EVCHARGER_CHARGING_MONEYPOT,
+        has_entity_name=True,
+        translation_key=EVCHARGER_CHARGING_MONEYPOT,
+        native_unit_of_measurement="€",
+        suggested_display_precision=2,
+        device_class=SensorDeviceClass.MONETARY,
+        state_class=SensorStateClass.TOTAL,
+        icon="mdi:piggy-bank",
+        required_option=CONF_OPTION_EVCHARGER,
+    ),
+    # Money sensors
+    Mylight150SensorEntityDescription(
+        key="money_pot",
+        data_key="money_pot",
+        has_entity_name=True,
+        translation_key="money_pot",
+        native_unit_of_measurement="€",
+        state_class=SensorStateClass.MEASUREMENT,
+        icon="mdi:piggy-bank",
+        required_option=CONF_OPTION_MSP,
     ),
 )
+
+
+def _is_wanted(desc: Mylight150SensorEntityDescription, data: dict[str, Any]) -> bool:
+    """Tell if a sensor must be created, according to the option availability"""
+    if desc.required_option is None:
+        return True
+    return data.get(desc.required_option) is not False
 
 
 async def async_setup_entry(
@@ -302,9 +340,28 @@ async def async_setup_entry(
 ) -> None:
     coordinator: Mylight150Coordinator = hass.data[DOMAIN][entry.entry_id]
 
+    data = coordinator.data or {}
+
+    # Sensors whose required account option is explicitly disabled: do not
+    # create them, and remove the ones created by a previous version.
+    registry = er.async_get(hass)
+    for desc in SENSORS:
+        if _is_wanted(desc, data):
+            continue
+        entity_id = registry.async_get_entity_id(
+            "sensor", DOMAIN, f"{DOMAIN}_{entry.entry_id}_{desc.key}"
+        )
+        if entity_id:
+            _LOGGER.debug(
+                f"Removing sensor {entity_id} (option {desc.required_option} not active)"
+            )
+            registry.async_remove(entity_id)
+
     # Common sensors
     sensors: list = [
-        Mylight150SensorEntity(coordinator, entry, desc) for desc in SENSORS
+        Mylight150SensorEntity(coordinator, entry, desc)
+        for desc in SENSORS
+        if _is_wanted(desc, data)
     ]
 
     # Pricing special sensors

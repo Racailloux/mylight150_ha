@@ -109,6 +109,10 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
                 _LOGGER.debug("Options data retrieved: %s", parsed_data)
                 if parsed_data:
                     data.update(parsed_data)
+            else:
+                parsed_data = await self._async_update_options_sensors()
+                if parsed_data:
+                    data.update(parsed_data)
 
             # Fetch virtual battery data and parse it for sensors
             parsed_data = await self._async_update_vbattery_data()
@@ -731,6 +735,10 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
         _LOGGER.debug(
             f"Current options detected: MB={self._has_mb}, MSB={self._has_msb}, MSP={self._has_msp}, EV Charger={self._has_evcharger}, HVAC={self._has_hvac}, Water Heater={self._has_waterheater}"
         )
+        return await self._async_update_options_sensors()
+
+    # Update options sensors to maintain their state in the coordinator data
+    async def _async_update_options_sensors(self) -> dict[str, Any]:
         return {
             CONF_OPTION_MB: self._has_mb,
             CONF_OPTION_MSB: self._has_msb,
