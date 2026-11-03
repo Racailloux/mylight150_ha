@@ -113,7 +113,7 @@ Les développeurs n'ont pas accès à toutes les options de mylight150. Si vous 
 
 ## Remerciements
 * [Home Assistant](https://github.com/home-assistant) : Plateforme domotique open-source puissante.
-* [HACS](https://hacs.xyz/) : Home Assistant Community Store offre une interface puissante pour gérer les téléchargements de tous vos besoins personnalisés.
+* [marketplace](https://next.home-assistant.io/integrations/marketplace) : Le marketplace de Home Asssitant permet de distribuer des intégrations personnalisées qui ne sont pas disponible dans le cœur de HA.
 * [mylight150] : Fournisseur d'électricité avec support de batterie virtuelle.
 * [hassio MyLight integration](https://github.com/acesyde/hassio_mylight_integration) : Intégration de MyLight System pour l'ancienne API de MyLight System (MyHome).
 
@@ -123,7 +123,7 @@ Les développeurs n'ont pas accès à toutes les options de mylight150. Si vous 
 [mylight150]: https://www.mylight-systems.com/
 [commits-shield]: https://img.shields.io/github/commit-activity/y/Racailloux/mylight150_ha.svg?style=for-the-badge
 [commits]: https://github.com/Racailloux/mylight150_ha/commits/main
-[hacs]: https://github.com/hacs/integration
+[marketplace]: https://next.home-assistant.io/integrations/marketplace
 [hacsbadge]: https://img.shields.io/badge/HACS-Default-orange.svg?style=for-the-badge
 [license-shield]: https://img.shields.io/github/license/Racailloux/mylight150_ha.svg?style=for-the-badge
 [maintenance-shield]: https://img.shields.io/badge/maintainer-Racailloux-blue.svg?style=for-the-badge
