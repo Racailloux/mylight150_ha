@@ -90,7 +90,7 @@
       "msb_level": { "name": "Niveau batterie virtuelle" },
       "savings": { "name": "Économies mensuelles" },
       "heatpump_mode": {
-        "name": "Mode smart de la PAC",
+        "name": "Mode smart de la chaudière",
         "state": {
           "off": "Eteint",
           "on": "Allumé"

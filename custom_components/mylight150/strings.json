@@ -88,7 +88,7 @@
       "msb_level": { "name": "Virtual battery level" },
       "savings": { "name": "Monthly money saving" },
       "heatpump_mode": {
-        "name": "Heat pump mode",
+        "name": "Boiler mode",
         "state": {
           "off": "Off",
           "on": "On"
@@ -143,7 +143,7 @@
     },
     "binary_sensor": {
       "option_evcharger": { "name": "EV charger" },
-      "option_hvac": { "name": "Heat pump" },
+      "option_hvac": { "name": "Boiler" },
       "option_mb": { "name": "MyBattery" },
       "option_msb": { "name": "MySmartBattery" },
       "option_msp": { "name": "MySmartPilot" },
