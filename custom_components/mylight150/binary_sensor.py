@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-
 from homeassistant.components.binary_sensor import (
     BinarySensorEntity,
     BinarySensorEntityDescription,
@@ -25,7 +23,6 @@ from .const import (
 )
 from .coordinator import Mylight150Coordinator
 from .entity import build_device_info
-
 
 # List all binary sensors
 BINARY_SENSORS: tuple[BinarySensorEntityDescription, ...] = (
