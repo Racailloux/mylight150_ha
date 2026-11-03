@@ -37,9 +37,6 @@ DIAGNOSTIC_ENDPOINTS: list[tuple[str, str]] = [
     ("v3_contract", "/v3/contract"),
     ("v3_contract_energy-pricing", "/v3/contract/energy-pricing"),
     ("v3_contract_activation_tracking", "/v3/contract-activation-tracking"),
-    # Live data
-    ("v3_measures", "/v3/measures"),
-    ("v3_measures_series", "/v3/measures/series"),
     # Options from contracts (MSB, MSP, MSH, etc.)
     ("v3_contract_options", "/v3/contract/options"),
     ("v3_contract_options_msb", "/v3/contract/options/msb"),
@@ -47,16 +44,25 @@ DIAGNOSTIC_ENDPOINTS: list[tuple[str, str]] = [
     ("v3_contract_options_msp", "/v3/contract/options/msp"),
     ("v3_contract_options_msh", "/v3/contract/options/msh"),
     ("v3_contract_options_myBatteryWithEms", "/v3/contract/options/myBatteryWithEms"),
-    # Savings and money pot
-    ("v3_savings", "/v3/savings"),
-    ("v3_money_pot", "/v3/money-pot"),
+    ### MB (MyBattery)
+    ("v3_mb_dso", "/v3/mb/dso"),
+    ("v3_mb_dso_consumption_history", "/v3/mb/dso/consumption/history?year=2026"),
+    ("v3_mb_dso_injection_history", "/v3/mb/dso/injection/history?year=2026"),
+    ("v3_mb_dso_consumption", "/v3/mb/dso/consumption"),
+    ("v3_mb_dso_injection", "/v3/mb/dso/injection"),
+    ### MSB (MySmartBattery)
+    ("v3_msb_legacy", "/v3/msb/legacy"),
+    ("v3_virtual_battery_state", "/v3/virtual-battery/state"),
     # Energy, production and consumption
     ("v3_energies", "/v3/energies"),
     ("v3_production", "/v3/production"),
     ("v3_production_day", "/v3/production?aggregation=Days"),
     ("v3_consumption", "/v3/consumption"),
     ("v3_consumption_day", "/v3/consumption?aggregation=Days"),
-    # Piloted Equipment (HVAC, water heater, etc.)
+    # Live data
+    ("v3_measures", "/v3/measures"),
+    ("v3_measures_series", "/v3/measures/series"),
+    ### Piloted Equipment (HVAC, water heater, etc.)
     ("v2_equipments", "/v2/installations/{code}/equipments"),
     (
         "v2_electricalVehicle10",
@@ -85,12 +91,9 @@ DIAGNOSTIC_ENDPOINTS: list[tuple[str, str]] = [
         "/v3/equipments/electricalVehicle10/evCharger/availableChargingModes",
     ),
     ("evcharger", "/EVChargers"),
-    # MB (MyBattery)
-    ("v3_mb", "/v3/mb"),
-    ("v3_mb_legacy", "/v3/mb/legacy"),
-    # MSB (MySmartBattery)
-    ("v3_msb_legacy", "/v3/msb/legacy"),
-    ("v3_virtual_battery_state", "/v3/virtual-battery/state"),
+    # Savings and money pot
+    ("v3_savings", "/v3/savings"),
+    ("v3_money_pot", "/v3/money-pot"),
 ]
 
 
