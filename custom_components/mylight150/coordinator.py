@@ -106,7 +106,7 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
                 await self._async_update_pricing_data()
                 # Update options
                 parsed_data = await self._async_update_options_data()
-                _LOGGER.debug("Options data retrieved: %s", parsed_data)
+                _LOGGER.debug(f"Options data retrieved: {parsed_data}")
                 if parsed_data:
                     data.update(parsed_data)
             else:
@@ -114,31 +114,31 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
                 if parsed_data:
                     data.update(parsed_data)
 
-            # Fetch virtual battery data and parse it for sensors
-            parsed_data = await self._async_update_vbattery_data()
-            if parsed_data:
-                data.update(parsed_data)
-
-            # Fetch realtime home data and parse it for sensors
-            parsed_data = await self._async_update_measures_data()
-            if parsed_data:
-                data.update(parsed_data)
-
-            # Fetch equipment data and parse it for sensors
-            parsed_data = await self._async_update_equipment_data()
-            if parsed_data:
-                data.update(parsed_data)
-                # Update money-pot informations only if equipment managed by mylight150
-                parsed_data = await self._async_update_moneypot_data()
+            # MySmartBattery data retrieval
+            if self._has_msb:
+                # Fetch virtual MySmartBattery data and parse it for sensors
+                parsed_data = await self._async_update_msb_vbattery_data()
+                if parsed_data:
+                    data.update(parsed_data)
+                # Fetch realtime home data and parse it for sensors
+                parsed_data = await self._async_update_msb_measures_data()
+                if parsed_data:
+                    data.update(parsed_data)
+                # Fetch energy data and parse it for sensors
+                parsed_data = await self._async_update_energy_data()
                 if parsed_data:
                     data.update(parsed_data)
 
-            # Fetch energy data and parse it for sensors
-            parsed_data = await self._async_update_energy_data()
-            if parsed_data:
-                data.update(parsed_data)
-
-            # Fetch other data if needed in the future..
+            # MySmartPilot data retrieval
+            if self._has_msp:
+                # Fetch equipment data and parse it for sensors
+                parsed_data = await self._async_update_equipment_data()
+                if parsed_data:
+                    data.update(parsed_data)
+                    # Update money-pot informations only if equipment managed by mylight150
+                    parsed_data = await self._async_update_moneypot_data()
+                    if parsed_data:
+                        data.update(parsed_data)
 
             # Update date after having updated all dependent data
             self._last_refresh_date = dt_util.now().date()
@@ -191,7 +191,7 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
 
         return ""
 
-    async def _async_update_measures_data(self) -> dict[str, Any]:
+    async def _async_update_msb_measures_data(self) -> dict[str, Any]:
         """Fetch instant powers (kW) data from /v3/measures endpoint."""
         try:
             data = await self._api.async_call_api("/v3/measures")
@@ -219,7 +219,7 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
 
         return {}
 
-    async def _async_update_vbattery_data(self) -> dict[str, Any]:
+    async def _async_update_msb_vbattery_data(self) -> dict[str, Any]:
         """Fetch instant data from /v3/virtual-battery/state endpoint."""
         try:
             data = await self._api.async_call_api("/v3/virtual-battery/state")
