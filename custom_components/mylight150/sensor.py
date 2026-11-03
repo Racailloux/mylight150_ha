@@ -30,9 +30,11 @@ from .const import (
     CONF_ENERGY_PROD_FROM_SOLAR,
     CONF_ENERGY_PROD_TO_GRID,
     CONF_ENERGY_PROD_TO_MSB,
+    CONF_MB_AUTONOMY,
+    CONF_MB_LAST_UPDATE,
     CONF_OPTION_EVCHARGER,
     CONF_OPTION_HVAC,
-    # CONF_OPTION_MB,
+    CONF_OPTION_MB,
     CONF_OPTION_MSB,
     CONF_OPTION_MSP,
     CONF_OPTION_WATERHEATER,
@@ -67,7 +69,7 @@ class Mylight150SensorEntityDescription(SensorEntityDescription):
 
 # List all sensors
 SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
-    # Live powers sensors (kW)
+    # MySmartBattery (virtual battery) sensors
     Mylight150SensorEntityDescription(
         key="solar_production",
         has_entity_name=True,
@@ -98,7 +100,6 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
         icon="mdi:home-lightning-bolt",
         required_option=CONF_OPTION_MSB,
     ),
-    # MySmartBattery (virtual battery) sensors
     Mylight150SensorEntityDescription(
         key="msb_state",
         has_entity_name=True,
@@ -226,6 +227,26 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
         state_class=SensorStateClass.TOTAL_INCREASING,
         icon="mdi:transmission-tower-export",
         required_option=CONF_OPTION_MSB,
+    ),
+    # MyBattery (virtual battery) sensors
+    Mylight150SensorEntityDescription(
+        key=CONF_MB_LAST_UPDATE,
+        has_entity_name=True,
+        translation_key=CONF_MB_LAST_UPDATE,
+        device_class=SensorDeviceClass.DATE,
+        icon="mdi:calendar-clock",
+        required_option=CONF_OPTION_MB,
+    ),
+    Mylight150SensorEntityDescription(
+        key=CONF_MB_AUTONOMY,
+        has_entity_name=True,
+        translation_key=CONF_MB_AUTONOMY,
+        native_unit_of_measurement=UnitOfEnergy.KILO_WATT_HOUR,
+        suggested_display_precision=0,
+        device_class=SensorDeviceClass.ENERGY_STORAGE,
+        state_class=SensorStateClass.MEASUREMENT,
+        icon="mdi:battery",
+        required_option=CONF_OPTION_MB,
     ),
     # MySmartPilot equipments sensors
     Mylight150SensorEntityDescription(

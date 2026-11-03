@@ -88,6 +88,8 @@
       "msb_autonomy": { "name": "Autonomie batterie virtuelle" },
       "msb_capacity": { "name": "Capacité batterie virtuelle" },
       "msb_level": { "name": "Niveau batterie virtuelle" },
+      "mb_autonomy": { "name": "Autonomie batterie virtuelle" },
+      "mb_last_update": { "name": "Dernière mise à jour de la batterie virtuelle" },
       "savings": { "name": "Économies mensuelles" },
       "heatpump_mode": {
         "name": "Mode smart de la chaudière",

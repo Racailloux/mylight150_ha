@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import logging
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from typing import Any
 
 from homeassistant.config_entries import ConfigEntry
@@ -23,6 +23,8 @@ from .const import (
     CONF_ENERGY_PROD_FROM_SOLAR,
     CONF_ENERGY_PROD_TO_GRID,
     CONF_ENERGY_PROD_TO_MSB,
+    CONF_MB_AUTONOMY,
+    CONF_MB_LAST_UPDATE,
     CONF_OPTION_EVCHARGER,
     CONF_OPTION_HVAC,
     CONF_OPTION_MB,
@@ -126,6 +128,13 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
                     data.update(parsed_data)
                 # Fetch energy data and parse it for sensors
                 parsed_data = await self._async_update_energy_data()
+                if parsed_data:
+                    data.update(parsed_data)
+
+            # MyBattery data retrieval
+            if self._has_mb:
+                # Fetch virtual MyBattery data and parse it for sensors
+                parsed_data = await self._async_update_mb_vbattery_data()
                 if parsed_data:
                     data.update(parsed_data)
 
@@ -240,7 +249,7 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             if parsed.get("msb_state", "idle") == "charging":
                 parsed["msb_power"] = parsed.get("msb_power", 0.0) * -1
 
-            _LOGGER.debug("Data parsed for virtual battery: %s", parsed)
+            _LOGGER.debug("Data parsed for MySmartBattery virtual battery: %s", parsed)
             return parsed
 
         except (
@@ -249,8 +258,33 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             RequestException,
             JSONDecodeError,
         ) as err:
-            _LOGGER.warning("Error while retrieving virtual battery data.")
-            _LOGGER.debug(f"Error while retrieving virtual battery data: {err}")
+            _LOGGER.warning("Error while retrieving MySmartBattery virtual battery data.")
+            _LOGGER.debug(f"Error while retrieving MySmartBattery virtual battery data: {err}")
+
+        return {}
+
+    async def _async_update_mb_vbattery_data(self) -> dict[str, Any]:
+        """Fetch instant data from /v3/mb/dso endpoint."""
+        try:
+            data = await self._api.async_call_api("/v3/mb/dso")
+
+            lastUpdate = _safe_get(data, "lastUpdatedAt", default="1970-01-01")
+            parsed: dict[str, Any] = {
+                CONF_MB_LAST_UPDATE: datetime.strptime(lastUpdate, "%Y-%m-%d").date(),
+                CONF_MB_AUTONOMY: _safe_get(data, "stateOfCharge", default=0),
+            }
+            
+            _LOGGER.debug("Data parsed for MyBattery virtual battery: %s", parsed)
+            return parsed
+
+        except (
+            Mylight150AuthError,
+            Mylight150ApiError,
+            RequestException,
+            JSONDecodeError,
+        ) as err:
+            _LOGGER.warning("Error while retrieving MyBattery virtual battery data.")
+            _LOGGER.debug(f"Error while retrieving MyBattery virtual battery data: {err}")
 
         return {}
 
