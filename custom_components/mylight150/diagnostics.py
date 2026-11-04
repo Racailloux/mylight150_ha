@@ -46,10 +46,12 @@ DIAGNOSTIC_ENDPOINTS: list[tuple[str, str]] = [
     ("v3_contract_options_myBatteryWithEms", "/v3/contract/options/myBatteryWithEms"),
     ### MB (MyBattery)
     ("v3_mb_dso", "/v3/mb/dso"),
-    ("v3_mb_dso_consumption_history", "/v3/mb/dso/consumption/history?year=2026"),
-    ("v3_mb_dso_injection_history", "/v3/mb/dso/injection/history?year=2026"),
     ("v3_mb_dso_consumption", "/v3/mb/dso/consumption"),
+    ("v3_mb_dso_consumption_history_2025", "/v3/mb/dso/consumption/history?year=2025"),
+    ("v3_mb_dso_consumption_history_2026", "/v3/mb/dso/consumption/history?year=2026"),
     ("v3_mb_dso_injection", "/v3/mb/dso/injection"),
+    ("v3_mb_dso_injection_history_2025", "/v3/mb/dso/injection/history?year=2025"),
+    ("v3_mb_dso_injection_history_2026", "/v3/mb/dso/injection/history?year=2026"),
     ### MSB (MySmartBattery)
     ("v3_msb_legacy", "/v3/msb/legacy"),
     ("v3_virtual_battery_state", "/v3/virtual-battery/state"),
