@@ -3,7 +3,6 @@
 [![ML150xHA](ML150xHA_FR.jpg)][releases]
 
 [![GitHub Release][releases-shield]][releases] 
-![hacs][hacsbadge]
 [![License][license-shield]](LICENSE)
 [![GitHub Activity][commits-shield]][commits] 
 ![Project Maintenance][maintenance-shield]
@@ -23,8 +22,8 @@ Le tableau de bord énergie peut être alimenté par les capteurs fournis par l'
 
 Il existe deux méthodes pour installer cette intégration dans [Home Assistant](https://www.home-assistant.io) :
 
-### Méthode recommandée : Via HACS
-La méthode la plus simple et recommandée est d'utiliser [HACS](https://hacs.xyz), qui facilite le suivi et l'installation des mises à jour futures.
+### Méthode recommandée : Via le Marketplace
+La méthode la plus simple et recommandée est d'utiliser le [Marketplace](https://www.home-assistant.io/integrations/marketplace/)), qui facilite le suivi et l'installation des mises à jour futures.
 
 ### Méthode manuelle
 Sinon, vous pouvez installer manuellement l'intégration en copiant les fichiers de ce dépôt dans le répertoire `custom_components` de votre installation Home Assistant :
