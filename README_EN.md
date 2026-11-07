@@ -23,6 +23,7 @@ Energy board can be feed by all informations from sensors.
 There are two ways this integration can be installed into [Home Assistant](https://www.home-assistant.io).
 
 The easiest and recommended way is to install the integration using the [Marketplace](https://www.home-assistant.io/integrations/marketplace/), which makes future updates easy to track and install.
+[![Open your Home Assistant instance and open a repository in the Marketplace.](https://my.home-assistant.io/badges/marketplace_repository.svg)][marketplace]
 
 Alternatively, installation can be done manually by copying the files in this repository into the `custom_components` directory in the Home Assistant configuration directory:
 
@@ -122,7 +123,7 @@ As the maintainers don't get all mylight150 options, if you own some that are no
 [commits-shield]: https://img.shields.io/github/commit-activity/y/Racailloux/mylight150_ha.svg?style=for-the-badge
 [commits]: https://github.com/Racailloux/mylight150_ha/commits/main
 [marketplacebadge]: https://img.shields.io/badge/Marketplace-Default-41BDF5.svg?style=for-the-badge
-[marketplace]: https://my.home-assistant.io/redirect/hacs_repository/?owner=Racailloux&repository=mylight150_ha&category=integration
+[marketplace]: https://my.home-assistant.io/redirect/marketplace_repository/?owner=Racailloux&repository=mylight150_ha&category=integration
 [license-shield]: https://img.shields.io/github/license/Racailloux/mylight150_ha.svg?style=for-the-badge
 [maintenance-shield]: https://img.shields.io/badge/maintainer-Racailloux-blue.svg?style=for-the-badge
 [releases-shield]: https://img.shields.io/github/release/Racailloux/mylight150_ha.svg?style=for-the-badge
