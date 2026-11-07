@@ -64,9 +64,6 @@ Find configuration options under **Settings ➤ Devices & Services ➤ Integrati
 
 ## Provided Entities
 
-The device will take the name of 'mylight150 <installation_code>' where the installation code is a unique ID that mylight150 generate for your own installation.
-This will be the base of all entity ID structure : mylight150_entity_name
-
 ### Sensors
 
 | Entity ID                                          | Description                                                              | Unit | State Class        |
@@ -99,15 +96,6 @@ This will be the base of all entity ID structure : mylight150_entity_name
 | | | | |
 | `sensor.mylight150_pricing_mode`                   | Current pricing mode, depending on the contract.                         |  -   | `text`             |
 | `sensor.mylight150_current_pricing`                | Current pricing value. Pricing needs to be configured.                   | €/kWh| `measurement`      |
-
-
-## Informations wanted
-**⚠️ Some features needs users data to be implemented**
-As the maintainers don't get all mylight150 options, if you own some that are not implemented, you are welvcome to contact us. Diagnotics data will be needed
-* MyBattery<br/>
-  Integration of the MyBattery option
-* evCharger<br/>
-  Integration of the car charger equipment
 
 
 ## Credits
