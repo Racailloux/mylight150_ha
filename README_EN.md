@@ -3,6 +3,7 @@
 [![ML150xHA](ML150xHA_EN.jpg)][releases]
 
 [![GitHub Release][releases-shield]][releases] 
+[![Marketplace][marketplacebadge]][marketplace]
 [![License][license-shield]](LICENSE)
 [![GitHub Activity][commits-shield]][commits] 
 ![Project Maintenance][maintenance-shield]
@@ -120,7 +121,8 @@ As the maintainers don't get all mylight150 options, if you own some that are no
 [mylight150]: https://www.mylight-systems.com/
 [commits-shield]: https://img.shields.io/github/commit-activity/y/Racailloux/mylight150_ha.svg?style=for-the-badge
 [commits]: https://github.com/Racailloux/mylight150_ha/commits/main
-[marketplace]: https://next.home-assistant.io/integrations/marketplace
+[marketplacebadge]: https://img.shields.io/badge/Marketplace-Default-41BDF5.svg?style=for-the-badge
+[marketplace]: https://my.home-assistant.io/redirect/hacs_repository/?owner=Racailloux&repository=mylight150_ha&category=integration
 [license-shield]: https://img.shields.io/github/license/Racailloux/mylight150_ha.svg?style=for-the-badge
 [maintenance-shield]: https://img.shields.io/badge/maintainer-Racailloux-blue.svg?style=for-the-badge
 [releases-shield]: https://img.shields.io/github/release/Racailloux/mylight150_ha.svg?style=for-the-badge
