@@ -25,6 +25,7 @@ Il existe deux méthodes pour installer cette intégration dans [Home Assistant]
 
 ### Méthode recommandée : Via le Marketplace
 La méthode la plus simple et recommandée est d'utiliser le [Marketplace](https://www.home-assistant.io/integrations/marketplace/)), qui facilite le suivi et l'installation des mises à jour futures.
+[![Ouvre votre instance de Home Assistant et ouvre la page de l'intégration dans le Marketplace.](https://my.home-assistant.io/badges/marketplace_repository.svg)][marketplace]
 
 ### Méthode manuelle
 Sinon, vous pouvez installer manuellement l'intégration en copiant les fichiers de ce dépôt dans le répertoire `custom_components` de votre installation Home Assistant :
@@ -124,7 +125,7 @@ Les développeurs n'ont pas accès à toutes les options de mylight150. Si vous 
 [commits-shield]: https://img.shields.io/github/commit-activity/y/Racailloux/mylight150_ha.svg?style=for-the-badge
 [commits]: https://github.com/Racailloux/mylight150_ha/commits/main
 [marketplacebadge]: https://img.shields.io/badge/Marketplace-Default-41BDF5.svg?style=for-the-badge
-[marketplace]: https://my.home-assistant.io/redirect/hacs_repository/?owner=Racailloux&repository=mylight150_ha&category=integration
+[marketplace]: https://my.home-assistant.io/redirect/marketplace_repository/?owner=Racailloux&repository=mylight150_ha&category=integration
 [hacsbadge]: https://img.shields.io/badge/HACS-Default-orange.svg?style=for-the-badge
 [license-shield]: https://img.shields.io/github/license/Racailloux/mylight150_ha.svg?style=for-the-badge
 [maintenance-shield]: https://img.shields.io/badge/maintainer-Racailloux-blue.svg?style=for-the-badge
