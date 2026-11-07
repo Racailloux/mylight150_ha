@@ -3,7 +3,6 @@
 [![ML150xHA](ML150xHA_EN.jpg)][releases]
 
 [![GitHub Release][releases-shield]][releases] 
-[![hacs][hacsbadge]][hacs] 
 [![License][license-shield]](LICENSE)
 [![GitHub Activity][commits-shield]][commits] 
 ![Project Maintenance][maintenance-shield]
@@ -22,7 +21,7 @@ Energy board can be feed by all informations from sensors.
 
 There are two ways this integration can be installed into [Home Assistant](https://www.home-assistant.io).
 
-The easiest and recommended way is to install the integration using [HACS](https://hacs.xyz), which makes future updates easy to track and install.
+The easiest and recommended way is to install the integration using the [Marketplace](https://www.home-assistant.io/integrations/marketplace/), which makes future updates easy to track and install.
 
 Alternatively, installation can be done manually by copying the files in this repository into the `custom_components` directory in the Home Assistant configuration directory:
 
@@ -122,7 +121,6 @@ As the maintainers don't get all mylight150 options, if you own some that are no
 [commits-shield]: https://img.shields.io/github/commit-activity/y/Racailloux/mylight150_ha.svg?style=for-the-badge
 [commits]: https://github.com/Racailloux/mylight150_ha/commits/main
 [marketplace]: https://next.home-assistant.io/integrations/marketplace
-[hacsbadge]: https://img.shields.io/badge/HACS-Default-orange.svg?style=for-the-badge
 [license-shield]: https://img.shields.io/github/license/Racailloux/mylight150_ha.svg?style=for-the-badge
 [maintenance-shield]: https://img.shields.io/badge/maintainer-Racailloux-blue.svg?style=for-the-badge
 [releases-shield]: https://img.shields.io/github/release/Racailloux/mylight150_ha.svg?style=for-the-badge
