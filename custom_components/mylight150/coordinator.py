@@ -160,7 +160,7 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             _LOGGER.warning(f"API error: {err}", err)
         return {}
 
-    # Persistency
+    # Load persistent data for long term persistency
     async def async_load_persistent_data(self) -> None:
         """Load persistent data from .storage/ at startup."""
         stored = await self._store.async_load()
@@ -171,12 +171,13 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             self._persistent = {}
             _LOGGER.debug("No persistent data found, starting fresh.")
 
+    # Save persistent data for long term persistency
     async def _async_save_persistent_data(self) -> None:
         """Save persistent data to .storage/ at every first morning update."""
         await self._store.async_save(self._persistent)
         _LOGGER.debug("Persistent data saved: %s", self._persistent)
 
-    # API Calls to mylight150 endpoints
+    # Fetch installation code for API v2 usage and diagnostics
     async def _async_update_installation_code(self) -> str:
         """Fetch installation code from /v2 endpoint."""
         try:
@@ -200,6 +201,80 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
 
         return ""
 
+    # Update options data in coordinator and send usefull ones to binary sensors
+    async def _async_update_options_data(self) -> dict[str, Any]:
+        """Fetch options data."""
+        _LOGGER.debug("Updating options data...")
+
+        try:
+            data = await self._api.async_call_api("/v3/contract/options")
+
+            _LOGGER.debug("Options data retrieved: %s", data)
+            # MyBattery
+            self._has_mb = data.get("mb", None) != None
+            # MySmartBattery
+            self._has_msb = data.get("msb", None) != None
+            # MySmartCommunity
+            self._has_msc = data.get("msc", None) != None
+            # MySmartHeater
+            self._has_msh = data.get("msh", None) != None
+            # MySmartPilot
+            self._has_msp = data.get("msp", None) != None
+        except (
+            Mylight150AuthError,
+            Mylight150ApiError,
+            RequestException,
+            JSONDecodeError,
+        ) as err:
+            _LOGGER.warning("Error while retrieving contract options data.")
+            _LOGGER.debug(f"Error while retrieving contract options data: {err}")
+
+        # Update equipment data if MySmartPilot is available
+        self._has_evcharger = False
+        self._has_hvac = False
+        self._has_waterheater = False
+
+        if self._has_msp:
+            _LOGGER.debug("MySmartPilot is available for this installation.")
+            try:
+                data = await self._api.async_call_api("/v3/equipments")
+                equipments = data.get("equipments", [])
+
+                for equipment in equipments:
+                    equipment_type = equipment.get("equipmentType")
+
+                    if equipment_type and equipment_type == "evCharger":
+                        self._has_evcharger = True
+                    elif equipment_type and equipment_type == "heatPump":
+                        self._has_hvac = True
+                    elif equipment_type and equipment_type == "waterHeater":
+                        self._has_waterheater = True
+            except (
+                Mylight150AuthError,
+                Mylight150ApiError,
+                RequestException,
+                JSONDecodeError,
+            ) as err:
+                _LOGGER.warning("Error while retrieving contract options data.")
+                _LOGGER.debug(f"Error while retrieving contract options data: {err}")
+
+        _LOGGER.debug(
+            f"Current options detected: MB={self._has_mb}, MSB={self._has_msb}, MSP={self._has_msp}, EV Charger={self._has_evcharger}, HVAC={self._has_hvac}, Water Heater={self._has_waterheater}"
+        )
+        return await self._async_update_options_sensors()
+
+    # Update options sensors to maintain their state in the coordinator data
+    async def _async_update_options_sensors(self) -> dict[str, Any]:
+        return {
+            CONF_OPTION_MB: self._has_mb,
+            CONF_OPTION_MSB: self._has_msb,
+            CONF_OPTION_MSP: self._has_msp,
+            CONF_OPTION_EVCHARGER: self._has_evcharger,
+            CONF_OPTION_HVAC: self._has_hvac,
+            CONF_OPTION_WATERHEATER: self._has_waterheater,
+        }
+
+    # Fetch instant data of MSB live measures
     async def _async_update_msb_measures_data(self) -> dict[str, Any]:
         """Fetch instant powers (kW) data from /v3/measures endpoint."""
         try:
@@ -228,6 +303,7 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
 
         return {}
 
+    # Fetch instant data of MSB virtual battery
     async def _async_update_msb_vbattery_data(self) -> dict[str, Any]:
         """Fetch instant data from /v3/virtual-battery/state endpoint."""
         try:
@@ -267,15 +343,18 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
 
         return {}
 
+    # Fetch instant data of MB virtual battery
     async def _async_update_mb_vbattery_data(self) -> dict[str, Any]:
         """Fetch instant data from /v3/mb/dso endpoint."""
         try:
             data = await self._api.async_call_api("/v3/mb/dso")
 
-            lastUpdate = _safe_get(data, "lastUpdatedAt", default="1970-01-01")
+            lastUpdate = _safe_get(data, "lastUpdatedAt", default=None)
             parsed: dict[str, Any] = {
-                CONF_MB_LAST_UPDATE: datetime.strptime(lastUpdate, "%Y-%m-%d").date(),
-                CONF_MB_AUTONOMY: _safe_get(data, "stateOfCharge", default=0),
+                CONF_MB_LAST_UPDATE: datetime.strptime(lastUpdate, "%Y-%m-%d").date()
+                if lastUpdate
+                else None,
+                CONF_MB_AUTONOMY: _safe_get(data, "stateOfCharge", default=None),
             }
 
             _LOGGER.debug("Data parsed for MyBattery virtual battery: %s", parsed)
@@ -294,6 +373,7 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
 
         return {}
 
+    # Fetch instant data of all equipments (evCharger, waterHeater, heatPump)
     async def _async_update_equipment_data(self) -> dict[str, Any]:
         """Fetch equipment data from /v3/equipments endpoint."""
         _LOGGER.debug("Fetching equipment data from API endpoint...")
@@ -385,6 +465,32 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             _LOGGER.debug(f"Error while retrieving equipments: {err}")
             return {}
 
+    # Update money-pot data
+    async def _async_update_moneypot_data(self) -> dict[str, Any]:
+        """Fetch instant data from /v3/money-pot endpoint."""
+        try:
+            data = await self._api.async_call_api("/v3/money-pot")
+
+            parsed: dict[str, Any] = {
+                "money_pot": _safe_get(
+                    data, "payload", "balance", "value", default=0.0
+                ),
+            }
+            _LOGGER.debug("Data parsed for money-pot: %s", parsed)
+            return parsed
+
+        except (
+            Mylight150AuthError,
+            Mylight150ApiError,
+            RequestException,
+            JSONDecodeError,
+        ) as err:
+            _LOGGER.warning("Error while retrieving money-pot data.")
+            _LOGGER.debug(f"Error while retrieving money-pot data: {err}")
+
+        return {}
+
+    # Fetch energy data for consumption and production
     async def _async_update_energy_data(self) -> dict[str, Any]:
         """Fetch all energy data from /v3/consumption and /v3/production endpoints."""
         today = dt_util.now().date()
@@ -466,6 +572,7 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
 
         return total
 
+    # Fetch energy production data for a given date and number of days
     async def _async_get_energy_production_days(
         self, start_date: str, days_nr: int = 1
     ) -> dict:
@@ -499,6 +606,7 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             _LOGGER.debug(f"Error while retrieving energy production data: {err}")
             return {}
 
+    # Fetch energy consumption data for a given date and number of days
     async def _async_get_energy_consumption_days(
         self, start_date: str, days_nr: int = 1
     ) -> dict:
@@ -535,6 +643,7 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             _LOGGER.debug(f"Error while retrieving energy consumption data: {err}")
             return {}
 
+    # Fetch energy production data for a given month of year
     async def _async_get_energy_production_month(self, year: int, month: int) -> dict:
         """Fetch production data from the requested month."""
         endpoint = f"/v3/production?aggregation=Month&date={year}-{month}-01"
@@ -566,6 +675,7 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             _LOGGER.debug(f"Error while retrieving energy production data: {err}")
             return {}
 
+    # Fetch energy consumption data for a given month of year
     async def _async_get_energy_consumption_month(self, year: int, month: int) -> dict:
         """Fetch consumption data from the requested month."""
         endpoint = f"/v3/consumption?aggregation=Month&date={year}-{month}-01"
@@ -600,6 +710,7 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             _LOGGER.debug(f"Error while retrieving energy consumption data: {err}")
             return {}
 
+    # Fetch energy production data for a given year
     async def _async_get_energy_production_year(self, year: int) -> dict:
         """Fetch production data from the requested year."""
         endpoint = f"/v3/production?aggregation=Year&count=1&date={year}-01-01"
@@ -631,6 +742,7 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             _LOGGER.debug(f"Error while retrieving energy production data: {err}")
             return {}
 
+    # Fetch energy consumption data for a given year
     async def _async_get_energy_consumption_year(self, year: int) -> dict:
         """Fetch consumption data from the requested year."""
         endpoint = f"/v3/consumption?aggregation=Year&count=1&date={year}-01-01"
@@ -715,105 +827,7 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
 
         return True
 
-    # Update options data in coordinator and send usefull ones to binary sensors
-    async def _async_update_options_data(self) -> dict[str, Any]:
-        """Fetch options data."""
-        _LOGGER.debug("Updating options data...")
-
-        try:
-            data = await self._api.async_call_api("/v3/contract/options")
-
-            _LOGGER.debug("Options data retrieved: %s", data)
-            # MyBattery
-            self._has_mb = data.get("mb", None) != None
-            # MySmartBattery
-            self._has_msb = data.get("msb", None) != None
-            # MySmartCommunity
-            self._has_msc = data.get("msc", None) != None
-            # MySmartHeater
-            self._has_msh = data.get("msh", None) != None
-            # MySmartPilot
-            self._has_msp = data.get("msp", None) != None
-        except (
-            Mylight150AuthError,
-            Mylight150ApiError,
-            RequestException,
-            JSONDecodeError,
-        ) as err:
-            _LOGGER.warning("Error while retrieving contract options data.")
-            _LOGGER.debug(f"Error while retrieving contract options data: {err}")
-
-        # Update equipment data if MySmartPilot is available
-        self._has_evcharger = False
-        self._has_hvac = False
-        self._has_waterheater = False
-
-        if self._has_msp:
-            _LOGGER.debug("MySmartPilot is available for this installation.")
-            try:
-                data = await self._api.async_call_api("/v3/equipments")
-                equipments = data.get("equipments", [])
-
-                for equipment in equipments:
-                    equipment_type = equipment.get("equipmentType")
-
-                    if equipment_type and equipment_type == "evCharger":
-                        self._has_evcharger = True
-                    elif equipment_type and equipment_type == "heatPump":
-                        self._has_hvac = True
-                    elif equipment_type and equipment_type == "waterHeater":
-                        self._has_waterheater = True
-            except (
-                Mylight150AuthError,
-                Mylight150ApiError,
-                RequestException,
-                JSONDecodeError,
-            ) as err:
-                _LOGGER.warning("Error while retrieving contract options data.")
-                _LOGGER.debug(f"Error while retrieving contract options data: {err}")
-
-        _LOGGER.debug(
-            f"Current options detected: MB={self._has_mb}, MSB={self._has_msb}, MSP={self._has_msp}, EV Charger={self._has_evcharger}, HVAC={self._has_hvac}, Water Heater={self._has_waterheater}"
-        )
-        return await self._async_update_options_sensors()
-
-    # Update options sensors to maintain their state in the coordinator data
-    async def _async_update_options_sensors(self) -> dict[str, Any]:
-        return {
-            CONF_OPTION_MB: self._has_mb,
-            CONF_OPTION_MSB: self._has_msb,
-            CONF_OPTION_MSP: self._has_msp,
-            CONF_OPTION_EVCHARGER: self._has_evcharger,
-            CONF_OPTION_HVAC: self._has_hvac,
-            CONF_OPTION_WATERHEATER: self._has_waterheater,
-        }
-
-    # Update money-pot data
-    async def _async_update_moneypot_data(self) -> dict[str, Any]:
-        """Fetch instant data from /v3/money-pot endpoint."""
-        try:
-            data = await self._api.async_call_api("/v3/money-pot")
-
-            parsed: dict[str, Any] = {
-                "money_pot": _safe_get(
-                    data, "payload", "balance", "value", default=0.0
-                ),
-            }
-            _LOGGER.debug("Data parsed for money-pot: %s", parsed)
-            return parsed
-
-        except (
-            Mylight150AuthError,
-            Mylight150ApiError,
-            RequestException,
-            JSONDecodeError,
-        ) as err:
-            _LOGGER.warning("Error while retrieving money-pot data.")
-            _LOGGER.debug(f"Error while retrieving money-pot data: {err}")
-
-        return {}
-
-
+# Retrieve nested values from a dictionary safely
 def _safe_get(data: Any, *keys, default=None) -> Any:
     """Navigate nested dicts safely — returns default if any level is None or missing."""
     current = data
