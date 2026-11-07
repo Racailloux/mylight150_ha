@@ -827,6 +827,7 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
 
         return True
 
+
 # Retrieve nested values from a dictionary safely
 def _safe_get(data: Any, *keys, default=None) -> Any:
     """Navigate nested dicts safely — returns default if any level is None or missing."""
