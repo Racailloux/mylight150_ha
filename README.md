@@ -67,10 +67,6 @@ Vous trouverez les options de configuration sous **Paramètres ➤ Appareils et 
 
 ## Entités fournies
 
-L'appareil portera le nom "mylight150 <installation_code>", où installation_code est un identifiant unique généré par mylight150 pour votre installation.
-Cela servira de base pour la structure des identifiants des entités : mylight150_entity_name.
-
-
 ### Capteurs
 
 | ID de l'entité                                     | Description                                                                        | Unité | State Class        |
@@ -103,13 +99,6 @@ Cela servira de base pour la structure des identifiants des entités : mylight15
 | | | | |
 | `sensor.mylight150_pricing_mode`                   | Mode tarifaire actuel, selon le contrat.                                           |  -    | `text`             |
 | `sensor.mylight150_current_pricing`                | Valeur tarifaire actuelle. Les tarifs doivent être configurés.                     | €/kWh | `measurement`      |
-
-
-## Informations recherchées
-⚠️ **Certaines fonctionnalités nécessitent des données utilisateurs pour être implémentées.**
-Les développeurs n'ont pas accès à toutes les options de mylight150. Si vous possédez des fonctionnalités non implémentées, n'hésitez pas à nous contacter. Des données de diagnostic seront nécessaires.
-* MyBattery :<br> Intégration de l'option MyBattery.
-* evCharger :br Intégration de l'équipement de charge pour voiture électrique.
 
 
 ## Remerciements
