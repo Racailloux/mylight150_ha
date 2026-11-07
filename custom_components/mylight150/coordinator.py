@@ -24,6 +24,9 @@ from .const import (
     CONF_ENERGY_PROD_TO_GRID,
     CONF_ENERGY_PROD_TO_MSB,
     CONF_MB_AUTONOMY,
+    CONF_MB_ENERGY_CHARGE,
+    CONF_MB_ENERGY_CONSO_FROM_GRID,
+    CONF_MB_ENERGY_DISCHARGE,
     CONF_MB_LAST_UPDATE,
     CONF_OPTION_EVCHARGER,
     CONF_OPTION_HVAC,
@@ -118,29 +121,37 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
 
             # MySmartBattery data retrieval
             if self._has_msb:
-                # Fetch virtual MySmartBattery data and parse it for sensors
+                # Fetch virtual MySmartBattery data
                 parsed_data = await self._async_update_msb_vbattery_data()
                 if parsed_data:
                     data.update(parsed_data)
-                # Fetch realtime home data and parse it for sensors
+                # Fetch realtime home data
                 parsed_data = await self._async_update_msb_measures_data()
                 if parsed_data:
                     data.update(parsed_data)
-                # Fetch energy data and parse it for sensors
+                # Fetch energy data
                 parsed_data = await self._async_update_energy_data()
                 if parsed_data:
                     data.update(parsed_data)
 
             # MyBattery data retrieval
             if self._has_mb:
-                # Fetch virtual MyBattery data and parse it for sensors
+                # Fetch virtual MyBattery data
                 parsed_data = await self._async_update_mb_vbattery_data()
+                if parsed_data:
+                    data.update(parsed_data)
+                # Fetch MyBattery consumption data
+                parsed_data = await self._async_update_mb_consumption_data()
+                if parsed_data:
+                    data.update(parsed_data)
+                # Fetch MyBattery injection data
+                parsed_data = await self._async_update_mb_injection_data()
                 if parsed_data:
                     data.update(parsed_data)
 
             # MySmartPilot data retrieval
             if self._has_msp:
-                # Fetch equipment data and parse it for sensors
+                # Fetch equipment data
                 parsed_data = await self._async_update_equipment_data()
                 if parsed_data:
                     data.update(parsed_data)
@@ -274,7 +285,7 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             CONF_OPTION_WATERHEATER: self._has_waterheater,
         }
 
-    # Fetch instant data of MSB live measures
+    # Fetch instant data for MSB live measures
     async def _async_update_msb_measures_data(self) -> dict[str, Any]:
         """Fetch instant powers (kW) data from /v3/measures endpoint."""
         try:
@@ -300,10 +311,9 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
         ) as err:
             _LOGGER.warning("Error while retrieving home data.")
             _LOGGER.debug(f"Error while retrieving home data: {err}")
-
         return {}
 
-    # Fetch instant data of MSB virtual battery
+    # Fetch instant data for MSB virtual battery
     async def _async_update_msb_vbattery_data(self) -> dict[str, Any]:
         """Fetch instant data from /v3/virtual-battery/state endpoint."""
         try:
@@ -340,10 +350,9 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             _LOGGER.debug(
                 f"Error while retrieving MySmartBattery virtual battery data: {err}"
             )
-
         return {}
 
-    # Fetch instant data of MB virtual battery
+    # Fetch instant data for MB virtual battery
     async def _async_update_mb_vbattery_data(self) -> dict[str, Any]:
         """Fetch instant data from /v3/mb/dso endpoint."""
         try:
@@ -356,8 +365,7 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
                 else None,
                 CONF_MB_AUTONOMY: _safe_get(data, "stateOfCharge", default=None),
             }
-
-            _LOGGER.debug("Data parsed for MyBattery virtual battery: %s", parsed)
+            _LOGGER.debug(f"Data parsed for MyBattery virtual battery: {parsed}")
             return parsed
 
         except (
@@ -370,7 +378,67 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             _LOGGER.debug(
                 f"Error while retrieving MyBattery virtual battery data: {err}"
             )
+        return {}
 
+    # Fetch yearly data for MB consumption
+    async def _async_update_mb_consumption_data(self) -> dict[str, Any]:
+        """Fetch all energy data from /v3/mb/dso/consumption/history endpoints."""
+        current_year = dt_util.now().date().strftime("%Y")
+
+        try:
+            data = await self._api.async_call_api(
+                f"/v3/mb/dso/consumption/history?year={current_year}"
+            )
+
+            parsed: dict[str, Any] = {
+                CONF_MB_ENERGY_CONSO_FROM_GRID: _safe_get(data, "total", default=None),
+            }
+            _LOGGER.debug(f"Data parsed for MyBattery consumption: {parsed}")
+            return parsed
+
+        except (
+            Mylight150AuthError,
+            Mylight150ApiError,
+            RequestException,
+            JSONDecodeError,
+        ) as err:
+            _LOGGER.warning("Error while retrieving MyBattery virtual battery data.")
+            _LOGGER.debug(
+                f"Error while retrieving MyBattery virtual battery data: {err}"
+            )
+        return {}
+
+    # Fetch yearly data for MB injection
+    async def _async_update_mb_injection_data(self) -> dict[str, Any]:
+        """Fetch all energy data from /v3/mb/dso/injection/history endpoints."""
+        current_year = dt_util.now().date().strftime("%Y")
+
+        try:
+            data = await self._api.async_call_api(
+                f"/v3/mb/dso/injection/history?year={current_year}"
+            )
+
+            parsed: dict[str, Any] = {
+                CONF_MB_ENERGY_CHARGE: _safe_get(
+                    data, "performances", "charge", default=None
+                ),
+                CONF_MB_ENERGY_DISCHARGE: _safe_get(
+                    data, "performances", "discharge", default=None
+                ),
+            }
+            _LOGGER.debug(f"Data parsed for MyBattery injection: {parsed}")
+            return parsed
+
+        except (
+            Mylight150AuthError,
+            Mylight150ApiError,
+            RequestException,
+            JSONDecodeError,
+        ) as err:
+            _LOGGER.warning("Error while retrieving MyBattery virtual battery data.")
+            _LOGGER.debug(
+                f"Error while retrieving MyBattery virtual battery data: {err}"
+            )
         return {}
 
     # Fetch instant data of all equipments (evCharger, waterHeater, heatPump)

@@ -89,6 +89,9 @@
       "msb_capacity": { "name": "Capacité batterie virtuelle" },
       "msb_level": { "name": "Niveau batterie virtuelle" },
       "mb_autonomy": { "name": "Autonomie batterie virtuelle" },
+      "mb_energy_charge": { "name": "Charge batterie virtuelle" },
+      "mb_energy_conso_from_grid": { "name": "Energie réseau consommée"},
+      "mb_energy_discharge": { "name": "Décharge batterie virtuelle" },
       "mb_last_update": { "name": "Dernière mise à jour de la batterie virtuelle" },
       "savings": { "name": "Économies mensuelles" },
       "heatpump_mode": {
