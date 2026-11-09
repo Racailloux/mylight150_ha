@@ -1,0 +1,31 @@
+name: Release zip
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: write
+
+jobs:
+  zip:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      TAG: ${{ github.event.release.tag_name }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Align manifest version to tag version
+        run: |
+          VERSION="${TAG#v}"
+          jq --arg v "$VERSION" '.version = $v' custom_components/mylight150/manifest.json > /tmp/manifest.json
+          mv /tmp/manifest.json custom_components/mylight150/manifest.json
+
+      - name: Generate zip
+        run: |
+          cd custom_components/mylight150
+          zip -r ../../mylight150.zip ./
+
+      - name: ttach zip to release
+        run: gh release upload "$TAG" mylight150.zip --clobber
