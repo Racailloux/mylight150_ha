@@ -64,7 +64,21 @@ Find configuration options under **Settings ➤ Devices & Services ➤ Integrati
 
 ## Provided Entities
 
-### Sensors
+### Common sensors
+
+| Entity ID                                          | Description                                                                           | Unit | State Class        |
+| -------------------------------------------------- | ------------------------------------------------------------------------------------- | ---- | ------------------ |
+| `sensor.mylight150_option_msb`                     | MySmartBattery                                                                        |   -  | `binary`           |
+| `sensor.mylight150_option_mb`                      | MyBattery                                                                             |   -  | `binary`           |
+| `sensor.mylight150_option_msp`                     | MySMartPilot                                                                          |   -  | `binary`           |
+| `sensor.mylight150_option_waterheater`             | Water heater piloted option                                                           |   -  | `binary`           |
+| `sensor.mylight150_option_option_hvac`             | HVAC piloted option                                                                   |   -  | `binary`           |
+| `sensor.mylight150_option_evcharger`               | EV Charger piloted option                                                             |   -  | `binary`           |
+| | | | |
+| `sensor.mylight150_pricing_mode`                   | Current pricing mode, depending on the contract.                                      |  -   | `text`             |
+| `sensor.mylight150_current_pricing`                | Current pricing value. Pricing needs to be configured.                                | €/kWh| `measurement`      |
+
+### MySmartBattery sensors
 
 | Entity ID                                          | Description                                                              | Unit | State Class        |
 | -------------------------------------------------- | ------------------------------------------------------------------------ | ---- | ------------------ |
@@ -76,15 +90,6 @@ Find configuration options under **Settings ➤ Devices & Services ➤ Integrati
 | `sensor.mylight150_msb_power`                      | Virtual battery power                                                    | kW   | `measurement`      |
 | `sensor.mylight150_msb_autonomy`                   | Virtual battery autonomy                                                 | kWh  | `measurement`      |
 | `sensor.mylight150_msb_capacity`                   | Virtual battery capacity                                                 | kWh  | `measurement`      |
-| `sensor.mylight150_money_pot`                      | Current value of your money pot                                          | EUR  | `measurement`      |
-| | | | |
-| `sensor.mylight150_heatPump_mode`                  | Current heat pump mode                                                   |  -   | `text`             |
-| `sensor.mylight150_waterHeater_mode`               | Current water heater mode                                                |  -   | `text`             |
-| `sensor.mylight150_evcharger_state`                | EV charger state                                                         |   -  | `text`             |
-| `sensor.mylight150_evcharger_charging_type`        | EV charger charging type                                                 |   -  | `text`             |
-| `sensor.mylight150_evcharger_charging_consumption` | EV charger charging consumption                                          | kWh  | `total`            |
-| `sensor.mylight150_evcharger_charging_cost`        | EV charger charging cost                                                 | EUR  | `total`            |
-| `sensor.mylight150_evcharger_charging_moneypot`    | EV charger charging money pot                                            | EUR  | `total`            |
 | | | | |
 | `sensor.mylight150_energy_prod_from_solar `        | Solar energy production since integration installation                   | kWh  | `total_increasing` |
 | `sensor.mylight150_energy_prod_to_msb`             | Virtual battery energy in since integration installation                 | kWh  | `total_increasing` |
@@ -93,14 +98,37 @@ Find configuration options under **Settings ➤ Devices & Services ➤ Integrati
 | `sensor.mylight150_energy_conso_from_solar`        | Solar energy self-consumption since integration installation             | kWh  | `total_increasing` |
 | `sensor.mylight150_energy_conso_from_msb`          | Virtual battery energy out since integration installation                | kWh  | `total_increasing` |
 | `sensor.mylight150_energy_conso_from_grid`         | Grid energy consumption since integration installation                   | kWh  | `total_increasing` |
+
+### MyBattery sensors
+
+| Entity ID                                          | Description                                                              | Unit | State Class        |
+| -------------------------------------------------- | ------------------------------------------------------------------------ | ---- | ------------------ |
+| `sensor.mylight150_solar_production`               | Date of the last update of virtual batterie counter                      |   -  | `date`             |
+| `sensor.mylight150_mb_autonomy`                    | Virtual battery status at the given date                                 | kWh  | `measurement`      |
+| `sensor.mylight150_mb_energy_conso_from_grid`      | Grid energy consumption since integration installation                   | kWh  | `total_increasing` |
+| `sensor.mylight150_mb_energy_charge`               | Virtual battery energy in since integration installation                 | kWh  | `total_increasing` |
+| `sensor.mylight150_mb_energy_discharge`            | Virtual battery energy out since integration installation                | kWh  | `total_increasing` |
+
+### MySmartPilot sensors
+
+| Entity ID                                          | Description                                                              | Unit | State Class        |
+| -------------------------------------------------- | ------------------------------------------------------------------------ | ---- | ------------------ |
+| `sensor.mylight150_money_pot`                      | Current value of your money pot                                          | EUR  | `measurement`      |
 | | | | |
-| `sensor.mylight150_pricing_mode`                   | Current pricing mode, depending on the contract.                         |  -   | `text`             |
-| `sensor.mylight150_current_pricing`                | Current pricing value. Pricing needs to be configured.                   | €/kWh| `measurement`      |
+| `sensor.mylight150_waterHeater_mode`               | Current water heater mode                                                |  -   | `text`             |
+| | | | |
+| `sensor.mylight150_heatPump_mode`                  | Current heat pump mode                                                   |  -   | `text`             |
+| | | | |
+| `sensor.mylight150_evcharger_state`                | EV charger state                                                         |   -  | `text`             |
+| `sensor.mylight150_evcharger_charging_type`        | EV charger charging type                                                 |   -  | `text`             |
+| `sensor.mylight150_evcharger_charging_consumption` | EV charger charging consumption                                          | kWh  | `total`            |
+| `sensor.mylight150_evcharger_charging_cost`        | EV charger charging cost                                                 | EUR  | `total`            |
+| `sensor.mylight150_evcharger_charging_moneypot`    | EV charger charging money pot                                            | EUR  | `total`            |
 
 
 ## Credits
 * [Home Assistant](https://github.com/home-assistant) : Home Assistant open-source powerful domotic plateform.
-* [marketplace](https://next.home-assistant.io/integrations/marketplace) : Home Asssitant marketplace lets you find and install community-created integrations that are not available in HA code.
+* [marketplace](https://next.home-assistant.io/integrations/marketplace) : Home Assistant marketplace lets you find and install community-created integrations that are not available in HA code.
 * [mylight150] : Electricity provider with virtual battery support.
 * [hassio MyLight integration](https://github.com/acesyde/hassio_mylight_integration) : MyLight system integration for previous API from MtLight System (MYHome)
 
