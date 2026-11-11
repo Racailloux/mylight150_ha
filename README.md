@@ -67,43 +67,71 @@ Vous trouverez les options de configuration sous **Paramètres ➤ Appareils et 
 
 ## Entités fournies
 
-### Capteurs
+### Capteurs communs
 
-| ID de l'entité                                     | Description                                                                        | Unité | State Class        |
-| -------------------------------------------------- | ---------------------------------------------------------------------------------- | ----- | ------------------ |
-| `sensor.mylight150_solar_production`               | Production solaire actuelle                                                        | kW    | `measurement`      |
-| `sensor.mylight150_grid`                           | Puissance actuelle du réseau                                                       | kW    | `measurement`      |
-| `sensor.mylight150_injection`                      | Puissance actuelle injectée sur le réseau                                          | kW    | `measurement`      |
-| `sensor.mylight150_load`                           | Consommation électrique actuelle                                                   | kW    | `measurement`      |
-| `sensor.mylight150_msb_state`                      | État de la batterie virtuelle                                                      |   -   | `text`             |
-| `sensor.mylight150_msb_power`                      | Puissance de la batterie virtuelle                                                 | kW    | `measurement`      |
-| `sensor.mylight150_msb_autonomy`                   | Autonomie de la batterie virtuelle                                                 | kWh   | `measurement`      |
-| `sensor.mylight150_msb_capacity`                   | Capacité de la batterie virtuelle                                                  | kWh   | `measurement`      |
-| `sensor.mylight150_money_pot`                      | Valeur actuelle de votre cagnotte                                                  | EUR   | `measurement`      |
+| ID de l'entité                                     | Description                                                                           | Unité | State Class        |
+| -------------------------------------------------- | ------------------------------------------------------------------------------------- | ----- | ------------------ |
+| `sensor.mylight150_option_msb`                     | MySmartBattery                                                                        |   -   | `binary`           |
+| `sensor.mylight150_option_mb`                      | MyBattery                                                                             |   -   | `binary`           |
+| `sensor.mylight150_option_msp`                     | MySMartPilot                                                                          |   -   | `binary`           |
+| `sensor.mylight150_option_waterheater`             | Option pilotage ballon d'eau chaude                                                   |   -   | `binary`           |
+| `sensor.mylight150_option_option_hvac`             | Option pilotage chaudière                                                             |   -   | `binary`           |
+| `sensor.mylight150_option_evcharger`               | Option pilotage borne de recharge                                                     |   -   | `binary`           |
 | | | | |
-| `sensor.mylight150_heatPump_mode`                  | Mode actuel de la pompe à chaleur                                                  |   -   | `text`             |
-| `sensor.mylight150_waterHeater_mode`               | Mode actuel du chauffe-eau                                                         |   -   | `text`             |
-| `sensor.mylight150_evcharger_state`                | État de la borne de recharge                                                       |   -   | `text`             |
-| `sensor.mylight150_evcharger_charging_type`        | Mode de charge de la borne de recharge                                             |   -   | `text`             |
-| `sensor.mylight150_evcharger_charging_consumption` | Consommation de la borne de recharge                                               | kWh   | `total`            |
-| `sensor.mylight150_evcharger_charging_cost`        | Coût de la borne de recharge                                                       | EUR   | `total`            |
-| `sensor.mylight150_evcharger_charging_moneypot`    | Cagnotte de la borne de recharge                                                   | EUR   | `total`            |
+| `sensor.mylight150_pricing_mode`                   | Mode tarifaire actuel, selon le contrat.                                              |  -    | `text`             |
+| `sensor.mylight150_current_pricing`                | Valeur tarifaire actuelle. Les tarifs doivent être configurés.                        | €/kWh | `measurement`      |
+
+### Capteurs MySmartBattery
+
+| ID de l'entité                                     | Description                                                                           | Unité | State Class        |
+| -------------------------------------------------- | ------------------------------------------------------------------------------------- | ----- | ------------------ |
+| `sensor.mylight150_solar_production`               | Production solaire actuelle                                                           | kW    | `measurement`      |
+| `sensor.mylight150_grid`                           | Puissance actuelle du réseau                                                          | kW    | `measurement`      |
+| `sensor.mylight150_injection`                      | Puissance actuelle injectée sur le réseau                                             | kW    | `measurement`      |
+| `sensor.mylight150_load`                           | Consommation électrique actuelle                                                      | kW    | `measurement`      |
+| `sensor.mylight150_msb_state`                      | État de la batterie virtuelle                                                         |   -   | `text`             |
+| `sensor.mylight150_msb_power`                      | Puissance de la batterie virtuelle                                                    | kW    | `measurement`      |
+| `sensor.mylight150_msb_autonomy`                   | Autonomie de la batterie virtuelle                                                    | kWh   | `measurement`      |
+| `sensor.mylight150_msb_capacity`                   | Capacité de la batterie virtuelle                                                     | kWh   | `measurement`      |
 | | | | |
-| `sensor.mylight150_energy_prod_from_solar `        | Production d'énergie solaire depuis l'installation de l'intégration                | kWh   | `total_increasing` |
-| `sensor.mylight150_energy_prod_to_msb`             | Énergie stockée dans la batterie virtuelle depuis l'installation de l'intégration  | kWh   | `total_increasing` |
-| `sensor.mylight150_energy_prod_to_grid`            | Injection d'énergie dans le réseau depuis l'installation de l'intégration          | kWh   | `total_increasing` |
-| `sensor.mylight150_energy_consumption`             | Consommation totale d'énergie depuis l'installation de l'intégration               | kWh   | `total_increasing` |
-| `sensor.mylight150_energy_conso_from_solar`        | Autoconsommation d'énergie solaire depuis l'installation de l'intégration          | kWh   | `total_increasing` |
-| `sensor.mylight150_energy_conso_from_msb`          | Énergie restituée par la batterie virtuelle depuis l'installation de l'intégration | kWh   | `total_increasing` |
-| `sensor.mylight150_energy_conso_from_grid`         | Consommation d'énergie du réseau depuis l'installation de l'intégration            | kWh   | `total_increasing` |
+| `sensor.mylight150_energy_prod_from_solar `        | Production d'énergie solaire depuis l'installation de l'intégration                   | kWh   | `total_increasing` |
+| `sensor.mylight150_energy_prod_to_msb`             | Énergie chargée dans la batterie virtuelle depuis l'installation de l'intégration     | kWh   | `total_increasing` |
+| `sensor.mylight150_energy_prod_to_grid`            | Injection d'énergie dans le réseau depuis l'installation de l'intégration             | kWh   | `total_increasing` |
+| `sensor.mylight150_energy_consumption`             | Consommation totale d'énergie depuis l'installation de l'intégration                  | kWh   | `total_increasing` |
+| `sensor.mylight150_energy_conso_from_solar`        | Autoconsommation d'énergie solaire depuis l'installation de l'intégration             | kWh   | `total_increasing` |
+| `sensor.mylight150_energy_conso_from_msb`          | Énergie déchargée depuis la batterie virtuelle depuis l'installation de l'intégration | kWh   | `total_increasing` |
+| `sensor.mylight150_energy_conso_from_grid`         |                | kWh   | `total_increasing` |
+
+### Capteurs MyBattery
+
+| ID de l'entité                                     | Description                                                                           | Unité | State Class        |
+| -------------------------------------------------- | ------------------------------------------------------------------------------------- | ----- | ------------------ |
+| `sensor.mylight150_solar_production`               | Date de la dernière mise à jour du compteur de la batterie virtuelle                  |   -   | `date`             |
+| `sensor.mylight150_mb_autonomy`                    | Etat de charge de la batterie virtuelle à la date                                     | kWh   | `measurement`      |
+| `sensor.mylight150_mb_energy_conso_from_grid`      | Consommation d'énergie du réseau depuis l'installation de l'intégration               | kWh   | `total_increasing` |
+| `sensor.mylight150_mb_energy_charge`               | Énergie chargée dans la batterie virtuelle depuis l'installation de l'intégration     | kWh   | `total_increasing` |
+| `sensor.mylight150_mb_energy_discharge`            | Énergie restituée depuis la batterie virtuelle depuis l'installation de l'intégration | kWh   | `total_increasing` |
+
+### Capteurs MySmartPilot
+
+| ID de l'entité                                     | Description                                                                           | Unité | State Class        |
+| -------------------------------------------------- | ------------------------------------------------------------------------------------- | ----- | ------------------ |
+| `sensor.mylight150_money_pot`                      | Valeur actuelle de votre cagnotte                                                     | EUR   | `measurement`      |
 | | | | |
-| `sensor.mylight150_pricing_mode`                   | Mode tarifaire actuel, selon le contrat.                                           |  -    | `text`             |
-| `sensor.mylight150_current_pricing`                | Valeur tarifaire actuelle. Les tarifs doivent être configurés.                     | €/kWh | `measurement`      |
+| `sensor.mylight150_waterHeater_mode`               | Mode actuel du chauffe-eau                                                            |   -   | `text`             |
+| | | | |
+| `sensor.mylight150_heatPump_mode`                  | Mode actuel de la pompe à chaleur                                                     |   -   | `text`             |
+| | | | |
+| `sensor.mylight150_evcharger_state`                | État de la borne de recharge                                                          |   -   | `text`             |
+| `sensor.mylight150_evcharger_charging_type`        | Mode de charge de la borne de recharge                                                |   -   | `text`             |
+| `sensor.mylight150_evcharger_charging_consumption` | Consommation de la borne de recharge                                                  | kWh   | `total`            |
+| `sensor.mylight150_evcharger_charging_cost`        | Coût de la borne de recharge                                                          | EUR   | `total`            |
+| `sensor.mylight150_evcharger_charging_moneypot`    | Cagnotte de la borne de recharge                                                      | EUR   | `total`            |
 
 
 ## Remerciements
 * [Home Assistant](https://github.com/home-assistant) : Plateforme domotique open-source puissante.
-* [marketplace](https://next.home-assistant.io/integrations/marketplace) : Le marketplace de Home Asssitant permet de distribuer des intégrations personnalisées qui ne sont pas disponible dans le cœur de HA.
+* [marketplace](https://next.home-assistant.io/integrations/marketplace) : Le marketplace de Home Assistant permet de distribuer des intégrations personnalisées qui ne sont pas disponible dans le cœur de HA.
 * [mylight150] : Fournisseur d'électricité avec support de batterie virtuelle.
 * [hassio MyLight integration](https://github.com/acesyde/hassio_mylight_integration) : Intégration de MyLight System pour l'ancienne API de MyLight System (MyHome).
 
