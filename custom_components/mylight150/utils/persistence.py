@@ -70,5 +70,5 @@ class PersistentTotals:
 
     # Save the given year nr as the last saved data of the yearly counters
     @last_closed_year_mb_energies.setter
-    def last_closed_year(self, value: int) -> None:
+    def last_closed_year_mb_energies(self, value: int) -> None:
         self._data[_LAST_YEAR] = value
