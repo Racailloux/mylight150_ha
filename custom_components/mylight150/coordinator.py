@@ -44,6 +44,13 @@ from .const import (
 from .utils.api import Mylight150ApiClient, Mylight150ApiError, Mylight150AuthError
 from .utils.persistence import PersistentTotals
 
+# Yearly MyBattery energy counters list
+ENERGY_TOTAL_MB_KEYS: tuple[str, ...] = (
+    CONF_MB_ENERGY_CHARGE,
+    CONF_MB_ENERGY_DISCHARGE,
+    CONF_MB_ENERGY_CONSO_FROM_GRID,
+)
+
 # Daily MySmartBattery energy counters list
 ENERGY_TOTAL_MSB_KEYS: tuple[str, ...] = (
     CONF_ENERGY_PROD_FROM_SOLAR,
@@ -150,12 +157,8 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
                 parsed_data = await self._async_update_mb_vbattery_data()
                 if parsed_data:
                     data.update(parsed_data)
-                # Fetch MyBattery consumption data
-                parsed_data = await self._async_update_mb_consumption_data()
-                if parsed_data:
-                    data.update(parsed_data)
-                # Fetch MyBattery injection data
-                parsed_data = await self._async_update_mb_injection_data()
+                # Fetch MyBattery energy data
+                parsed_data = await self._async_update_mb_energy_data()
                 if parsed_data:
                     data.update(parsed_data)
 
@@ -520,7 +523,7 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
 
         return {}
 
-    # Fetch energy data for consumption and production with persistency management
+    # Fetch MySmartBattery energy data for consumption and production with persistency management
     async def _async_update_msb_energy_data(self) -> dict[str, Any]:
         """Return the energy totals to display."""
         # Close the days that are finished and not yet counted
@@ -531,7 +534,9 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
 
         total: dict[str, Any] = {}
         for key in ENERGY_TOTAL_MSB_KEYS:
-            new_value = self._totals.get(key) + today_values.get(key, 0.0)
+            new_value = self._totals.get(key) + _safe_get(
+                today_values, key, default=0.0
+            )
             # The API sometimes lowers a value: never display a decrease
             last_known = (self.data or {}).get(key, 0.0) or 0.0
             total[key] = max(new_value, last_known)
@@ -539,7 +544,7 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
         _LOGGER.debug(f"Total energies data retrieved: {total}")
         return total
 
-    # Close the days that are finished and not yet counted in the persistent counters
+    # Close the days that are finished and not yet counted in the MySmartBattery persistent counters
     async def _async_close_pending_msb_energy_persistent(self) -> None:
         """Add to the counters every finished day that is not counted yet."""
         yesterday = dt_util.now().date() - timedelta(days=1)
@@ -575,7 +580,7 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             _LOGGER.debug("Day %s added to the persistent counters: %s", day, values)
             day += timedelta(days=1)
 
-    # Fetch energy production and consumption data for a given date
+    # Fetch MySmartBattery energy production and consumption data for a given date
     async def _async_get_msb_energy_day(self, start: date) -> dict[str, float] | None:
         """Production + consumption for a period, or None if either call failed."""
         values: dict[str, Any] = {}
@@ -590,7 +595,7 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             return None
         return values
 
-    # Fetch energy production data for a given date and number of days
+    # Fetch MySmartBattery energy production data for a given date and number of days
     async def _async_get_msb_energy_production_days(
         self, start_date: str, days_nr: int = 1
     ) -> dict | None:
@@ -624,7 +629,7 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             _LOGGER.debug(f"Error while retrieving energy production data: {err}")
             return None
 
-    # Fetch energy consumption data for a given date and number of days
+    # Fetch MySmartBattery energy consumption data for a given date and number of days
     async def _async_get_msb_energy_consumption_days(
         self, start_date: str, days_nr: int = 1
     ) -> dict | None:
@@ -661,7 +666,7 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             _LOGGER.debug(f"Error while retrieving energy consumption data: {err}")
             return None
 
-    # Fetch energy production data for a given month of year
+    # Fetch MySmartBattery energy production data for a given month of year
     async def _async_get_msb_energy_production_month(
         self, year: int, month: int
     ) -> dict | None:
@@ -695,7 +700,7 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             _LOGGER.debug(f"Error while retrieving energy production data: {err}")
             return None
 
-    # Fetch energy consumption data for a given month of year
+    # Fetch MySmartBattery energy consumption data for a given month of year
     async def _async_get_msb_energy_consumption_month(
         self, year: int, month: int
     ) -> dict | None:
@@ -732,7 +737,7 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             _LOGGER.debug(f"Error while retrieving energy consumption data: {err}")
             return None
 
-    # Fetch energy production data for a given year
+    # Fetch MySmartBattery energy production data for a given year
     async def _async_get_msb_energy_production_year(self, year: int) -> dict | None:
         """Fetch production data from the requested year."""
         endpoint = f"/v3/production?aggregation=Year&count=1&date={year}-01-01"
@@ -764,7 +769,7 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             _LOGGER.debug(f"Error while retrieving energy production data: {err}")
             return None
 
-    # Fetch energy consumption data for a given year
+    # Fetch MySmartBattery energy consumption data for a given year
     async def _async_get_msb_energy_consumption_year(self, year: int) -> dict | None:
         """Fetch consumption data from the requested year."""
         endpoint = f"/v3/consumption?aggregation=Year&count=1&date={year}-01-01"
@@ -827,14 +832,81 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             )
         return {}
 
-    # Fetch yearly data for MB consumption
-    async def _async_update_mb_consumption_data(self) -> dict[str, Any]:
-        """Fetch all energy data from /v3/mb/dso/consumption/history endpoints."""
-        current_year = dt_util.now().date().strftime("%Y")
+    # Fetch MyBattery energy data for consumption and production with persistency management
+    async def _async_update_mb_energy_data(self) -> dict[str, Any]:
+        """Return the energy totals to display."""
+        current_year = dt_util.now().date().year
 
+        # Close the days that are finished and not yet counted
+        await self._async_close_pending_mb_energy_persistent()
+
+        # Retrieve current daily values
+        yearly_values = await self._async_get_mb_energy_year(current_year) or {}
+
+        total: dict[str, Any] = {}
+        for key in ENERGY_TOTAL_MB_KEYS:
+            _safe_get(self._totals, key)
+            new_value = self._totals.get(key) + _safe_get(
+                yearly_values, key, default=0.0
+            )
+            # The API sometimes lowers a value: never display a decrease
+            last_known = (self.data or {}).get(key, 0.0) or 0.0
+            total[key] = max(new_value, last_known)
+
+        _LOGGER.debug(f"Total energies data retrieved: {total}")
+        return total
+
+    # Close the days that are finished and not yet counted in the MySmartBattery persistent counters
+    async def _async_close_pending_mb_energy_persistent(self) -> None:
+        """Add to the counters every finished day that is not counted yet."""
+        last_year = dt_util.now().date().year - 1
+        last_closed = self._totals.last_closed_year_mb_energies
+
+        if last_closed is None:
+            _LOGGER.debug(
+                f"First run with this version, starting from year {last_year}."
+            )
+            self._totals.last_closed_year_mb_energies = last_year
+            await self._totals.async_save()
+            return
+
+        if last_closed >= last_year:
+            _LOGGER.debug(
+                f"No new year to add to the persistent counters (last closed: {last_closed}, last year: {last_year})."
+            )
+            return
+
+        # Fetch and add the last year data to the persistent counters
+        values = await self._async_get_mb_energy_year(last_year)
+        if values is None:
+            _LOGGER.warning(f"Energies of {last_year} not available, will retry.")
+            return
+        self._totals.append_values(values, ENERGY_TOTAL_MB_KEYS)
+        self._totals.last_closed_year_mb_energies = last_year
+        await self._totals.async_save()
+        _LOGGER.debug(f"Year {last_year} added to the persistent counters: {values}")
+
+    # Fetch MyBattery energy production and consumption data for a given date
+    async def _async_get_mb_energy_year(self, year: int) -> dict[str, float] | None:
+        """Production + consumption for a period, or None if either call failed."""
+        values: dict[str, Any] = {}
+        data = await self._async_get_mb_consumption_data(year)
+        if data:
+            values.update(data)
+            data = await self._async_get_mb_injection_data(year)
+            if data:
+                values.update(data)
+        if values is None:
+            _LOGGER.warning(f"Energies of {year} not available.")
+            return None
+        return values
+
+    # Fetch yearly data for MB consumption
+    async def _async_get_mb_consumption_data(self, year: int) -> dict[str, Any]:
+        """Fetch all energy data from /v3/mb/dso/consumption/history endpoints."""
         try:
             data = await self._api.async_call_api(
-                f"/v3/mb/dso/consumption/history?year={current_year}"
+                f"/v3/mb/dso/consumption/history?year={year}"
             )
 
             parsed: dict[str, Any] = {
@@ -856,13 +928,11 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
         return {}
 
     # Fetch yearly data for MB injection
-    async def _async_update_mb_injection_data(self) -> dict[str, Any]:
+    async def _async_get_mb_injection_data(self, year: int) -> dict[str, Any]:
         """Fetch all energy data from /v3/mb/dso/injection/history endpoints."""
-        current_year = dt_util.now().date().strftime("%Y")
-
         try:
             data = await self._api.async_call_api(
-                f"/v3/mb/dso/injection/history?year={current_year}"
+                f"/v3/mb/dso/injection/history?year={year}"
             )
 
             parsed: dict[str, Any] = {
