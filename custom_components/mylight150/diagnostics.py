@@ -54,13 +54,13 @@ DIAGNOSTIC_ENDPOINTS: list[tuple[str, str]] = [
     ("v3_mb_dso_injection_history_2026", "/v3/mb/dso/injection/history?year=2026"),
     ### MSB (MySmartBattery)
     ("v3_msb_legacy", "/v3/msb/legacy"),
-    ("v3_virtual_battery_state", "/v3/virtual-battery/state"),
+    ("v3_virtual-battery_state", "/v3/virtual-battery/state"),
     # Energy, production and consumption
     ("v3_energies", "/v3/energies"),
     ("v3_production", "/v3/production"),
-    ("v3_production_day", "/v3/production?aggregation=Days"),
+    ("v3_production_aggregation_Days", "/v3/production?aggregation=Days"),
     ("v3_consumption", "/v3/consumption"),
-    ("v3_consumption_day", "/v3/consumption?aggregation=Days"),
+    ("v3_consumption_aggregation_Days", "/v3/consumption?aggregation=Days"),
     # Live data
     ("v3_measures", "/v3/measures"),
     ("v3_measures_series", "/v3/measures/series"),
@@ -95,7 +95,7 @@ DIAGNOSTIC_ENDPOINTS: list[tuple[str, str]] = [
     ("evcharger", "/EVChargers"),
     # Savings and money pot
     ("v3_savings", "/v3/savings"),
-    ("v3_money_pot", "/v3/money-pot"),
+    ("v3_money-pot", "/v3/money-pot"),
 ]
 
 
