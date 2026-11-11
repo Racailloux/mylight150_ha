@@ -213,6 +213,56 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
 
         return ""
 
+    # Update pricing type and schedule in persistent data and config entry
+    async def _async_update_pricing_data(self) -> bool:
+        """Fetch pricing type and schedule to update persistent data."""
+        _LOGGER.debug("Updating pricing data...")
+        endpoint = "/v3/contract/energy-pricing"
+        try:
+            pricing_data = await self._api.async_call_api(endpoint)
+        except (
+            Mylight150AuthError,
+            Mylight150ApiError,
+            RequestException,
+            JSONDecodeError,
+        ) as err:
+            _LOGGER.warning("Error while retrieving pricing data.")
+            _LOGGER.debug(f"Error while retrieving pricing data: {err}")
+            return False
+
+        # Update pricing type
+        try:
+            # Load pricing type from entry and API and update it, if necessary
+            pricing_type = pricing_data.get("current", DEFAULT_PRICING_TYPE)
+            pricing_type_stored = self._entry.data.get(CONF_PRICING_TYPE, "")
+
+            if pricing_type != pricing_type_stored:
+                _LOGGER.info(
+                    f"Pricing type change detected! Configuration was '{pricing_type_stored}', new pricing is '{pricing_type}'."
+                )
+                entry_data = self._entry.data.copy()
+                entry_data[CONF_PRICING_TYPE] = pricing_type
+                self._hass.config_entries.async_update_entry(
+                    self._entry, data=entry_data
+                )
+                # await self._hass.config_entries.async_reload(self._entry.entry_id)
+
+        except (AttributeError, TypeError, HomeAssistantError) as err:
+            _LOGGER.warning("Error while updating pricing type.")
+            _LOGGER.debug(f"Error while updating pricing type: {err}")
+            return False
+
+        # Update schedule table
+        try:
+            schedule = pricing_data.get("schedule", {})
+            self.hphc_schedule = schedule.get("breakdown", [])
+            _LOGGER.debug("peak/offpeak schedule loaded: %s", self.hphc_schedule)
+        except (AttributeError, TypeError) as err:
+            _LOGGER.warning("Error while retrieving pricing schedule.")
+            _LOGGER.debug(f"Error while retrieving pricing schedule: {err}")
+
+        return True
+
     # Update options data in coordinator and send usefull ones to binary sensors
     async def _async_update_options_data(self) -> dict[str, Any]:
         """Fetch options data."""
@@ -353,95 +403,6 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             )
         return {}
 
-    # Fetch instant data for MB virtual battery
-    async def _async_update_mb_vbattery_data(self) -> dict[str, Any]:
-        """Fetch instant data from /v3/mb/dso endpoint."""
-        try:
-            data = await self._api.async_call_api("/v3/mb/dso")
-
-            lastUpdate = _safe_get(data, "lastUpdatedAt", default=None)
-            parsed: dict[str, Any] = {
-                CONF_MB_LAST_UPDATE: datetime.strptime(lastUpdate, "%Y-%m-%d").date()
-                if lastUpdate
-                else None,
-                CONF_MB_AUTONOMY: _safe_get(data, "stateOfCharge", default=None),
-            }
-            _LOGGER.debug(f"Data parsed for MyBattery virtual battery: {parsed}")
-            return parsed
-
-        except (
-            Mylight150AuthError,
-            Mylight150ApiError,
-            RequestException,
-            JSONDecodeError,
-        ) as err:
-            _LOGGER.warning("Error while retrieving MyBattery virtual battery data.")
-            _LOGGER.debug(
-                f"Error while retrieving MyBattery virtual battery data: {err}"
-            )
-        return {}
-
-    # Fetch yearly data for MB consumption
-    async def _async_update_mb_consumption_data(self) -> dict[str, Any]:
-        """Fetch all energy data from /v3/mb/dso/consumption/history endpoints."""
-        current_year = dt_util.now().date().strftime("%Y")
-
-        try:
-            data = await self._api.async_call_api(
-                f"/v3/mb/dso/consumption/history?year={current_year}"
-            )
-
-            parsed: dict[str, Any] = {
-                CONF_MB_ENERGY_CONSO_FROM_GRID: _safe_get(data, "total", default=None),
-            }
-            _LOGGER.debug(f"Data parsed for MyBattery consumption: {parsed}")
-            return parsed
-
-        except (
-            Mylight150AuthError,
-            Mylight150ApiError,
-            RequestException,
-            JSONDecodeError,
-        ) as err:
-            _LOGGER.warning("Error while retrieving MyBattery virtual battery data.")
-            _LOGGER.debug(
-                f"Error while retrieving MyBattery virtual battery data: {err}"
-            )
-        return {}
-
-    # Fetch yearly data for MB injection
-    async def _async_update_mb_injection_data(self) -> dict[str, Any]:
-        """Fetch all energy data from /v3/mb/dso/injection/history endpoints."""
-        current_year = dt_util.now().date().strftime("%Y")
-
-        try:
-            data = await self._api.async_call_api(
-                f"/v3/mb/dso/injection/history?year={current_year}"
-            )
-
-            parsed: dict[str, Any] = {
-                CONF_MB_ENERGY_CHARGE: _safe_get(
-                    data, "performances", "charge", default=None
-                ),
-                CONF_MB_ENERGY_DISCHARGE: _safe_get(
-                    data, "performances", "discharge", default=None
-                ),
-            }
-            _LOGGER.debug(f"Data parsed for MyBattery injection: {parsed}")
-            return parsed
-
-        except (
-            Mylight150AuthError,
-            Mylight150ApiError,
-            RequestException,
-            JSONDecodeError,
-        ) as err:
-            _LOGGER.warning("Error while retrieving MyBattery virtual battery data.")
-            _LOGGER.debug(
-                f"Error while retrieving MyBattery virtual battery data: {err}"
-            )
-        return {}
-
     # Fetch instant data of all equipments (evCharger, waterHeater, heatPump)
     async def _async_update_equipment_data(self) -> dict[str, Any]:
         """Fetch equipment data from /v3/equipments endpoint."""
@@ -560,13 +521,13 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
         return {}
 
     # Fetch energy data for consumption and production with persistency management
-    async def _async_update_energy_data(self) -> dict[str, Any]:
+    async def _async_update_msb_energy_data(self) -> dict[str, Any]:
         """Return the energy totals to display."""
         # Close the days that are finished and not yet counted
-        await self._async_close_pending_energy_persistent()
+        await self._async_close_pending_msb_energy_persistent()
 
         # Retrieve current daily values
-        today_values = await self._async_get_energy_day(dt_util.now().date()) or {}
+        today_values = await self._async_get_msb_energy_day(dt_util.now().date()) or {}
 
         total: dict[str, Any] = {}
         for key in ENERGY_TOTAL_MSB_KEYS:
@@ -578,7 +539,8 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
         _LOGGER.debug(f"Total energies data retrieved: {total}")
         return total
 
-    async def _async_close_pending_energy_persistent(self) -> None:
+    # Close the days that are finished and not yet counted in the persistent counters
+    async def _async_close_pending_msb_energy_persistent(self) -> None:
         """Add to the counters every finished day that is not counted yet."""
         yesterday = dt_util.now().date() - timedelta(days=1)
         last_closed = self._totals.last_closed_day_msb_energies
@@ -613,13 +575,14 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             _LOGGER.debug("Day %s added to the persistent counters: %s", day, values)
             day += timedelta(days=1)
 
-    async def _async_get_energy_day(self, start: date) -> dict[str, float] | None:
+    # Fetch energy production and consumption data for a given date
+    async def _async_get_msb_energy_day(self, start: date) -> dict[str, float] | None:
         """Production + consumption for a period, or None if either call failed."""
         values: dict[str, Any] = {}
-        data = await self._async_get_energy_production_days(start.isoformat())
+        data = await self._async_get_msb_energy_production_days(start.isoformat())
         if data:
             values.update(data)
-            data = await self._async_get_energy_consumption_days(start.isoformat())
+            data = await self._async_get_msb_energy_consumption_days(start.isoformat())
             if data:
                 values.update(data)
         if values is None:
@@ -628,7 +591,7 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
         return values
 
     # Fetch energy production data for a given date and number of days
-    async def _async_get_energy_production_days(
+    async def _async_get_msb_energy_production_days(
         self, start_date: str, days_nr: int = 1
     ) -> dict | None:
         """Fetch production data from the requested date and number of days."""
@@ -662,7 +625,7 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             return None
 
     # Fetch energy consumption data for a given date and number of days
-    async def _async_get_energy_consumption_days(
+    async def _async_get_msb_energy_consumption_days(
         self, start_date: str, days_nr: int = 1
     ) -> dict | None:
         """Fetch consumption data from the requested date and number of days."""
@@ -699,7 +662,7 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             return None
 
     # Fetch energy production data for a given month of year
-    async def _async_get_energy_production_month(
+    async def _async_get_msb_energy_production_month(
         self, year: int, month: int
     ) -> dict | None:
         """Fetch production data from the requested month."""
@@ -733,7 +696,7 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             return None
 
     # Fetch energy consumption data for a given month of year
-    async def _async_get_energy_consumption_month(
+    async def _async_get_msb_energy_consumption_month(
         self, year: int, month: int
     ) -> dict | None:
         """Fetch consumption data from the requested month."""
@@ -770,7 +733,7 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             return None
 
     # Fetch energy production data for a given year
-    async def _async_get_energy_production_year(self, year: int) -> dict | None:
+    async def _async_get_msb_energy_production_year(self, year: int) -> dict | None:
         """Fetch production data from the requested year."""
         endpoint = f"/v3/production?aggregation=Year&count=1&date={year}-01-01"
 
@@ -802,7 +765,7 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             return None
 
     # Fetch energy consumption data for a given year
-    async def _async_get_energy_consumption_year(self, year: int) -> dict | None:
+    async def _async_get_msb_energy_consumption_year(self, year: int) -> dict | None:
         """Fetch consumption data from the requested year."""
         endpoint = f"/v3/consumption?aggregation=Year&count=1&date={year}-01-01"
 
@@ -836,56 +799,94 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             _LOGGER.debug(f"Error while retrieving energy consumption data: {err}")
             return None
 
-    # Update pricing type and schedule in persistent data and config entry
-    async def _async_update_pricing_data(self) -> bool:
-        """Fetch pricing type and schedule to update persistent data."""
-        _LOGGER.debug("Updating pricing data...")
-        endpoint = "/v3/contract/energy-pricing"
+    # Fetch data for MB virtual battery
+    async def _async_update_mb_vbattery_data(self) -> dict[str, Any]:
+        """Fetch instant data from /v3/mb/dso endpoint."""
         try:
-            pricing_data = await self._api.async_call_api(endpoint)
+            data = await self._api.async_call_api("/v3/mb/dso")
+
+            lastUpdate = _safe_get(data, "lastUpdatedAt", default=None)
+            parsed: dict[str, Any] = {
+                CONF_MB_LAST_UPDATE: datetime.strptime(lastUpdate, "%Y-%m-%d").date()
+                if lastUpdate
+                else None,
+                CONF_MB_AUTONOMY: _safe_get(data, "stateOfCharge", default=None),
+            }
+            _LOGGER.debug(f"Data parsed for MyBattery virtual battery: {parsed}")
+            return parsed
+
         except (
             Mylight150AuthError,
             Mylight150ApiError,
             RequestException,
             JSONDecodeError,
         ) as err:
-            _LOGGER.warning("Error while retrieving pricing data.")
-            _LOGGER.debug(f"Error while retrieving pricing data: {err}")
-            return False
+            _LOGGER.warning("Error while retrieving MyBattery virtual battery data.")
+            _LOGGER.debug(
+                f"Error while retrieving MyBattery virtual battery data: {err}"
+            )
+        return {}
 
-        # Update pricing type
+    # Fetch yearly data for MB consumption
+    async def _async_update_mb_consumption_data(self) -> dict[str, Any]:
+        """Fetch all energy data from /v3/mb/dso/consumption/history endpoints."""
+        current_year = dt_util.now().date().strftime("%Y")
+
         try:
-            # Load pricing type from entry and API and update it, if necessary
-            pricing_type = pricing_data.get("current", DEFAULT_PRICING_TYPE)
-            pricing_type_stored = self._entry.data.get(CONF_PRICING_TYPE, "")
+            data = await self._api.async_call_api(
+                f"/v3/mb/dso/consumption/history?year={current_year}"
+            )
 
-            if pricing_type != pricing_type_stored:
-                _LOGGER.info(
-                    f"Pricing type change detected! Configuration was '{pricing_type_stored}', new pricing is '{pricing_type}'."
-                )
-                entry_data = self._entry.data.copy()
-                entry_data[CONF_PRICING_TYPE] = pricing_type
-                self._hass.config_entries.async_update_entry(
-                    self._entry, data=entry_data
-                )
-                # await self._hass.config_entries.async_reload(self._entry.entry_id)
+            parsed: dict[str, Any] = {
+                CONF_MB_ENERGY_CONSO_FROM_GRID: _safe_get(data, "total", default=None),
+            }
+            _LOGGER.debug(f"Data parsed for MyBattery consumption: {parsed}")
+            return parsed
 
-        except (AttributeError, TypeError, HomeAssistantError) as err:
-            _LOGGER.warning("Error while updating pricing type.")
-            _LOGGER.debug(f"Error while updating pricing type: {err}")
-            return False
+        except (
+            Mylight150AuthError,
+            Mylight150ApiError,
+            RequestException,
+            JSONDecodeError,
+        ) as err:
+            _LOGGER.warning("Error while retrieving MyBattery virtual battery data.")
+            _LOGGER.debug(
+                f"Error while retrieving MyBattery virtual battery data: {err}"
+            )
+        return {}
 
-        # Update schedule table
+    # Fetch yearly data for MB injection
+    async def _async_update_mb_injection_data(self) -> dict[str, Any]:
+        """Fetch all energy data from /v3/mb/dso/injection/history endpoints."""
+        current_year = dt_util.now().date().strftime("%Y")
+
         try:
-            schedule = pricing_data.get("schedule", {})
-            self.hphc_schedule = schedule.get("breakdown", [])
-            _LOGGER.debug("peak/offpeak schedule loaded: %s", self.hphc_schedule)
-        except (AttributeError, TypeError) as err:
-            _LOGGER.warning("Error while retrieving pricing schedule.")
-            _LOGGER.debug(f"Error while retrieving pricing schedule: {err}")
+            data = await self._api.async_call_api(
+                f"/v3/mb/dso/injection/history?year={current_year}"
+            )
 
-        return True
+            parsed: dict[str, Any] = {
+                CONF_MB_ENERGY_CHARGE: _safe_get(
+                    data, "performances", "charge", default=None
+                ),
+                CONF_MB_ENERGY_DISCHARGE: _safe_get(
+                    data, "performances", "discharge", default=None
+                ),
+            }
+            _LOGGER.debug(f"Data parsed for MyBattery injection: {parsed}")
+            return parsed
 
+        except (
+            Mylight150AuthError,
+            Mylight150ApiError,
+            RequestException,
+            JSONDecodeError,
+        ) as err:
+            _LOGGER.warning("Error while retrieving MyBattery virtual battery data.")
+            _LOGGER.debug(
+                f"Error while retrieving MyBattery virtual battery data: {err}"
+            )
+        return {}
 
 # Retrieve nested values from a dictionary safely
 def _safe_get(data: Any, *keys, default=None) -> Any:
