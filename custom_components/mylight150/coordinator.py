@@ -140,7 +140,7 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
                 if parsed_data:
                     data.update(parsed_data)
                 # Fetch energy data
-                parsed_data = await self._async_update_energy_data()
+                parsed_data = await self._async_update_msb_energy_data()
                 if parsed_data:
                     data.update(parsed_data)
 
@@ -564,7 +564,7 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
 
         day = first
         while day <= yesterday:
-            values = await self._async_get_energy_day(day)
+            values = await self._async_get_msb_energy_day(day)
             if values is None:
                 # Do not skip the day: nothing is counted, retry at next refresh
                 _LOGGER.warning("Energies of %s not available, will retry.", day)
@@ -887,6 +887,7 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
                 f"Error while retrieving MyBattery virtual battery data: {err}"
             )
         return {}
+
 
 # Retrieve nested values from a dictionary safely
 def _safe_get(data: Any, *keys, default=None) -> Any:
