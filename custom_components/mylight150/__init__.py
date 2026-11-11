@@ -18,8 +18,7 @@ from .const import (
     IDENTIFIER,
     PLATFORMS,
 )
-from .coordinator import Mylight150Coordinator
-from .utils.api import Mylight150ApiClient
+from .coordinator import Mylight150Coordinator, Mylight150ApiClient
 
 _LOGGER = logging.getLogger(__name__)
 
