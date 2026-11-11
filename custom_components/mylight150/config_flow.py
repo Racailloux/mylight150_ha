@@ -14,7 +14,6 @@ from homeassistant.helpers.selector import (
     NumberSelectorMode,
 )
 
-from .api import Mylight150ApiClient, Mylight150ApiError, Mylight150AuthError
 from .const import (
     CONF_PASSWORD,
     CONF_PRICING_BASE,
@@ -34,6 +33,7 @@ from .const import (
     MIN_UPDATE_INTERVAL,
 )
 from .schema import vol
+from .utils.api import Mylight150ApiClient, Mylight150ApiError, Mylight150AuthError
 
 _LOGGER = logging.getLogger(__name__)
 

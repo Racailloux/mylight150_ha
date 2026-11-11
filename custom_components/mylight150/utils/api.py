@@ -16,7 +16,7 @@ from homeassistant.core import HomeAssistant
 from requests import Session
 from requests.exceptions import RequestException
 
-from .const import (
+from ..const import (
     API_SUBSCRIPTION_KEY,
     API_URL,
     OAUTH_CLIENT_ID,

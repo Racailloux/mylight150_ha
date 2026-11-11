@@ -9,12 +9,10 @@ from typing import Any
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers.storage import Store
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 from homeassistant.util import dt as dt_util
 from requests.exceptions import JSONDecodeError, RequestException
 
-from .api import Mylight150ApiClient, Mylight150ApiError, Mylight150AuthError
 from .const import (
     CONF_ENERGY_CONSO_FROM_GRID,
     CONF_ENERGY_CONSO_FROM_MSB,
@@ -43,9 +41,21 @@ from .const import (
     EVCHARGER_CHARGING_TYPE,
     EVCHARGER_STATE,
 )
+from .utils.api import Mylight150ApiClient, Mylight150ApiError, Mylight150AuthError
+from .utils.persistence import PersistentTotals
 
-STORAGE_KEY = "mylight150_past_energies"
-STORAGE_VERSION = 1
+# Daily MySmartBattery energy counters list
+ENERGY_TOTAL_MSB_KEYS: tuple[str, ...] = (
+    CONF_ENERGY_PROD_FROM_SOLAR,
+    CONF_ENERGY_PROD_TO_MSB,
+    CONF_ENERGY_PROD_TO_GRID,
+    CONF_ENERGY_CONSUMPTION,
+    CONF_ENERGY_CONSO_FROM_SOLAR,
+    CONF_ENERGY_CONSO_FROM_MSB,
+    CONF_ENERGY_CONSO_FROM_GRID,
+)
+# Maximum day to try to retrieve after a long outage.
+MAX_CATCHUP_DAYS = 14
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -65,9 +75,8 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
         self._api = api
         self.installation_code: str | None = None
         self._last_refresh_date: date | None = None
-        # Init storage for long term persistency
-        self._store: Store[dict[str, Any]] = Store(hass, STORAGE_VERSION, STORAGE_KEY)
-        self._persistent: dict[str, Any] = {}
+        # Long term persistency: cumulative counters + closed periods bookkeeping
+        self._totals = PersistentTotals(hass)
         self.hphc_schedule: list[dict] = []
         self._has_mb: bool = False  # MyBattery
         self._has_msb: bool = False  # MySmartBattery
@@ -85,6 +94,7 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             update_interval=timedelta(minutes=update_interval_minutes),
         )
 
+    # Cyclic refresh every N minutes from configflow
     async def _async_update_data(self) -> dict[str, Any]:
         """Cyclic refresh every N minutes from config."""
         _LOGGER.info("Coordinator starts retrieving data")
@@ -173,20 +183,11 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
 
     # Load persistent data for long term persistency
     async def async_load_persistent_data(self) -> None:
-        """Load persistent data from .storage/ at startup."""
-        stored = await self._store.async_load()
-        if stored:
-            self._persistent.update(stored)
-            _LOGGER.debug("Persistent data loaded: %s", self._persistent)
-        else:
-            self._persistent = {}
-            _LOGGER.debug("No persistent data found, starting fresh.")
-
-    # Save persistent data for long term persistency
-    async def _async_save_persistent_data(self) -> None:
-        """Save persistent data to .storage/ at every first morning update."""
-        await self._store.async_save(self._persistent)
-        _LOGGER.debug("Persistent data saved: %s", self._persistent)
+        """Load persistent data from storage before the first refresh at startup."""
+        await self._totals.async_load()
+        _LOGGER.debug(
+            f"Persistent data loaded: last closed day {self._totals.last_closed_day_msb_energies}, last closed year {self._totals.last_closed_year_mb_energies}"
+        )
 
     # Fetch installation code for API v2 usage and diagnostics
     async def _async_update_installation_code(self) -> str:
@@ -558,92 +559,78 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
 
         return {}
 
-    # Fetch energy data for consumption and production
+    # Fetch energy data for consumption and production with persistency management
     async def _async_update_energy_data(self) -> dict[str, Any]:
-        """Fetch all energy data from /v3/consumption and /v3/production endpoints."""
-        today = dt_util.now().date()
-        yesterday = today - timedelta(days=1)
+        """Return the energy totals to display."""
+        # Close the days that are finished and not yet counted
+        await self._async_close_pending_energy_persistent()
 
-        strf_today = today.strftime("%Y-%m-%d")
-        strf_yesterday = yesterday.strftime("%Y-%m-%d")
+        # Retrieve current daily values
+        today_values = await self._async_get_energy_day(dt_util.now().date()) or {}
 
-        is_first_refresh_of_day = (
-            self._last_refresh_date is not None and self._last_refresh_date < today
-        )
-
-        if self._persistent is None or self._persistent == {}:
-            _LOGGER.debug("No persistent data found, start loading historical data...")
-            self._persistent = {}
-
-        if is_first_refresh_of_day:
-            _LOGGER.debug(
-                "First refresh of day %s — fetching yesterday's final value (%s).",
-                strf_today,
-                strf_yesterday,
-            )
-
-            # Get yesterday energies and update persistent data
-            yesterday_data: dict[str, Any] = {}
-            data = await self._async_get_energy_production_days(strf_yesterday)
-            if data:
-                yesterday_data.update(data)
-            data = await self._async_get_energy_consumption_days(strf_yesterday)
-            if data:
-                yesterday_data.update(data)
-
-            # Save in long term persistancy
-            for conf_key in [
-                CONF_ENERGY_PROD_FROM_SOLAR,
-                CONF_ENERGY_PROD_TO_MSB,
-                CONF_ENERGY_PROD_TO_GRID,
-                CONF_ENERGY_CONSUMPTION,
-                CONF_ENERGY_CONSO_FROM_SOLAR,
-                CONF_ENERGY_CONSO_FROM_MSB,
-                CONF_ENERGY_CONSO_FROM_GRID,
-            ]:
-                self._persistent[conf_key] = self._persistent.get(
-                    conf_key, 0.0
-                ) + yesterday_data.get(conf_key, 0.0)
-
-            await self._async_save_persistent_data()
-
-        # Retrieving data from current day to cumulate with past persistent data
-        _LOGGER.debug("Fetching energy data for date: %s", strf_today)
-        daily: dict[str, Any] = {}
-        data = await self._async_get_energy_production_days(strf_today)
-        if data:
-            daily.update(data)
-        data = await self._async_get_energy_consumption_days(strf_today)
-        if data:
-            daily.update(data)
-
-        # Generate sum of past and daily energies
         total: dict[str, Any] = {}
-        for conf_key in [
-            CONF_ENERGY_PROD_FROM_SOLAR,
-            CONF_ENERGY_PROD_TO_MSB,
-            CONF_ENERGY_PROD_TO_GRID,
-            CONF_ENERGY_CONSUMPTION,
-            CONF_ENERGY_CONSO_FROM_SOLAR,
-            CONF_ENERGY_CONSO_FROM_MSB,
-            CONF_ENERGY_CONSO_FROM_GRID,
-        ]:
-            past = self._persistent.get(conf_key, 0.0)
-            today = daily.get(conf_key, 0.0)
-            new_value = past + today
-
-            # Get last known value to filter API decrease that shouldn't be allowed
-            last_known = (self.data or {}).get(conf_key, 0.0) or 0.0
-            total[conf_key] = max(new_value, last_known)
+        for key in ENERGY_TOTAL_MSB_KEYS:
+            new_value = self._totals.get(key) + today_values.get(key, 0.0)
+            # The API sometimes lowers a value: never display a decrease
+            last_known = (self.data or {}).get(key, 0.0) or 0.0
+            total[key] = max(new_value, last_known)
 
         _LOGGER.debug(f"Total energies data retrieved: {total}")
-
         return total
+
+    async def _async_close_pending_energy_persistent(self) -> None:
+        """Add to the counters every finished day that is not counted yet."""
+        yesterday = dt_util.now().date() - timedelta(days=1)
+        last_closed = self._totals.last_closed_day_msb_energies
+
+        if last_closed is None:
+            # First run with this version, start from here
+            self._totals.last_closed_day_msb_energies = yesterday
+            await self._totals.async_save()
+            return
+
+        first = last_closed + timedelta(days=1)
+        oldest_allowed = yesterday - timedelta(days=MAX_CATCHUP_DAYS - 1)
+        if first < oldest_allowed:
+            _LOGGER.warning(
+                "Days from %s to %s will not be added (more than %s days missed).",
+                first,
+                oldest_allowed - timedelta(days=1),
+                MAX_CATCHUP_DAYS,
+            )
+            first = oldest_allowed
+
+        day = first
+        while day <= yesterday:
+            values = await self._async_get_energy_day(day)
+            if values is None:
+                # Do not skip the day: nothing is counted, retry at next refresh
+                _LOGGER.warning("Energies of %s not available, will retry.", day)
+                return
+            self._totals.append_values(values, ENERGY_TOTAL_MSB_KEYS)
+            self._totals.last_closed_day_msb_energies = day
+            await self._totals.async_save()
+            _LOGGER.debug("Day %s added to the persistent counters: %s", day, values)
+            day += timedelta(days=1)
+
+    async def _async_get_energy_day(self, start: date) -> dict[str, float] | None:
+        """Production + consumption for a period, or None if either call failed."""
+        values: dict[str, Any] = {}
+        data = await self._async_get_energy_production_days(start.isoformat())
+        if data:
+            values.update(data)
+            data = await self._async_get_energy_consumption_days(start.isoformat())
+            if data:
+                values.update(data)
+        if values is None:
+            _LOGGER.warning("Energies of %s not available, will retry.", start)
+            return None
+        return values
 
     # Fetch energy production data for a given date and number of days
     async def _async_get_energy_production_days(
         self, start_date: str, days_nr: int = 1
-    ) -> dict:
+    ) -> dict | None:
         """Fetch production data from the requested date and number of days."""
         endpoint = f"/v3/production?aggregation=Days&count={days_nr}&date={start_date}"
 
@@ -672,12 +659,12 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
         ) as err:
             _LOGGER.warning("Error while retrieving energy production data.")
             _LOGGER.debug(f"Error while retrieving energy production data: {err}")
-            return {}
+            return None
 
     # Fetch energy consumption data for a given date and number of days
     async def _async_get_energy_consumption_days(
         self, start_date: str, days_nr: int = 1
-    ) -> dict:
+    ) -> dict | None:
         """Fetch consumption data from the requested date and number of days."""
         endpoint = f"/v3/consumption?aggregation=Days&count={days_nr}&date={start_date}"
 
@@ -709,10 +696,12 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
         ) as err:
             _LOGGER.warning("Error while retrieving energy consumption data.")
             _LOGGER.debug(f"Error while retrieving energy consumption data: {err}")
-            return {}
+            return None
 
     # Fetch energy production data for a given month of year
-    async def _async_get_energy_production_month(self, year: int, month: int) -> dict:
+    async def _async_get_energy_production_month(
+        self, year: int, month: int
+    ) -> dict | None:
         """Fetch production data from the requested month."""
         endpoint = f"/v3/production?aggregation=Month&date={year}-{month}-01"
 
@@ -741,10 +730,12 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
         ) as err:
             _LOGGER.warning("Error while retrieving energy production data.")
             _LOGGER.debug(f"Error while retrieving energy production data: {err}")
-            return {}
+            return None
 
     # Fetch energy consumption data for a given month of year
-    async def _async_get_energy_consumption_month(self, year: int, month: int) -> dict:
+    async def _async_get_energy_consumption_month(
+        self, year: int, month: int
+    ) -> dict | None:
         """Fetch consumption data from the requested month."""
         endpoint = f"/v3/consumption?aggregation=Month&date={year}-{month}-01"
 
@@ -776,10 +767,10 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
         ) as err:
             _LOGGER.warning("Error while retrieving energy consumption data.")
             _LOGGER.debug(f"Error while retrieving energy consumption data: {err}")
-            return {}
+            return None
 
     # Fetch energy production data for a given year
-    async def _async_get_energy_production_year(self, year: int) -> dict:
+    async def _async_get_energy_production_year(self, year: int) -> dict | None:
         """Fetch production data from the requested year."""
         endpoint = f"/v3/production?aggregation=Year&count=1&date={year}-01-01"
 
@@ -808,10 +799,10 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
         ) as err:
             _LOGGER.warning("Error while retrieving energy production data.")
             _LOGGER.debug(f"Error while retrieving energy production data: {err}")
-            return {}
+            return None
 
     # Fetch energy consumption data for a given year
-    async def _async_get_energy_consumption_year(self, year: int) -> dict:
+    async def _async_get_energy_consumption_year(self, year: int) -> dict | None:
         """Fetch consumption data from the requested year."""
         endpoint = f"/v3/consumption?aggregation=Year&count=1&date={year}-01-01"
 
@@ -843,7 +834,7 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
         ) as err:
             _LOGGER.warning("Error while retrieving energy consumption data.")
             _LOGGER.debug(f"Error while retrieving energy consumption data: {err}")
-            return {}
+            return None
 
     # Update pricing type and schedule in persistent data and config entry
     async def _async_update_pricing_data(self) -> bool:
