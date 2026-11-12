@@ -1,6 +1,7 @@
 {
   "domain": "mylight150",
   "name": "mylight150",
+  "categories": ["energy.solar_batteries", "energy.meters_monitoring"],
   "codeowners": ["@Racailloux"],
   "config_flow": true,
   "dependencies": [],
