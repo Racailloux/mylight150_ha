@@ -1,0 +1,48 @@
+name: Backfill release zips
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      REPO: ${{ github.repository }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Generate and attach missing zips
+        run: |
+          set -euo pipefail
+          mapfile -t TAGS < <(gh release list --repo "$REPO" --limit 1000 \
+            --json tagName,isDraft --jq '.[] | select(.isDraft | not) | .tagName')
+
+          for TAG in "${TAGS[@]}"; do
+            if gh release view "$TAG" --repo "$REPO" --json assets \
+                 --jq '.assets[].name' | grep -qx 'mylight150.zip'; then
+              echo "$TAG : zip déjà présent, ignoré"
+              continue
+            fi
+
+            git checkout --force --quiet "tags/$TAG"
+
+            if [ ! -f custom_components/mylight150/manifest.json ]; then
+              echo "::warning::$TAG : custom_components/mylight150/manifest.json introuvable, ignoré"
+              continue
+            fi
+
+            echo "$TAG : génération du zip"
+            VERSION="${TAG#v}"
+            jq --arg v "$VERSION" '.version = $v' custom_components/mylight150/manifest.json > /tmp/manifest.json
+            mv /tmp/manifest.json custom_components/mylight150/manifest.json
+
+            rm -f /tmp/mylight150.zip
+            (cd custom_components/mylight150 && zip -qr /tmp/mylight150.zip .)
+            gh release upload "$TAG" /tmp/mylight150.zip --repo "$REPO" --clobber
+          done
