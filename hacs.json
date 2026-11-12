@@ -1,4 +1,5 @@
 {
     "name": "mylight150",
-    "homeassistant": "2024.4.0"
+    "homeassistant": "2024.4.0",
+    "filename": "mylight150.zip"
 }
