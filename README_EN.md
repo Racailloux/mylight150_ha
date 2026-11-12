@@ -72,7 +72,7 @@ Find configuration options under **Settings ➤ Devices & Services ➤ Integrati
 | `sensor.mylight150_option_mb`                      | MyBattery                                                                             |   -  | `binary`           |
 | `sensor.mylight150_option_msp`                     | MySMartPilot                                                                          |   -  | `binary`           |
 | `sensor.mylight150_option_waterheater`             | Water heater piloted option                                                           |   -  | `binary`           |
-| `sensor.mylight150_option_option_hvac`             | HVAC piloted option                                                                   |   -  | `binary`           |
+| `sensor.mylight150_option_option_hvac`             | Boiler piloted option                                                                 |   -  | `binary`           |
 | `sensor.mylight150_option_evcharger`               | EV Charger piloted option                                                             |   -  | `binary`           |
 | | | | |
 | `sensor.mylight150_pricing_mode`                   | Current pricing mode, depending on the contract.                                      |  -   | `text`             |
@@ -117,7 +117,7 @@ Find configuration options under **Settings ➤ Devices & Services ➤ Integrati
 | | | | |
 | `sensor.mylight150_waterHeater_mode`               | Current water heater mode                                                |  -   | `text`             |
 | | | | |
-| `sensor.mylight150_heatPump_mode`                  | Current heat pump mode                                                   |  -   | `text`             |
+| `sensor.mylight150_heatPump_mode`                  | Current boiler mode                                                      |  -   | `text`             |
 | | | | |
 | `sensor.mylight150_evcharger_state`                | EV charger state                                                         |   -  | `text`             |
 | `sensor.mylight150_evcharger_charging_type`        | EV charger charging type                                                 |   -  | `text`             |
