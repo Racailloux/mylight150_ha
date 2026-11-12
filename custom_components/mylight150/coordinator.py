@@ -26,8 +26,12 @@ from .const import (
     CONF_MB_ENERGY_CONSO_FROM_GRID,
     CONF_MB_ENERGY_DISCHARGE,
     CONF_MB_LAST_UPDATE,
+    CONF_MONEY_POT,
+    CONF_MONEY_POT_EVCHARGER,
+    CONF_MONEY_POT_HEATPUMP,
+    CONF_MONEY_POT_WATERHEATER,
     CONF_OPTION_EVCHARGER,
-    CONF_OPTION_HVAC,
+    CONF_OPTION_HEATPUMP,
     CONF_OPTION_MB,
     CONF_OPTION_MSB,
     CONF_OPTION_MSP,
@@ -91,7 +95,7 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
         self._has_msh: bool = False  # MySmartHeater
         self._has_msp: bool = False  # MySmartPilot
         self._has_evcharger: bool = False  # EV Charger
-        self._has_hvac: bool = False  # HVAC
+        self._has_heatpump: bool = False  # Heat Pump
         self._has_waterheater: bool = False  # Water Heater
 
         super().__init__(
@@ -296,7 +300,7 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
 
         # Update equipment data if MySmartPilot is available
         self._has_evcharger = False
-        self._has_hvac = False
+        self._has_heatpump = False
         self._has_waterheater = False
 
         if self._has_msp:
@@ -311,7 +315,7 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
                     if equipment_type and equipment_type == "evCharger":
                         self._has_evcharger = True
                     elif equipment_type and equipment_type == "heatPump":
-                        self._has_hvac = True
+                        self._has_heatpump = True
                     elif equipment_type and equipment_type == "waterHeater":
                         self._has_waterheater = True
             except (
@@ -324,7 +328,7 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
                 _LOGGER.debug(f"Error while retrieving contract options data: {err}")
 
         _LOGGER.debug(
-            f"Current options detected: MB={self._has_mb}, MSB={self._has_msb}, MSP={self._has_msp}, EV Charger={self._has_evcharger}, HVAC={self._has_hvac}, Water Heater={self._has_waterheater}"
+            f"Current options detected: MB={self._has_mb}, MSB={self._has_msb}, MSP={self._has_msp}, EV Charger={self._has_evcharger}, Heat pump={self._has_heatpump}, Water Heater={self._has_waterheater}"
         )
         return await self._async_update_options_sensors()
 
@@ -335,7 +339,7 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             CONF_OPTION_MSB: self._has_msb,
             CONF_OPTION_MSP: self._has_msp,
             CONF_OPTION_EVCHARGER: self._has_evcharger,
-            CONF_OPTION_HVAC: self._has_hvac,
+            CONF_OPTION_HEATPUMP: self._has_heatpump,
             CONF_OPTION_WATERHEATER: self._has_waterheater,
         }
 
@@ -501,12 +505,22 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
     # Update money-pot data
     async def _async_update_moneypot_data(self) -> dict[str, Any]:
         """Fetch instant data from /v3/money-pot endpoint."""
+
         try:
             data = await self._api.async_call_api("/v3/money-pot")
 
             parsed: dict[str, Any] = {
-                "money_pot": _safe_get(
-                    data, "payload", "balance", "value", default=0.0
+                CONF_MONEY_POT: _safe_get(
+                    data, "profit", "totalProfit", default=0.0
+                ),
+                CONF_MONEY_POT_EVCHARGER: _safe_get(
+                    data, "profit", "evChargersTotalProfit", default=0.0
+                ),
+                CONF_MONEY_POT_HEATPUMP: _safe_get(
+                    data, "profit", "heatPumpsTotalProfit", default=0.0
+                ),
+                CONF_MONEY_POT_WATERHEATER: _safe_get(
+                    data, "profit", "waterHeatersTotalProfit", default=0.0
                 ),
             }
             _LOGGER.debug("Data parsed for money-pot: %s", parsed)

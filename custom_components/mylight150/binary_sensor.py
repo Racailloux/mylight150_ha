@@ -14,7 +14,7 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
 from .const import (
     CONF_OPTION_EVCHARGER,
-    CONF_OPTION_HVAC,
+    CONF_OPTION_HEATPUMP,
     CONF_OPTION_MB,
     CONF_OPTION_MSB,
     CONF_OPTION_MSP,
@@ -47,8 +47,8 @@ BINARY_SENSORS: tuple[BinarySensorEntityDescription, ...] = (
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
     BinarySensorEntityDescription(
-        key=CONF_OPTION_HVAC,
-        translation_key=CONF_OPTION_HVAC,
+        key=CONF_OPTION_HEATPUMP,
+        translation_key=CONF_OPTION_HEATPUMP,
         entity_category=EntityCategory.DIAGNOSTIC,
     ),
     BinarySensorEntityDescription(

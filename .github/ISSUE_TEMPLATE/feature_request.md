@@ -24,5 +24,5 @@ How to enable mylight150 debugging?
 
 **Your installation details**
 Subscription (MySmartBattery / MyBattery / MySmartHome):
-Options (Water heater / HVAC / ev Charger / ...):
+Options (Water heater / Heat pump / ev Charger / ...):
 Any other details to help :

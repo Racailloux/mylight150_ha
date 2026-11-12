@@ -72,7 +72,7 @@ Find configuration options under **Settings ➤ Devices & Services ➤ Integrati
 | `sensor.mylight150_option_mb`                      | MyBattery                                                                             |   -  | `binary`           |
 | `sensor.mylight150_option_msp`                     | MySMartPilot                                                                          |   -  | `binary`           |
 | `sensor.mylight150_option_waterheater`             | Water heater piloted option                                                           |   -  | `binary`           |
-| `sensor.mylight150_option_option_hvac`             | HVAC piloted option                                                                   |   -  | `binary`           |
+| `sensor.mylight150_option_option_heatpump`         | Heat pump piloted option                                                              |   -  | `binary`           |
 | `sensor.mylight150_option_evcharger`               | EV Charger piloted option                                                             |   -  | `binary`           |
 | | | | |
 | `sensor.mylight150_pricing_mode`                   | Current pricing mode, depending on the contract.                                      |  -   | `text`             |

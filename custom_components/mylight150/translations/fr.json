@@ -146,11 +146,14 @@
         }
       },
       "current_pricing": { "name": "Tarif actuel" },
-      "money_pot": { "name": "Solde de la cagnotte" }
+      "money_pot": { "name": "Solde de la cagnotte" },
+      "money_pot_evcharger": { "name": "Cagnottage de la borne de recharge" },
+      "money_pot_heatpump": { "name": "Cagnottage de la chaudière" },
+      "money_pot_waterheater": { "name": "Cagnottage du chauffe-eau" }
     },
     "binary_sensor": {
       "option_evcharger": { "name": "Borne de recharge" },
-      "option_hvac": { "name": "Chaudière" },
+      "option_heatpump": { "name": "Chaudière" },
       "option_mb": { "name": "MyBattery" },
       "option_msb": { "name": "MySmartBattery" },
       "option_msp": { "name": "MySmartPilot" },

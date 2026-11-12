@@ -93,7 +93,7 @@
       "mb_energy_discharge": { "name": "Virtual battery discharge" },
       "mb_last_update": { "name": "Virtual battery last update" },
       "heatpump_mode": {
-        "name": "Boiler mode",
+        "name": "Heat pump mode",
         "state": {
           "off": "Off",
           "on": "On"
@@ -144,11 +144,14 @@
         }
       },
       "current_pricing": { "name": "Current pricing" },
-      "money_pot": { "name": "Moneypot balance" }
+      "money_pot": { "name": "Moneypot balance" },
+      "money_pot_evcharger": { "name": "EV charger money pot" },
+      "money_pot_heatpump": { "name": "Heat pump money pot" },
+      "money_pot_waterheater": { "name": "Water heater money pot" }
     },
     "binary_sensor": {
       "option_evcharger": { "name": "EV charger" },
-      "option_hvac": { "name": "Boiler" },
+      "option_heatpump": { "name": "Heat pump" },
       "option_mb": { "name": "MyBattery" },
       "option_msb": { "name": "MySmartBattery" },
       "option_msp": { "name": "MySmartPilot" },

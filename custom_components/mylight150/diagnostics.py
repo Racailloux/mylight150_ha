@@ -64,7 +64,7 @@ DIAGNOSTIC_ENDPOINTS: list[tuple[str, str]] = [
     # Live data
     ("v3_measures", "/v3/measures"),
     ("v3_measures_series", "/v3/measures/series"),
-    ### Piloted Equipment (HVAC, water heater, etc.)
+    ### Piloted Equipment (Heat pump, water heater, etc.)
     ("v2_equipments", "/v2/installations/{code}/equipments"),
     (
         "v2_electricalVehicle10",

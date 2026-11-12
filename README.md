@@ -75,7 +75,7 @@ Vous trouverez les options de configuration sous **Paramètres ➤ Appareils et 
 | `sensor.mylight150_option_mb`                      | MyBattery                                                                             |   -   | `binary`           |
 | `sensor.mylight150_option_msp`                     | MySMartPilot                                                                          |   -   | `binary`           |
 | `sensor.mylight150_option_waterheater`             | Option pilotage ballon d'eau chaude                                                   |   -   | `binary`           |
-| `sensor.mylight150_option_option_hvac`             | Option pilotage chaudière                                                             |   -   | `binary`           |
+| `sensor.mylight150_option_option_heatpump`         | Option pilotage pompe à chaleur                                                       |   -   | `binary`           |
 | `sensor.mylight150_option_evcharger`               | Option pilotage borne de recharge                                                     |   -   | `binary`           |
 | | | | |
 | `sensor.mylight150_pricing_mode`                   | Mode tarifaire actuel, selon le contrat.                                              |  -    | `text`             |
