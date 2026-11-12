@@ -11,5 +11,5 @@
   "issue_tracker": "https://github.com/Racailloux/mylight150_ha/issues",
   "loggers": ["mylight150"],
   "requirements": [],
-  "version": "1.0.0"
+  "version": "1.0.1"
 }
