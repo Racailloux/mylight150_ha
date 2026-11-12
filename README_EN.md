@@ -5,6 +5,7 @@
 [![GitHub Release][releases-shield]][releases] 
 [![Marketplace][marketplacebadge]][marketplace]
 [![License][license-shield]](LICENSE)
+
 [![GitHub Activity][commits-shield]][commits] 
 ![Project Maintenance][maintenance-shield]
 
