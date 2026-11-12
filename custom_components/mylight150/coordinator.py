@@ -510,9 +510,7 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             data = await self._api.async_call_api("/v3/money-pot")
 
             parsed: dict[str, Any] = {
-                CONF_MONEY_POT: _safe_get(
-                    data, "profit", "totalProfit", default=0.0
-                ),
+                CONF_MONEY_POT: _safe_get(data, "profit", "totalProfit", default=0.0),
                 CONF_MONEY_POT_EVCHARGER: _safe_get(
                     data, "profit", "evChargersTotalProfit", default=0.0
                 ),
