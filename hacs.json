@@ -1,5 +1,6 @@
 {
     "name": "mylight150",
+    "zip_release": true,
     "homeassistant": "2024.4.0",
     "filename": "mylight150.zip"
 }
