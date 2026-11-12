@@ -117,7 +117,7 @@ Find configuration options under **Settings ➤ Devices & Services ➤ Integrati
 | | | | |
 | `sensor.mylight150_waterHeater_mode`               | Current water heater mode                                                |  -   | `text`             |
 | | | | |
-| `sensor.mylight150_heatPump_mode`                  | Current heat pump mode                                                   |  -   | `text`             |
+| `sensor.mylight150_heatPump_mode`                  | Current boiler mode                                                      |  -   | `text`             |
 | | | | |
 | `sensor.mylight150_evcharger_state`                | EV charger state                                                         |   -  | `text`             |
 | `sensor.mylight150_evcharger_charging_type`        | EV charger charging type                                                 |   -  | `text`             |
