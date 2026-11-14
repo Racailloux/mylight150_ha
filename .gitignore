@@ -1,3 +1,4 @@
+/.venv
 /.vscode
 /custom_components/mylight150/tests
 /custom_components/.vscode
