@@ -33,6 +33,7 @@ from .const import (
     CONF_OPTION_EVCHARGER,
     CONF_OPTION_HEATPUMP,
     CONF_OPTION_MB,
+    CONF_OPTION_MBWE,
     CONF_OPTION_MSB,
     CONF_OPTION_MSP,
     CONF_OPTION_WATERHEATER,
@@ -94,6 +95,7 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
         self._has_msc: bool = False  # MySmartCommunity
         self._has_msh: bool = False  # MySmartHeater
         self._has_msp: bool = False  # MySmartPilot
+        self._has_mbwe: bool = False  # MyBatteryWithEms
         self._has_evcharger: bool = False  # EV Charger
         self._has_heatpump: bool = False  # Heat Pump
         self._has_waterheater: bool = False  # Water Heater
@@ -141,7 +143,7 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
                     data.update(parsed_data)
 
             # MySmartBattery data retrieval
-            if self._has_msb:
+            if self._has_msb or self._has_mbwe:
                 # Fetch virtual MySmartBattery data
                 parsed_data = await self._async_update_msb_vbattery_data()
                 if parsed_data:
@@ -156,7 +158,7 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
                     data.update(parsed_data)
 
             # MyBattery data retrieval
-            if self._has_mb:
+            if self._has_mb and not self._has_mbwe:
                 # Fetch virtual MyBattery data
                 parsed_data = await self._async_update_mb_vbattery_data()
                 if parsed_data:
@@ -283,6 +285,8 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
             self._has_mb = data.get("mb", None) != None
             # MySmartBattery
             self._has_msb = data.get("msb", None) != None
+            # MySmartPilot
+            self._has_mbwe = data.get("myBatteryWithEms", None) != None
             # MySmartCommunity
             self._has_msc = data.get("msc", None) != None
             # MySmartHeater
@@ -335,7 +339,8 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
     # Update options sensors to maintain their state in the coordinator data
     async def _async_update_options_sensors(self) -> dict[str, Any]:
         return {
-            CONF_OPTION_MB: self._has_mb,
+            CONF_OPTION_MB: self._has_mb or self._has_mbwe,
+            CONF_OPTION_MBWE: self._has_mbwe,
             CONF_OPTION_MSB: self._has_msb,
             CONF_OPTION_MSP: self._has_msp,
             CONF_OPTION_EVCHARGER: self._has_evcharger,

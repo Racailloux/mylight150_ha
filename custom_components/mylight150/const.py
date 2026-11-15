@@ -44,6 +44,7 @@ CONF_MONEY_POT_WATERHEATER = "money_pot_waterheater"
 CONF_OPTION_EVCHARGER = "option_evcharger"
 CONF_OPTION_HEATPUMP = "option_heatpump"
 CONF_OPTION_MB = "option_mb"
+CONF_OPTION_MBWE = "option_mbwe"
 CONF_OPTION_MSB = "option_msb"
 CONF_OPTION_MSP = "option_msp"
 CONF_OPTION_WATERHEATER = "option_waterheater"
@@ -100,6 +101,7 @@ __all__ = [
     "CONF_OPTION_EVCHARGER",
     "CONF_OPTION_HEATPUMP",
     "CONF_OPTION_MB",
+    "CONF_OPTION_MBWE",
     "CONF_OPTION_MSB",
     "CONF_OPTION_MSP",
     "CONF_OPTION_WATERHEATER",

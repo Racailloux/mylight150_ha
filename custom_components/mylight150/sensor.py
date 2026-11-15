@@ -5,7 +5,7 @@ from __future__ import annotations
 import logging
 from dataclasses import dataclass
 from datetime import timedelta
-from typing import Any
+from typing import Any, Literal
 
 from homeassistant.components.sensor import (
     SensorDeviceClass,
@@ -42,6 +42,7 @@ from .const import (
     CONF_OPTION_EVCHARGER,
     CONF_OPTION_HEATPUMP,
     CONF_OPTION_MB,
+    CONF_OPTION_MBWE,
     CONF_OPTION_MSB,
     CONF_OPTION_MSP,
     CONF_OPTION_WATERHEATER,
@@ -71,7 +72,18 @@ _LOGGER = logging.getLogger(__name__)
 class Mylight150SensorEntityDescription(SensorEntityDescription):
     """SensorEntityDescription extended with coordinator data_key."""
 
-    required_option: str | None = None
+    # Account options required for this sensor to be created. If empty, the sensor is always created.
+    required_options: tuple[tuple[str, bool], ...] = ()
+    # "any" : sensor is created if at least one of the required options is active; "all" : only if all are active
+    required_mode: Literal["all", "any"] = "all"
+
+
+def on(key: str) -> tuple[str, bool]:
+    return (key, True)
+
+
+def off(key: str) -> tuple[str, bool]:
+    return (key, False)
 
 
 # List all sensors
@@ -85,7 +97,8 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.POWER,
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:solar-power",
-        required_option=CONF_OPTION_MSB,
+        required_options=(on(CONF_OPTION_MSB), on(CONF_OPTION_MBWE)),
+        required_mode="any",
     ),
     Mylight150SensorEntityDescription(
         key="grid",
@@ -95,7 +108,8 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.POWER,
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:transmission-tower",
-        required_option=CONF_OPTION_MSB,
+        required_options=(on(CONF_OPTION_MSB), on(CONF_OPTION_MBWE)),
+        required_mode="any",
     ),
     Mylight150SensorEntityDescription(
         key="load",
@@ -105,14 +119,16 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.POWER,
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:home-lightning-bolt",
-        required_option=CONF_OPTION_MSB,
+        required_options=(on(CONF_OPTION_MSB), on(CONF_OPTION_MBWE)),
+        required_mode="any",
     ),
     Mylight150SensorEntityDescription(
         key="msb_state",
         has_entity_name=True,
         translation_key="msb_state",
         icon="mdi:battery-sync",
-        required_option=CONF_OPTION_MSB,
+        required_options=(on(CONF_OPTION_MSB), on(CONF_OPTION_MBWE)),
+        required_mode="any",
     ),
     Mylight150SensorEntityDescription(
         key="msb_power",
@@ -122,7 +138,8 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.POWER,
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:battery-charging",
-        required_option=CONF_OPTION_MSB,
+        required_options=(on(CONF_OPTION_MSB), on(CONF_OPTION_MBWE)),
+        required_mode="any",
     ),
     Mylight150SensorEntityDescription(
         key="msb_autonomy",
@@ -133,7 +150,8 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.ENERGY_STORAGE,
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:battery",
-        required_option=CONF_OPTION_MSB,
+        required_options=(on(CONF_OPTION_MSB), on(CONF_OPTION_MBWE)),
+        required_mode="any",
     ),
     Mylight150SensorEntityDescription(
         key="msb_capacity",
@@ -144,7 +162,8 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.ENERGY_STORAGE,
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:home-battery",
-        required_option=CONF_OPTION_MSB,
+        required_options=(on(CONF_OPTION_MSB), on(CONF_OPTION_MBWE)),
+        required_mode="any",
     ),
     Mylight150SensorEntityDescription(
         key="msb_level",
@@ -155,7 +174,8 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.BATTERY,
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:battery",
-        required_option=CONF_OPTION_MSB,
+        required_options=(on(CONF_OPTION_MSB), on(CONF_OPTION_MBWE)),
+        required_mode="any",
     ),
     # Total energy sensors (kWh)
     Mylight150SensorEntityDescription(
@@ -167,7 +187,8 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.TOTAL_INCREASING,
         icon="mdi:solar-power",
-        required_option=CONF_OPTION_MSB,
+        required_options=(on(CONF_OPTION_MSB), on(CONF_OPTION_MBWE)),
+        required_mode="any",
     ),
     Mylight150SensorEntityDescription(
         key=CONF_ENERGY_PROD_TO_MSB,
@@ -178,7 +199,8 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.TOTAL_INCREASING,
         icon="mdi:battery-arrow-up",
-        required_option=CONF_OPTION_MSB,
+        required_options=(on(CONF_OPTION_MSB), on(CONF_OPTION_MBWE)),
+        required_mode="any",
     ),
     Mylight150SensorEntityDescription(
         key=CONF_ENERGY_PROD_TO_GRID,
@@ -189,7 +211,8 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.TOTAL_INCREASING,
         icon="mdi:transmission-tower-import",
-        required_option=CONF_OPTION_MSB,
+        required_options=(on(CONF_OPTION_MSB), on(CONF_OPTION_MBWE)),
+        required_mode="any",
     ),
     Mylight150SensorEntityDescription(
         key=CONF_ENERGY_CONSUMPTION,
@@ -200,7 +223,8 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.TOTAL_INCREASING,
         icon="mdi:home-lightning-bolt",
-        required_option=CONF_OPTION_MSB,
+        required_options=(on(CONF_OPTION_MSB), on(CONF_OPTION_MBWE)),
+        required_mode="any",
     ),
     Mylight150SensorEntityDescription(
         key=CONF_ENERGY_CONSO_FROM_SOLAR,
@@ -211,7 +235,8 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.TOTAL_INCREASING,
         icon="mdi:solar-power-variant",
-        required_option=CONF_OPTION_MSB,
+        required_options=(on(CONF_OPTION_MSB), on(CONF_OPTION_MBWE)),
+        required_mode="any",
     ),
     Mylight150SensorEntityDescription(
         key=CONF_ENERGY_CONSO_FROM_MSB,
@@ -222,7 +247,8 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.TOTAL_INCREASING,
         icon="mdi:battery-arrow-down",
-        required_option=CONF_OPTION_MSB,
+        required_options=(on(CONF_OPTION_MSB), on(CONF_OPTION_MBWE)),
+        required_mode="any",
     ),
     Mylight150SensorEntityDescription(
         key=CONF_ENERGY_CONSO_FROM_GRID,
@@ -233,7 +259,8 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.TOTAL_INCREASING,
         icon="mdi:transmission-tower-export",
-        required_option=CONF_OPTION_MSB,
+        required_options=(on(CONF_OPTION_MSB), on(CONF_OPTION_MBWE)),
+        required_mode="any",
     ),
     # MyBattery (virtual battery) sensors
     Mylight150SensorEntityDescription(
@@ -242,7 +269,7 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
         translation_key=CONF_MB_LAST_UPDATE,
         device_class=SensorDeviceClass.DATE,
         icon="mdi:calendar-clock",
-        required_option=CONF_OPTION_MB,
+        required_options=(on(CONF_OPTION_MB), off(CONF_OPTION_MBWE)),
     ),
     Mylight150SensorEntityDescription(
         key=CONF_MB_AUTONOMY,
@@ -253,7 +280,7 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.ENERGY_STORAGE,
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:battery",
-        required_option=CONF_OPTION_MB,
+        required_options=(on(CONF_OPTION_MB), off(CONF_OPTION_MBWE)),
     ),
     Mylight150SensorEntityDescription(
         key=CONF_MB_ENERGY_CHARGE,
@@ -264,7 +291,7 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.TOTAL_INCREASING,
         icon="mdi:battery-arrow-up",
-        required_option=CONF_OPTION_MB,
+        required_options=(on(CONF_OPTION_MB), off(CONF_OPTION_MBWE)),
     ),
     Mylight150SensorEntityDescription(
         key=CONF_MB_ENERGY_CONSO_FROM_GRID,
@@ -275,7 +302,7 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.TOTAL_INCREASING,
         icon="mdi:transmission-tower-export",
-        required_option=CONF_OPTION_MB,
+        required_options=(on(CONF_OPTION_MB), off(CONF_OPTION_MBWE)),
     ),
     Mylight150SensorEntityDescription(
         key=CONF_MB_ENERGY_DISCHARGE,
@@ -286,7 +313,7 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.TOTAL_INCREASING,
         icon="mdi:battery-arrow-down",
-        required_option=CONF_OPTION_MB,
+        required_options=(on(CONF_OPTION_MB), off(CONF_OPTION_MBWE)),
     ),
     # MySmartPilot equipments sensors
     Mylight150SensorEntityDescription(
@@ -294,28 +321,28 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
         has_entity_name=True,
         translation_key="heatpump_mode",
         icon="mdi:heating-coil",
-        required_option=CONF_OPTION_HEATPUMP,
+        required_options=(on(CONF_OPTION_HEATPUMP),),
     ),
     Mylight150SensorEntityDescription(
         key="waterHeater_mode",
         has_entity_name=True,
         translation_key="waterheater_mode",
         icon="mdi:water-boiler",
-        required_option=CONF_OPTION_WATERHEATER,
+        required_options=(on(CONF_OPTION_WATERHEATER),),
     ),
     Mylight150SensorEntityDescription(
         key=EVCHARGER_STATE,
         has_entity_name=True,
         translation_key=EVCHARGER_STATE,
         icon="mdi:car-electric",
-        required_option=CONF_OPTION_EVCHARGER,
+        required_options=(on(CONF_OPTION_EVCHARGER),),
     ),
     Mylight150SensorEntityDescription(
         key=EVCHARGER_CHARGING_TYPE,
         has_entity_name=True,
         translation_key=EVCHARGER_CHARGING_TYPE,
         icon="mdi:ev-plug-type1",
-        required_option=CONF_OPTION_EVCHARGER,
+        required_options=(on(CONF_OPTION_EVCHARGER),),
     ),
     Mylight150SensorEntityDescription(
         key=EVCHARGER_CHARGING_CONSUMPTION,
@@ -326,7 +353,7 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.ENERGY,
         state_class=SensorStateClass.TOTAL,
         icon="mdi:ev-station",
-        required_option=CONF_OPTION_EVCHARGER,
+        required_options=(on(CONF_OPTION_EVCHARGER),),
     ),
     Mylight150SensorEntityDescription(
         key=EVCHARGER_CHARGING_COST,
@@ -337,7 +364,7 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.MONETARY,
         state_class=SensorStateClass.TOTAL,
         icon="mdi:cash",
-        required_option=CONF_OPTION_EVCHARGER,
+        required_options=(on(CONF_OPTION_EVCHARGER),),
     ),
     Mylight150SensorEntityDescription(
         key=EVCHARGER_CHARGING_MONEYPOT,
@@ -348,7 +375,7 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
         device_class=SensorDeviceClass.MONETARY,
         state_class=SensorStateClass.TOTAL,
         icon="mdi:piggy-bank",
-        required_option=CONF_OPTION_EVCHARGER,
+        required_options=(on(CONF_OPTION_EVCHARGER),),
     ),
     # Money sensors
     Mylight150SensorEntityDescription(
@@ -358,7 +385,7 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
         native_unit_of_measurement="€",
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:piggy-bank",
-        required_option=CONF_OPTION_MSP,
+        required_options=(on(CONF_OPTION_MSP),),
     ),
     Mylight150SensorEntityDescription(
         key=CONF_MONEY_POT_EVCHARGER,
@@ -367,7 +394,7 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
         native_unit_of_measurement="€",
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:piggy-bank",
-        required_option=CONF_OPTION_EVCHARGER,
+        required_options=(on(CONF_OPTION_EVCHARGER),),
     ),
     Mylight150SensorEntityDescription(
         key=CONF_MONEY_POT_HEATPUMP,
@@ -376,7 +403,7 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
         native_unit_of_measurement="€",
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:piggy-bank",
-        required_option=CONF_OPTION_HEATPUMP,
+        required_options=(on(CONF_OPTION_HEATPUMP),),
     ),
     Mylight150SensorEntityDescription(
         key=CONF_MONEY_POT_WATERHEATER,
@@ -385,16 +412,22 @@ SENSORS: tuple[Mylight150SensorEntityDescription, ...] = (
         native_unit_of_measurement="€",
         state_class=SensorStateClass.MEASUREMENT,
         icon="mdi:piggy-bank",
-        required_option=CONF_OPTION_WATERHEATER,
+        required_options=(on(CONF_OPTION_WATERHEATER),),
     ),
 )
 
 
 def _is_wanted(desc: Mylight150SensorEntityDescription, data: dict[str, Any]) -> bool:
     """Tell if a sensor must be created, according to the option availability"""
-    if desc.required_option is None:
+    if not desc.required_options:
         return True
-    return data.get(desc.required_option) is not False
+    # Check if all required options are present in the data, and if their value matches the expected one
+    violated = [
+        data.get(key) is (not expected) for key, expected in desc.required_options
+    ]
+    if desc.required_mode == "any":
+        return not all(violated)
+    return not any(violated)
 
 
 async def async_setup_entry(
@@ -417,7 +450,7 @@ async def async_setup_entry(
         )
         if entity_id:
             _LOGGER.debug(
-                f"Removing sensor {entity_id} (option {desc.required_option} not active)"
+                f"Removing sensor {entity_id} (option {desc.required_options} not active)"
             )
             registry.async_remove(entity_id)
 
