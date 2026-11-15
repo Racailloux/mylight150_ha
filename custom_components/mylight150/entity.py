@@ -7,15 +7,19 @@ from homeassistant.helpers.device_registry import DeviceInfo
 from .const import DOMAIN, IDENTIFIER
 
 
+def build_modeled_device_info(model: str) -> DeviceInfo:
+    """Single source of truth for the device shared by all platforms with the given model designed."""
+    device_info = build_device_info()
+    device_info["model"] = model
+    return device_info
+
+
 def build_device_info() -> DeviceInfo:
-    """Single source of truth for the device shared by all platforms.
-    Every entity (sensor, binary_sensor, ...) must return exactly the same
-    DeviceInfo, so Home Assistant attaches them all to one device.
-    """
+    """Single source of truth for the device shared by all platforms."""
     return DeviceInfo(
         identifiers={(DOMAIN, IDENTIFIER)},
         name="mylight150",
-        manufacturer="mylight150 Systems",
+        manufacturer="mylight systems",
         model="",
-        configuration_url="https://client.mylight150.com",
+        configuration_url=None,
     )

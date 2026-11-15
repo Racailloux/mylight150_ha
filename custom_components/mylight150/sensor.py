@@ -17,6 +17,7 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import PERCENTAGE, UnitOfEnergy, UnitOfPower
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers import entity_registry as er
+from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
@@ -62,7 +63,7 @@ from .const import (
     EVCHARGER_STATE,
 )
 from .coordinator import Mylight150Coordinator
-from .entity import build_device_info
+from .entity import build_device_info, build_modeled_device_info
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -430,6 +431,20 @@ def _is_wanted(desc: Mylight150SensorEntityDescription, data: dict[str, Any]) ->
     return not any(violated)
 
 
+def _build_device_info(coordinator: Mylight150Coordinator) -> DeviceInfo:
+    """Build the device info for the mylight150 device, depending on the account options."""
+    data = coordinator.data or None
+    if data is not None:
+        _has_msb = data.get(CONF_OPTION_MSB)
+        _has_mb = data.get(CONF_OPTION_MB)
+
+        if _has_msb:
+            return build_modeled_device_info("MySmartBattery")
+        elif _has_mb:
+            return build_modeled_device_info("MyBattery")
+    return build_device_info()
+
+
 async def async_setup_entry(
     hass: HomeAssistant,
     entry: ConfigEntry,
@@ -488,7 +503,7 @@ class Mylight150SensorEntity(  # type: ignore[reportIncompatibleVariableOverride
         self._attr_unique_id = f"{DOMAIN}_{entry.entry_id}_{description.key}"
 
         # Device association
-        self._attr_device_info = build_device_info()
+        self._attr_device_info = _build_device_info(coordinator)
 
     @property
     def native_value(self) -> Any:  # type: ignore[reportIncompatibleVariableOverride]
@@ -517,7 +532,7 @@ class Mylight150PricingModeSensorEntity(  # type: ignore[reportIncompatibleVaria
         self._attr_icon = "mdi:clock-time-eight-outline"
 
         # Device association
-        self._attr_device_info = build_device_info()
+        self._attr_device_info = _build_device_info(coordinator)
 
     async def async_added_to_hass(self) -> None:
         await super().async_added_to_hass()
@@ -579,7 +594,7 @@ class Mylight150CurrentPricingSensorEntity(  # type: ignore[reportIncompatibleVa
         self._attr_icon = "mdi:currency-eur"
 
         # Device association
-        self._attr_device_info = build_device_info()
+        self._attr_device_info = _build_device_info(coordinator)
 
     async def async_added_to_hass(self) -> None:
         await super().async_added_to_hass()
