@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import asyncio
 import base64
 import email.utils
 import hashlib
@@ -28,6 +29,9 @@ from ..const import (
 
 _LOGGER = logging.getLogger(__name__)
 
+# Used for every login/refresh request (connect, read) timeout in seconds.
+LOGIN_TIMEOUT = (10, 30)
+
 
 class Mylight150AuthError(Exception):
     """Raised when authentication fails (bad credentials, expired tokens...)."""
@@ -51,6 +55,7 @@ class Mylight150ApiClient:
         self._refresh_token: str | None = None
         self._token_expires_at: float = 0.0
         self._refresh_token_expires_at: float = 0.0
+        self._token_lock = asyncio.Lock()
 
     # Public interfaces
     async def async_login_test(self) -> bool:
@@ -74,6 +79,11 @@ class Mylight150ApiClient:
 
     async def async_get_token(self) -> str:
         """Return a valid access token, or None if failed. Refreshing or re-logging if needed."""
+        async with self._token_lock:
+            return await self._async_get_token_unlocked()
+
+    async def _async_get_token_unlocked(self) -> str:
+        """Check/refresh/login logic. Must be called with the token lock held."""
         # 30 seconds margin to avoid token expiration during API calls
         now = datetime.now(UTC).timestamp() + 30
         _LOGGER.debug(
@@ -181,7 +191,10 @@ class Mylight150ApiClient:
         _LOGGER.debug(
             f"Starting executor thread to proceed to a full login for account: {self._username}"
         )
-        return await self._hass.async_add_executor_job(self._sync_login)
+        try:
+            return await self._hass.async_add_executor_job(self._sync_login)
+        except RequestException as err:
+            raise Mylight150ApiError(f"Login request failed: {err}") from err
 
     def _sync_login(self) -> str:
         # New connection, recreate a new session
@@ -210,7 +223,7 @@ class Mylight150ApiClient:
             f"code_challenge={code_challenge}&code_challenge_method=S256"
         )
 
-        response = self._session.get(form_url)
+        response = self._session.get(form_url, timeout=LOGIN_TIMEOUT)
         if response.status_code != 200:
             _LOGGER.warning(f"Step 1 Response code: {response.status_code}")
             _LOGGER.debug(f"Response text: {response.text[:200]}")
@@ -239,7 +252,9 @@ class Mylight150ApiClient:
             "password": self._password,
         }
 
-        response = self._session.post(self_asserted_url, data=data, headers=headers)
+        response = self._session.post(
+            self_asserted_url, data=data, headers=headers, timeout=LOGIN_TIMEOUT
+        )
         if response.status_code != 200:
             _LOGGER.warning(f"Step 2 failed! Response code: {response.status_code}")
             _LOGGER.debug(f"Response text: {response.text[:200]}")
@@ -258,7 +273,10 @@ class Mylight150ApiClient:
         }
 
         response = self._session.get(
-            confirmation_url, headers=headers, allow_redirects=False
+            confirmation_url,
+            headers=headers,
+            allow_redirects=False,
+            timeout=LOGIN_TIMEOUT,
         )
         if response.status_code != 302:
             _LOGGER.warning(f"Step 3 failed! Response code: {response.status_code}")
@@ -266,7 +284,12 @@ class Mylight150ApiClient:
             raise Mylight150AuthError(f"Step 3 failed: got {response.status_code}")
 
         redirect_url = response.headers.get("Location", "")
-        fragment = redirect_url.split("#")[1]
+        if "#" not in redirect_url:
+            _LOGGER.warning(
+                f"Step 3 failed! No fragment in redirect URL: {redirect_url[:100]}..."
+            )
+            raise Mylight150AuthError("Step 3: Missing fragment in redirect URL")
+        fragment = redirect_url.split("#", 1)[1]
         params = parse_qs(fragment)
         auth_code = params.get("code", [None])[0]
         if not auth_code:
@@ -286,7 +309,9 @@ class Mylight150ApiClient:
             "redirect_uri": OAUTH_REDIRECT_URI,
         }
 
-        response = self._session.post(token_url, data=data, allow_redirects=False)
+        response = self._session.post(
+            token_url, data=data, allow_redirects=False, timeout=LOGIN_TIMEOUT
+        )
         if response.status_code != 200:
             _LOGGER.warning(f"Step 4 failed! Response code: {response.status_code}")
             _LOGGER.debug(f"Response text: {response.text[:200]}")
@@ -299,7 +324,7 @@ class Mylight150ApiClient:
         access_token = token_data.get("access_token")
         if not access_token:
             _LOGGER.warning(
-                f"Step 4 failed! Missing access_token in response: {token_data[:100]}..."
+                f"Step 4 failed! Missing access_token in response: {str(token_data)[:100]}..."
             )
             raise Mylight150AuthError("Step 4: Missing access_token in response")
 
@@ -319,7 +344,12 @@ class Mylight150ApiClient:
         _LOGGER.debug(
             f"Starting executor thread to proceed to an access token refresh for account: {self._username}"
         )
-        return await self._hass.async_add_executor_job(self._sync_refresh_access_token)
+        try:
+            return await self._hass.async_add_executor_job(
+                self._sync_refresh_access_token
+            )
+        except RequestException as err:
+            raise Mylight150ApiError(f"Token refresh request failed: {err}") from err
 
     def _sync_refresh_access_token(self) -> str:
         """Use refresh_token to get a new access_token."""
@@ -331,7 +361,9 @@ class Mylight150ApiClient:
             "scope": OAUTH_SCOPE,
         }
 
-        response = self._session.post(url, data=data, allow_redirects=False)
+        response = self._session.post(
+            url, data=data, allow_redirects=False, timeout=LOGIN_TIMEOUT
+        )
         if response.status_code != 200:
             _LOGGER.debug(
                 f"Token refresh failed ({response.status_code}), will try a full login."
@@ -344,7 +376,7 @@ class Mylight150ApiClient:
 
         if not access_token:
             _LOGGER.debug(
-                f"Access token not found during refresh, will trying a full login. : {token_data[:100]}..."
+                f"Access token not found during refresh, will trying a full login. : {str(token_data)[:100]}..."
             )
             return self._sync_login()
 

@@ -8,8 +8,8 @@ from typing import Any
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from homeassistant.exceptions import HomeAssistantError
-from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
+from homeassistant.exceptions import ConfigEntryAuthFailed, HomeAssistantError
+from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.util import dt as dt_util
 from requests.exceptions import JSONDecodeError, RequestException
 
@@ -68,6 +68,8 @@ ENERGY_TOTAL_MSB_KEYS: tuple[str, ...] = (
 )
 # Maximum day to try to retrieve after a long outage.
 MAX_CATCHUP_DAYS = 14
+# Maximum number of attempts to retrieve the installation code from /v2 endpoint.
+MAX_INSTALLATION_CODE_ATTEMPTS = 3
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -86,6 +88,7 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
         self._entry = entry
         self._api = api
         self.installation_code: str | None = None
+        self._installation_code_attempts: int = 0
         self._last_refresh_date: date | None = None
         # Long term persistency: cumulative counters + closed periods bookkeeping
         self._totals = PersistentTotals(hass)
@@ -113,7 +116,11 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
         _LOGGER.info("Coordinator starts retrieving data")
         try:
             # Fetch installation code if not already done > Only needed for historical users
-            if not self.installation_code:
+            if (
+                not self.installation_code
+                and self._installation_code_attempts < MAX_INSTALLATION_CODE_ATTEMPTS
+            ):
+                self._installation_code_attempts += 1
                 self.installation_code = await self._async_update_installation_code()
                 _LOGGER.debug("Installation code: %s", self.installation_code)
 
@@ -187,7 +194,7 @@ class Mylight150Coordinator(DataUpdateCoordinator[dict[str, Any]]):
         except Mylight150AuthError as err:
             _LOGGER.warning(f"Authentification error: {err}", err)
         except Mylight150ApiError as err:
-            _LOGGER.warning(f"API error: {err}", err)
+            _LOGGER.warning(f"API error: {err}")
         return {}
 
     # Load persistent data for long term persistency
